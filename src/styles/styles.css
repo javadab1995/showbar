@@ -1,0 +1,431 @@
+
+
+@import url("https://fonts.googleapis.com/css2?family=Markazi+Text:wght@400..700&display=swap");
+@import "tailwindcss";
+/* =========================================================
+   SHOWBAR DESIGN TOKENS
+   ========================================================= */
+
+   @theme inline {
+  /* Colors */
+  --color-primary: var(--primary);
+  --color-primary-dark: var(--primary-dark);
+  --color-primary-soft: var(--primary-soft);
+
+  --color-background: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+
+  --color-border: var(--border);
+
+  --color-text: var(--text);
+  --color-text-2: var(--text-2);
+  --color-muted: var(--muted);
+
+  --color-success: var(--success) !important;
+  --color-warning: var(--warning) !important;
+  --color-danger: var(--danger) !important;
+  
+
+  /* Font */
+  --font-sans: var(--font-sans) !important;
+}
+
+@utility filter-select {
+  @apply  w-auto rounded-full hover:border-primary border border-border text-sm  px-3 py-1 h-9 min-w-0 text-text outline-none transition ;
+}
+
+@utility filter-select-hover {
+  @apply hover:border-primary;
+}
+@utility bg-primary-radial {
+  background:
+    radial-gradient(
+      ellipse 9px 6px at 14% 25%,
+      transparent 45%,
+      var(--color-primary-dark) 48% 62%,
+      transparent 65%
+    ),
+    radial-gradient(
+      ellipse 12px 8px at 40% 70%,
+      transparent 43%,
+      var(--color-primary-dark) 46% 60%,
+      transparent 63%
+    ),
+    radial-gradient(
+      ellipse 7px 11px at 66% 25%,
+      transparent 44%,
+      var(--color-primary-dark) 47% 61%,
+      transparent 64%
+    ),
+    radial-gradient(
+      ellipse 14px 7px at 86% 72%,
+      transparent 43%,
+      var(--color-primary-dark) 46% 60%,
+      transparent 63%
+    ),
+    radial-gradient(
+      ellipse 5px 3px at 25% 80%,
+      var(--color-primary-dark) 0 70%,
+      transparent 73%
+    ),
+    linear-gradient(
+      135deg,
+      var(--color-primary),
+      var(--color-primary-dark)
+    );
+}
+@utility bg-surface-radial {
+  background:
+    radial-gradient(
+      ellipse 9px 6px at 14% 25%,
+      transparent 45%,
+      var(--color-text-2) 48% 62%,
+      transparent 65%
+    ),
+    radial-gradient(
+      ellipse 12px 8px at 40% 70%,
+      transparent 43%,
+      var(--color-text-2) 46% 60%,
+      transparent 63%
+    ),
+    radial-gradient(
+      ellipse 7px 11px at 66% 25%,
+      transparent 44%,
+      var(--color-text-2) 47% 61%,
+      transparent 64%
+    ),
+    radial-gradient(
+      ellipse 14px 7px at 86% 72%,
+      transparent 43%,
+      var(--color-text-2) 46% 60%,
+      transparent 63%
+    ),
+    radial-gradient(
+      ellipse 5px 3px at 25% 80%,
+      var(--color-text-2) 0 70%,
+      transparent 73%
+    ),
+    linear-gradient(
+      135deg,
+      var(--color-text),
+      var(--color-text-2)
+    );
+}
+@utility bg-login-pattern {
+  background:
+    /* لکه‌های بزرگ */
+    radial-gradient(
+      ellipse 34px 22px at 8% 14%,
+      var(--color-primary-dark) 0%,
+      var(--color-primary-dark) 62%,
+      transparent 66%
+    ),
+
+    radial-gradient(
+      ellipse 26px 38px at 24% 72%,
+      var(--color-primary-dark) 0%,
+      var(--color-primary-dark) 60%,
+      transparent 65%
+    ),
+
+    radial-gradient(
+      ellipse 42px 25px at 48% 18%,
+      var(--color-primary-dark) 0%,
+      var(--color-primary-dark) 58%,
+      transparent 64%
+    ),
+
+    radial-gradient(
+      ellipse 30px 44px at 72% 64%,
+      var(--color-primary-dark) 0%,
+      var(--color-primary-dark) 58%,
+      transparent 64%
+    ),
+
+    radial-gradient(
+      ellipse 46px 28px at 94% 22%,
+      var(--color-primary-dark) 0%,
+      var(--color-primary-dark) 60%,
+      transparent 66%
+    ),
+
+    /* لکه‌های متوسط */
+    radial-gradient(
+      ellipse 16px 11px at 17% 42%,
+      var(--color-primary-dark) 0%,
+      var(--color-primary-dark) 62%,
+      transparent 68%
+    ),
+
+    radial-gradient(
+      ellipse 12px 18px at 37% 86%,
+      var(--color-primary-dark) 0%,
+      var(--color-primary-dark) 60%,
+      transparent 67%
+    ),
+
+    radial-gradient(
+      ellipse 19px 13px at 63% 40%,
+      var(--color-primary-dark) 0%,
+      var(--color-primary-dark) 60%,
+      transparent 67%
+    ),
+
+    radial-gradient(
+      ellipse 14px 21px at 84% 86%,
+      var(--color-primary-dark) 0%,
+      var(--color-primary-dark) 60%,
+      transparent 67%
+    ),
+
+    /* لکه‌های کوچک */
+    radial-gradient(
+      circle 7px at 32% 30%,
+      var(--color-primary-dark) 0%,
+      var(--color-primary-dark) 62%,
+      transparent 68%
+    ),
+
+    radial-gradient(
+      circle 5px at 55% 78%,
+      var(--color-primary-dark) 0%,
+      var(--color-primary-dark) 62%,
+      transparent 68%
+    ),
+
+    radial-gradient(
+      circle 8px at 78% 28%,
+      var(--color-primary-dark) 0%,
+      var(--color-primary-dark) 62%,
+      transparent 68%
+    ),
+
+    /* پایه */
+    linear-gradient(
+      135deg,
+      var(--color-primary),
+      var(--color-primary-dark)
+    );
+}
+@layer base {
+:root {
+  --primary: #0D674E;
+  --primary-dark: #09543F;
+  --primary-soft: #EAF5F1;
+
+  --bg: #F9FAFA;
+  --surface: #FDFDFE;
+  --surface-2: #F3F5F4;
+
+  --border: #E2E7E5;
+
+  --text: #17201E;
+  --text-2: #68716F;
+  --muted: #9AA19F;
+
+  --success: #16A96A;
+  --warning: #E99A18;
+  --danger: #DC454B;
+
+ 
+  --gradient-primary-soft:
+    linear-gradient(
+      135deg,
+      #EAF5F1 0%,
+      #F9FAFA 100%
+    );
+
+  --shadow:
+    0 8px 28px rgba(22, 35, 31, 0.06);
+
+
+  /* Typography */
+  --font-sans: "Markazi Text", Tahoma, sans-serif;
+}
+
+
+/* =========================================================
+   DARK THEME
+   ========================================================= */
+
+:root[data-theme="dark"] {
+
+  --primary: #39A889;
+  --primary-dark: #2C8D74;
+  --primary-soft: #123B32;
+
+  --bg: #0D1412;
+  --surface: #141D1A;
+  --surface-2: #1B2622;
+
+  --border: #2B3733;
+
+  --text: #F3F7F5;
+  --text-2: #B8C2BE;
+  --muted: #7F8C87;
+
+  --success: #35C98A;
+  --warning: #F5B84B;
+  --danger: #FF6B70;
+
+ 
+
+  --gradient-primary-soft:
+    radial-gradient(
+      135deg,
+      #123B32 0%,
+      #18231F 100%
+    );
+
+  --shadow:
+    0 8px 28px rgba(0, 0, 0, 0.18);
+
+}
+}
+
+
+/* =========================================================
+   TAILWIND SEMANTIC TOKENS
+   ========================================================= */
+
+
+html {
+  font-family: var(--font-sans) !important;
+  background: var(--bg);
+  color: var(--text);
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  transition:
+    background-color 180ms ease,
+    color 180ms ease;
+}
+option{
+  background-color: var(--primary-dark);
+  color: var(--bg);
+  font-size: 12px;
+}
+
+input:input:-internal-autofill-selected{
+background-color: var(--color-primary-soft) 70%  !important;
+}
+
+
+/* =========================================================
+   BASE
+   ========================================================= */
+* {
+  box-sizing: border-box;
+}
+
+
+
+.bg-gradient-primary-soft {
+  background: var(--gradient-primary-soft);
+}
+
+
+.loader {
+  width: fit-content;
+  height: fit-content;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.truckWrapper {
+  width: 200px;
+  height: 100px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  align-items: center;
+  justify-content: flex-end;
+  overflow-x: hidden;
+}
+/* truck upper body */
+.truckBody {
+  width: 130px;
+  height: fit-content;
+  margin-bottom: 6px;
+  animation: motion 1s linear infinite;
+}
+/* truck suspension animation*/
+@keyframes motion {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(3px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
+}
+/* truck's tires */
+.truckTires {
+  width: 130px;
+  height: fit-content;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0px 10px 0px 15px;
+  position: absolute;
+  bottom: 0;
+}
+.truckTires svg {
+  width: 24px;
+}
+
+.road {
+  width: 100%;
+  height: 1.5px;
+  background-color: #282828;
+  position: relative;
+  bottom: 0;
+  align-self: flex-end;
+  border-radius: 3px;
+}
+.road::before {
+  content: "";
+  position: absolute;
+  width: 20px;
+  height: 100%;
+  background-color: #282828;
+  right: -50%;
+  border-radius: 3px;
+  animation: roadAnimation 1.4s linear infinite;
+  border-left: 10px solid white;
+}
+.road::after {
+  content: "";
+  position: absolute;
+  width: 10px;
+  height: 100%;
+  background-color: #282828;
+  right: -65%;
+  border-radius: 3px;
+  animation: roadAnimation 1.4s linear infinite;
+  border-left: 4px solid white;
+}
+
+.lampPost {
+  position: absolute;
+  bottom: 0;
+  right: -90%;
+  height: 90px;
+  animation: roadAnimation 1.4s linear infinite;
+}
+
+@keyframes roadAnimation {
+  0% {
+    transform: translateX(0px);
+  }
+  100% {
+    transform: translateX(-350px);
+  }
+}
