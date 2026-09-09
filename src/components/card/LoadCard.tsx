@@ -9,11 +9,12 @@ import {
   Truck,
 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { Load } from "../../types";
+
 import { money } from "../../data/mock";
 import { StatusBadge } from "../ui/StatusBadge";
 import DropdownMenu from "../dropdown/DropdownMenu";
 import { Button } from "../buttons/Button";
+import { Load } from "../../types/load";
 
 
 type LoadCardProps = {
@@ -27,7 +28,7 @@ export function LoadCard({
   selected,
   onToggle,
 }: LoadCardProps) {
-  const unavailable = load.status !== "فعال";
+  const unavailable = load.status !== "active";
 
   return (
     <article className="group relative py-2 ">
@@ -62,20 +63,20 @@ export function LoadCard({
 
             <span className="flex items-center gap-1.5">
               <Truck size={14} />
-              {load.vehicle}
+              {load.vehicle_type}
             </span>
 
             <span className="flex items-center gap-1.5">
               <CalendarDays size={14} />
-              {load.date}
+              {load.loading_date}
             </span>
           </div>
 
           <div className=" shrink-0 items-center gap-2 text-sm text-text-2 flex flex-wrap md:hidden mt-2">
             <span className="font-medium text-text ">{load.cargo}</span>
             <span className="flex items-center ">{load.weight} تن</span>
-            <span className="flex items-center ">{load.vehicle}</span>
-            <span className="flex items-center ">{load.date}</span>
+            <span className="flex items-center ">{load.vehicle_type}</span>
+            <span className="flex items-center ">{load.loading_date}</span>
           </div>
         </div>
         {/* Price + Status */}

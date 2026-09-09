@@ -1,7 +1,5 @@
-type Coordinates = {
-  lat: number;
-  lng: number;
-};
+import { Coordinates } from "../../types/load";
+
 
 export function calculateDistance(from: Coordinates, to: Coordinates): number {
   const earthRadius = 6371;

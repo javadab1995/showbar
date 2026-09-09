@@ -5,11 +5,9 @@ import {
 import {
   useState,
 } from "react";
+import { Coordinates } from "../../types/load";
 
-type Coordinates = {
-  latitude: number;
-  longitude: number;
-};
+
 
 type NearMeFilterProps = {
   enabled: boolean;
@@ -43,13 +41,10 @@ export function NearMeFilter({
 
     navigator.geolocation.getCurrentPosition(
       (position) => {
-        const coordinates = {
-          latitude:
-            position.coords.latitude,
-
-          longitude:
-            position.coords.longitude,
-        };
+       const coordinates: Coordinates = {
+         lat: position.coords.latitude,
+         lng: position.coords.longitude,
+       };
 
         setLoading(false);
 

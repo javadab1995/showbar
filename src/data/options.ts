@@ -3,17 +3,20 @@ export type FilterOption = {
   label: string;
 };
 
-export const tradeTypeOptions: FilterOption[] = [
+export const TRADE_TYPE_OPTIONS = [
   {
-    value: "export",
     label: "صادرات",
+    value: "export",
   },
   {
-    value: "import",
     label: "واردات",
+    value: "import",
+  },
+  {
+    label: "ترانزیت",
+    value: "transit",
   },
 ];
-
 export const cargoOptions: FilterOption[] = [
   {
     value: "food",
@@ -83,7 +86,7 @@ export const fleetOptions: FilterOption[] = [
   },
 ];
 
-export const borderOptions: FilterOption[] = [
+export const BORDER_OPTIONS: FilterOption[] = [
   {
     value: "jolfa",
     label: "جلفا",
@@ -129,8 +132,6 @@ export const cityOptions: FilterOption[] = [
   },
 ];
 
-
-
 export const VEHICLE_OPTIONS = [
   { label: "تریلی", value: "trailer" },
   { label: "کامیون", value: "truck" },
@@ -140,4 +141,11 @@ export const STATUS_OPTIONS = [
   { label: "فعال", value: "active" },
   { label: "رزرو شده", value: "reserved" },
   { label: "تکمیل شده", value: "completed" },
+  { label: "لغو شده", value: "cancelled" },
+  { label: "منقضی شده", value: "expired" },
 ];
+
+export const CURRENCY_OPTIONS = [
+  { value: "IRR", label: "تومان" },
+  { value: "USD", label: "دلار" },
+] ;

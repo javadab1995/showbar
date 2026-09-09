@@ -1,7 +1,7 @@
  import { motion } from "framer-motion";
 
 import {
-  borderOptions,
+BORDER_OPTIONS,
   cargoOptions,
   cityOptions,
   fleetOptions,
@@ -196,7 +196,7 @@ export function LoadFilters({
       {/* Border */}
       <div className="shrink-0">
         <MultiSelect
-          options={borderOptions}
+          options={BORDER_OPTIONS}
           value={filters.borders}
           onChange={(value) =>
             onChange("borders", value)

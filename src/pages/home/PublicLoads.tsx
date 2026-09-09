@@ -1,22 +1,90 @@
 import { useState } from "react";
+
 import { useBasket } from "../../contexts/BasketContext";
-import { Coordinates, initialLoadFilters, LoadFilters } from "../../types/load";
-import { filterLoads } from "../../helpers/loads/filterLoads";
-import { loads } from "../../data/mock";
-import { calculateDistance } from "../../helpers/calc/calculateDistance";
+
+import {
+  type Coordinates,
+  initialLoadFilters,
+  type LoadFilters,
+} from "../../types/load";
+
 import { LoadSearch } from "../../components/searches/LoadSearch";
+
 import { LoadResultSummary } from "../../components/summary/LoadResultSummary";
+
 import { LoadList } from "../../components/lists/LoadList";
+
 import { LoadFilters as LoadFiltersComponent } from "../../components/filters/LoadFilters";
 
 
+
+import { useInfiniteScroll } from "../../hooks/useInfiniteScroll";
+import { usePublicLoads } from "../../hooks/usePublicLoads";
+import { Loader, LoaderCircle } from "lucide-react";
+import Spinner from "../../components/widgets/Spinner";
+
 export function PublicLoads() {
+  // ==================================
+  // Basket
+  // ==================================
+
   const { basket, setBasket } = useBasket();
 
+  // ==================================
+  // Search
+  // ==================================
+
   const [query, setQuery] = useState("");
+
+  // ==================================
+  // Filters
+  // ==================================
+
   const [filters, setFilters] = useState<LoadFilters>(initialLoadFilters);
 
+  // ==================================
+  // User Location
+  // ==================================
+
   const [userLocation, setUserLocation] = useState<Coordinates | null>(null);
+
+  // ==================================
+  // Loads Query
+  // ==================================
+
+  const {
+    loads,
+
+    totalCount,
+
+    isLoading,
+
+    isError,
+
+    error,
+
+    hasNextPage,
+
+    isFetchingNextPage,
+
+    fetchNextPage,
+  } = usePublicLoads(query, filters);
+
+  // ==================================
+  // Infinite Scroll
+  // ==================================
+
+  const { lastItemRef } = useInfiniteScroll({
+    hasNextPage: hasNextPage ?? false,
+
+    isFetchingNextPage,
+
+    fetchNextPage,
+  });
+
+  // ==================================
+  // Update Filter
+  // ==================================
 
   const updateFilter = <K extends keyof LoadFilters>(
     key: K,
@@ -28,46 +96,71 @@ export function PublicLoads() {
     }));
   };
 
-  const filteredLoads = filterLoads(loads, query, filters);
-
-  const sortedLoads =
-    filters.nearest && userLocation
-      ? [...filteredLoads].sort((a, b) => {
-          const distanceA = calculateDistance(
-            userLocation,
-            a.originCoordinates,
-          );
-
-          const distanceB = calculateDistance(
-            userLocation,
-            b.originCoordinates,
-          );
-
-          return distanceA - distanceB;
-        })
-      : filteredLoads;
+  // ==================================
+  // Near Me
+  // ==================================
 
   const handleNearMeChange = (
     enabled: boolean,
     coordinates: Coordinates | null,
   ) => {
     updateFilter("nearest", enabled);
+
     setUserLocation(coordinates);
   };
+
+  // ==================================
+  // Basket
+  // ==================================
 
   const toggleBasket = (id: string) => {
     setBasket((prev) =>
       prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id],
     );
   };
-  
+
+  // ==================================
+  // Reset Filters
+  // ==================================
+
   const resetFilters = () => {
     setFilters(initialLoadFilters);
+
     setUserLocation(null);
   };
 
+  // ==================================
+  // Loading
+  // ==================================
+
+  if (isLoading) {
+    return (
+      <section className="mx-auto flex flex-col justify-between items-center w-full h-full py-52">
+        <Spinner />
+        در حال دریافت بارها...
+      
+      </section>
+    );
+  }
+
+  // ==================================
+  // Error
+  // ==================================
+
+  if (isError) {
+    return (
+      <section className="mx-auto px-6 py-20">
+        <p className="text-danger">
+          {error instanceof Error ? error.message : "خطا در دریافت بارها"}
+        </p>
+      </section>
+    );
+  }
+
   return (
     <section className="mx-auto px-6 py-20">
+      {/* Header */}
+
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-text">بارهای موجود</h1>
 
@@ -76,7 +169,11 @@ export function PublicLoads() {
         </p>
       </div>
 
+      {/* Search */}
+
       <LoadSearch value={query} onChange={setQuery} />
+
+      {/* Filters */}
 
       <LoadFiltersComponent
         filters={filters}
@@ -85,13 +182,34 @@ export function PublicLoads() {
         onReset={resetFilters}
       />
 
-      <LoadResultSummary count={sortedLoads.length} />
+      {/* Summary */}
+
+      <LoadResultSummary count={totalCount} />
+
+      {/* Loads */}
 
       <LoadList
-        loads={sortedLoads}
+        loads={loads}
         basket={basket}
         onToggleBasket={toggleBasket}
+        lastItemRef={lastItemRef}
       />
+
+      {/* Loading Next Page */}
+
+      {isFetchingNextPage && (
+        <div className="py-8 text-center text-sm text-text-2">
+          در حال دریافت بارهای بیشتر... <Loader />
+        </div>
+      )}
+
+      {/* End */}
+
+      {!hasNextPage && loads.length > 0 && (
+        <div className="py-8 text-center text-sm text-text-2">
+          همه بارها نمایش داده شدند
+        </div>
+      )}
     </section>
   );
 }

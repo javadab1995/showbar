@@ -10,11 +10,12 @@ export const TableFooter = ({
   currentPage,
   onPageSizeChange,
   onPageChange,
-} : PaginationProps & { onPageSizeChange: (n: number) => void }) => {
+
+}: PaginationProps & { onPageSizeChange: (n: number) => void }) => {
   return (
     <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-4 py-3 border-t border-border ">
       <div className="flex items-center gap-2 text-xs text-text/75">
-        <label>Rows per page:</label>
+        <label>تعداد ردیف در هر صفحه:</label>
         <select
           value={pageSize}
           onChange={(e) => onPageSizeChange(Number(e.target.value))}
@@ -33,6 +34,7 @@ export const TableFooter = ({
         totalItems={totalItems}
         pageSize={pageSize}
         onPageChange={onPageChange}
+        
       />
     </div>
   );

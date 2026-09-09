@@ -1,5 +1,5 @@
 // components/layout/PublicHeader.tsx
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import { Package } from "lucide-react";
 import ThemeToggle from "../../components/ui/ThemeToggle";
 import { useBasket } from "../../contexts/BasketContext";
@@ -7,6 +7,9 @@ import { Button } from "../buttons/Button";
 
 export default function PublicHeader() {
   const { basket } = useBasket();
+  const { pathname } = useLocation();
+
+  const loadsActive = pathname === "/" || pathname.startsWith("/loads");
 
 
   const navClass = ({ isActive }: { isActive: boolean }) =>
@@ -25,7 +28,16 @@ export default function PublicHeader() {
 
       {/* Desktop Nav - Hidden on mobile */}
       <div className="hidden md:flex items-center h-full">
-        <NavLink to="/loads" className={navClass}>
+        <NavLink
+          to="/loads"
+          className={() =>
+            `flex items-center justify-center px-4 h-full border-b-2 transition-all duration-200 ${
+              loadsActive
+                ? "border-primary text-primary font-bold"
+                : "border-transparent text-text-2 hover:border-primary/50 hover:text-text"
+            }`
+          }
+        >
           بارها
         </NavLink>
         <NavLink to="/about" className={navClass}>

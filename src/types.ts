@@ -1,21 +1,20 @@
-import { number } from "framer-motion";
+
 import { type LucideIcon } from "lucide-react";
 
-export type LoadStatus =
-  | "فعال"
-  | "رزرو شده"
-  | "تکمیل شده"
-  | "لغو شده"
-  | "منقضی شده";
-  
-export type RequestStatus =
-  | "در انتظار بررسی"
-  | "تأیید شده"
-  | "رد شده"
-  | "لغو شده";
-export type NotificationStatus = "فعال" | "اطلاع داده شد" | "لغو شده";
 
-export type TradeType = "export" | "import";
+
+export type LoadStatus =
+  | "active"
+  | "reserved"
+  | "completed"
+  | "cancelled"
+  | "expired";
+
+export type RequestStatus = "pending" | "approved" | "rejected" | "cancelled";
+
+export type NotificationStatus = "active" | "notified" | "cancelled";
+
+export type TradeType = "export" | "import" | "transit";
 
 export type CargoType =
   | "steel"
@@ -35,31 +34,9 @@ export type FleetType =
 
 export type BorderType = "jolfa" | "bazargan" | "razi" | "sarb" | "poldasht";
 
-export type Coordinates = {
-  lat: number;
-  lng: number;
-};
 
-export type Load = {
-  id: string;
-  origin: string;
-  destination: string;
-  cargo: string;
-  cargoType: CargoType;
-  weight: number;
-  vehicle: string;
-  vehicleType: FleetType;
-  tradeType: TradeType;
-  exitBorder: BorderType;
-  date: string;
-  price: number;
-  status: LoadStatus;
-  createdAt: string;
-  description: string;
-  location: Coordinates; 
-  requirements: string[];
-  originCoordinates: Coordinates;
-};
+
+
 
 export interface Vehicle {
   id: string;
