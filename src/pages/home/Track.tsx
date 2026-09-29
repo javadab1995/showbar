@@ -1,46 +1,150 @@
-import { ChangeEvent, SubmitEvent, useState } from "react";
-import { Search, ClipboardList } from "lucide-react";
-import { Button } from "../../components/buttons/Button";
+import { useEffect, useState } from "react";
+import { ClipboardList } from "lucide-react";
+import { useSearchParams } from "react-router-dom";
+
 import BackButton from "../../components/buttons/BackButton";
 
+
+import {
+  getDriverRequestHistory,
+  getRequestByTrackingCode,
+} from "../../services/apiRequest";
+
+import type {
+  RequestDetails as RequestDetailsType,
+  RequestHistoryItem,
+  TrackRequestFormData,
+} from "../../types/trackRequest.type";
+
+import toast from "react-hot-toast";
+import TrackTabs from "../../components/tabs/TrackTabs";
+import RequestHistory from "../../components/features/requests/RequestHistory";
+import TrackingCodeForm from "../../components/forms/TrackingCodeForm";
+import RequestDetails from "../../components/features/requests/RequestDetails";
+import HistoryForm from "../../components/forms/HistoryForm";
+
+type TrackTab = "form" | "history";
+
 export default function TrackRequest() {
-  const [mode, setMode] = useState("all");
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  const [form, setForm] = useState({
-    driverId: "",
-    nationalCode: "",
-    phone: "",
-    trackingCode: "",
-  });
+  const tabParam = searchParams.get("tab");
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setForm((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
-  };
+  const activeTab: TrackTab = tabParam === "history" ? "history" : "form";
 
-  const handleSubmit = (e: SubmitEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const trackingCode = searchParams.get("code") ?? "";
 
-    if (mode === "all") {
-      console.log({
-        driverId: form.driverId,
-        nationalCode: form.nationalCode,
-        phone: form.phone,
-      });
-    } else {
-      console.log({
-        trackingCode: form.trackingCode,
-      });
+  const [request, setRequest] = useState<RequestDetailsType | null>(null);
+
+  const [history, setHistory] = useState<RequestHistoryItem[] | null>(null);
+
+  const [loading, setLoading] = useState(false);
+
+  const [historySearched, setHistorySearched] = useState(false);
+
+  useEffect(() => {
+    if (!tabParam) {
+      setSearchParams(
+        {
+          tab: "form",
+        },
+        { replace: true },
+      );
     }
-  };
+  }, [tabParam, setSearchParams]);
+
+  function handleTabChange(tab: TrackTab) {
+    setRequest(null);
+    setHistory(null);
+    setHistorySearched(false);
+
+    if (tab === "history") {
+      setSearchParams({
+        tab: "history",
+      });
+
+      return;
+    }
+
+    setSearchParams({
+      tab: "form",
+    });
+  }
+
+  async function handleTrackingCodeSubmit(data: TrackRequestFormData) {
+    try {
+      setLoading(true);
+
+      const code = data.trackingCode.trim().toUpperCase();
+
+      const result = await getRequestByTrackingCode(code);
+
+      if (!result) {
+        toast.error("درخواستی با این کد پیگیری پیدا نشد");
+        return;
+      }
+
+      setRequest(result);
+
+      setSearchParams({
+        tab: "form",
+        code,
+      });
+    } catch (error) {
+      console.error("GET REQUEST ERROR:", error);
+
+      toast.error("دریافت درخواست انجام نشد");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleHistorySubmit(data: TrackRequestFormData) {
+    try {
+      setLoading(true);
+
+      const result = await getDriverRequestHistory({
+        nationalId: data.nationalId.trim(),
+        phone: data.phone.trim(),
+
+        plate: data.identifierType === "PLATE" ? data.plate.trim() : undefined,
+
+        transitCode:
+          data.identifierType === "TRANSIT"
+            ? data.transitCode.trim()
+            : undefined,
+      });
+
+      setHistory(result);
+      setHistorySearched(true);
+
+      if (!result || result.length === 0) {
+        toast.error("درخواستی با این اطلاعات پیدا نشد");
+      }
+    } catch (error) {
+      console.error("GET REQUEST HISTORY ERROR:", error);
+
+      toast.error("دریافت سوابق درخواست‌ها انجام نشد");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function handleNewTrackingSearch() {
+    setRequest(null);
+
+    setSearchParams({
+      tab: "form",
+    });
+  }
+
+  function handleNewHistorySearch() {
+    setHistory(null);
+    setHistorySearched(false);
+  }
 
   return (
-    <main
-      dir="rtl"
-      className="min-h-screen bg-bg px-4 py-20 text-text sm:px-6 "
-    >
+    <main dir="rtl" className="min-h-screen bg-bg px-4 py-20 text-text sm:px-6">
       <div className="mx-auto w-full max-w-xl">
         {/* Header */}
         <div className="mb-8 text-center">
@@ -57,207 +161,52 @@ export default function TrackRequest() {
 
         {/* Main Card */}
         <div className="rounded-3xl border border-border bg-surface p-5 shadow-sm sm:p-7">
-          {/* Tabs */}
-          <div className="mb-7 grid grid-cols-2 rounded-2xl bg-bg p-1">
-            <button
-              type="button"
-              onClick={() => setMode("all")}
-              className={` 
-                rounded-xl px-4 py-3 text-sm font-medium
-                transition
-                ${
-                  mode === "all"
-                    ? "bg-background text-text"
-                    : "text-text/50 hover:text-text"
-                }
-              `}
-            >
-              درخواست‌های من
-            </button>
+          <TrackTabs activeTab={activeTab} onChange={handleTabChange} />
 
-            <button
-              type="button"
-              onClick={() => setMode("single")}
-              className={` 
-                rounded-xl px-4 py-3 text-sm font-medium
-                transition
-                ${
-                  mode === "single"
-                    ? "bg-background text-text "
-                    : "text-text/50 hover:text-text"
-                }
-              `}
-            >
-              یک درخواست
-            </button>
-          </div>
+          {/* -------------------------------- */}
+          {/* FORM TAB */}
+          {/* -------------------------------- */}
 
-          <form onSubmit={handleSubmit} className="space-y-5">
-            {mode === "all" ? (
-              <>
-                <div>
-                  <label
-                    htmlFor="driverId"
-                    className="mb-2 block text-sm font-medium"
-                  >
-                    شناسه راننده
-                  </label>
+          {activeTab === "form" && !request && (
+            <TrackingCodeForm
+              defaultValue={trackingCode}
+              loading={loading}
+              onSubmit={handleTrackingCodeSubmit}
+            />
+          )}
 
-                  <input
-                    id="driverId"
-                    name="driverId"
-                    value={form.driverId}
-                    onChange={handleChange}
-                    placeholder="شناسه راننده را وارد کنید"
-                    className="
-                      h-12 w-full rounded-xl
-                      border border-border
-                      bg-surface
-                      px-4 text-sm
-                      text-text
-                      outline-none
-                      placeholder:text-text/40
-                      transition
-                      focus:border-primary
-                      focus:ring-4
-                      focus:ring-primary/10
-                    "
-                  />
-                </div>
+          {/* -------------------------------- */}
+          {/* TRACKING RESULT */}
+          {/* -------------------------------- */}
 
-                <div>
-                  <label
-                    htmlFor="nationalCode"
-                    className="mb-2 block text-sm font-medium"
-                  >
-                    کد ملی
-                  </label>
-                  <input
-                    id="nationalCode"
-                    name="nationalCode"
-                    inputMode="numeric"
-                    maxLength={10}
-                    value={form.nationalCode}
-                    onChange={handleChange}
-                    placeholder="کد ملی را وارد کنید"
-                    className="
-                      h-12 w-full rounded-xl
-                      border border-border
-                      bg-surface
-                      px-4 text-sm
-                      text-text
-                      outline-none
-                      placeholder:text-text/40
-                      transition
-                      focus:border-primary
-                      focus:ring-4
-                      focus:ring-primary/10
-                    "
-                  />
-                </div>
+          {activeTab === "form" && request && (
+            <RequestDetails
+              request={request}
+              onNewSearch={handleNewTrackingSearch}
+            />
+          )}
 
-                <div>
-                  <label
-                    htmlFor="phone"
-                    className="mb-2 block text-sm font-medium"
-                  >
-                    شماره تلفن
-                  </label>
+          {/* -------------------------------- */}
+          {/* HISTORY TAB */}
+          {/* -------------------------------- */}
 
-                  <input
-                    id="phone"
-                    name="phone"
-                    type="tel"
-                    inputMode="tel"
-                    value={form.phone}
-                    onChange={handleChange}
-                    placeholder="مثلاً ۰۹۱۲۱۲۳۴۵۶۷"
-                    className="
-                      h-12 w-full rounded-xl
-                      border border-border
-                      bg-surface
-                      px-4 text-sm
-                      text-text
-                      outline-none
-                      placeholder:text-text/40
-                      transition
-                      focus:border-primary
-                      focus:ring-4
-                      focus:ring-primary/10
-                    "
-                  />
-                </div>
+          {activeTab === "history" && !historySearched && (
+            <HistoryForm loading={loading} onSubmit={handleHistorySubmit} />
+          )}
 
-                <div className="rounded-xl bg-bg px-4 py-3 text-xs leading-6 text-text/60">
-                  با وارد کردن اطلاعات بالا، درخواست‌های ثبت‌شده مربوط به شما
-                  نمایش داده می‌شود.
-                </div>
-              </>
-            ) : (
-              <>
-                <div>
-                  <label
-                    htmlFor="trackingCode"
-                    className="mb-2 block text-sm font-medium"
-                  >
-                    کد پیگیری
-                  </label>
+          {/* -------------------------------- */}
+          {/* HISTORY RESULT */}
+          {/* -------------------------------- */}
 
-                  <input
-                    id="trackingCode"
-                    name="trackingCode"
-                    value={form.trackingCode}
-                    onChange={handleChange}
-                    placeholder="مثلاً SHB-8F42K"
-                    className="
-                      h-14 w-full rounded-xl
-                      border border-border
-                      bg-surface
-                      px-4
-                      text-center text-base
-                      font-medium uppercase tracking-wider
-                      text-text
-                      outline-none
-                      placeholder:text-sm
-                      placeholder:font-normal
-                      placeholder:tracking-normal
-                      placeholder:text-text/40
-                      transition
-                      focus:border-primary
-                      focus:ring-4
-                      focus:ring-primary/10
-                    "
-                  />
-                </div>
-
-                <div className="rounded-xl bg-bg px-4 py-3 text-xs leading-6 text-text/60">
-                  کد پیگیری را که پس از ثبت درخواست دریافت کرده‌اید وارد کنید.
-                </div>
-              </>
-            )}
-
-            {/* Submit */}
-            <Button
-              type="submit"
-              className="
-                flex h-12 w-full 
-                items-center justify-center gap-2
-                rounded-md
-                bg-primary-radial 
-                px-5
-                font-semibold text-surface
-                transition
-                hover:bg-primary-dark
-                active:scale-[0.99]
-              "
-            >
-              <Search size={18} />
-              پیگیری
-            </Button>
-          </form>
+          {activeTab === "history" && historySearched && (
+            <RequestHistory
+              history={history ?? []}
+              onNewSearch={handleNewHistorySearch}
+            />
+          )}
         </div>
 
-       <BackButton/>
+        <BackButton to="/" title="بازگشت به بارها" />
       </div>
     </main>
   );

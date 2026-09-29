@@ -1,18 +1,24 @@
+import { useEffect } from "react";
+
+import { Controller, useForm, type SubmitHandler } from "react-hook-form";
+
 import { useNavigate, useParams } from "react-router-dom";
-import { useForm, type SubmitHandler } from "react-hook-form";
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { zodResolver } from "@hookform/resolvers/zod";
-
-import toast from "react-hot-toast";
 
 import { Loader2 } from "lucide-react";
 
 import { Button } from "../../components/buttons/Button";
-import { FormInput } from "../../components/inputs/FormInput";
-import { TextAreaField } from "../../components/textarea/TextAreaField";
-import { SelectField } from "../../components/selects/SelectField";
 
+import { FormInput } from "../../components/inputs/FormInput";
+
+import { FormTextarea } from "../../components/inputs/FormTextarea";
+
+import { FormSelect } from "../../components/inputs/FormSelect";
+
+import { LocationField } from "../../components/maps/LocationField";
+
+import { DatePickerField } from "../../components/inputs/DatePickerField";
 
 import {
   cargoOptions,
@@ -21,9 +27,8 @@ import {
   TRADE_TYPE_OPTIONS,
   BORDER_OPTIONS,
   CURRENCY_OPTIONS,
+  countryOptions,
 } from "../../data/options";
-
-import { createLoad, updateLoad } from "../../services/apiLoads";
 
 import {
   loadSchema,
@@ -31,48 +36,94 @@ import {
   type LoadFormData,
 } from "../../schemas/loadSchema";
 
-import type { Coordinates, LoadData } from "../../types/load";
-import { LocationField } from "../../components/maps/LocationField";
+import type { LoadData } from "../../types/load";
+import { useLoad } from "../../hooks/other/useLoad";
+import { useCreateLoad } from "../../hooks/admin/useCreateLoad";
+import { useUpdateLoad } from "../../hooks/admin/useUpdateLoad";
+import Spinner from "../../components/widgets/Spinner";
 
+import GoToLoads from "../../components/buttons/GoToLoads";
+import { CitySearch } from "../../components/inputs/CitySearch";
+import { MultiSelect } from "../../components/selects/MultiSelect";
 
 export function LoadForm() {
+  // ==================================================
+  // Route
+  // ==================================================
+
   const { id } = useParams();
+
   const nav = useNavigate();
-  const queryClient = useQueryClient();
+
+  const isEdit = Boolean(id);
+
+  // ==================================================
+  // Load data
+  // ==================================================
+
+  const { data: load, isLoading: isLoadLoading } = useLoad(id);
+
+  // ==================================================
+  // Mutations
+  // ==================================================
+
+  const createMutation = useCreateLoad();
+
+  const updateMutation = useUpdateLoad();
+
+  const isPending = createMutation.isPending || updateMutation.isPending;
+
+  // ==================================================
+  // Form
+  // ==================================================
 
   const {
     register,
     handleSubmit,
     setValue,
     watch,
+    reset,
+    control,
+
     formState: { errors },
   } = useForm<LoadFormInput, unknown, LoadFormData>({
     resolver: zodResolver(loadSchema),
 
     defaultValues: {
+      origin_country_code: "IR",
       origin: "",
+
+      destination_country_code: "",
       destination: "",
 
       origin_location_url: "",
+
       destination_location_url: "",
 
       origin_latitude: null,
+
       origin_longitude: null,
 
       destination_latitude: null,
+
       destination_longitude: null,
 
       cargo: "",
+
       cargo_type: "",
 
       vehicle_type: "",
 
       trade_type: "",
-      exit_border: "",
+
+      exit_borders: [],
 
       weight: 0,
+
       price: 0,
+
       currency: "IRR",
+
       loading_date: "",
 
       status: "active",
@@ -81,91 +132,98 @@ export function LoadForm() {
     },
   });
 
+  // ==================================================
+  // Reset edit data
+  // ==================================================
 
-  // --------------------------------------------------
+  useEffect(() => {
+    if (!load) return;
+
+    reset({
+      origin_country_code: load?.origin_country_code ?? "",
+      origin: load.origin ?? "",
+
+      destination_country_code: load?.destination_country_code ?? "",
+      destination: load.destination ?? "",
+
+      origin_latitude: load.origin_latitude ?? null,
+
+      origin_longitude: load.origin_longitude ?? null,
+
+      destination_latitude: load.destination_latitude ?? null,
+
+      destination_longitude: load.destination_longitude ?? null,
+
+      cargo: load.cargo ?? "",
+
+      cargo_type: load.cargo_type ?? "",
+
+      vehicle_type: load.vehicle_type ?? "",
+
+      trade_type: load.trade_type ?? "",
+
+      exit_borders: load.exit_borders ?? [],
+
+      weight: load.weight ?? 0,
+
+      price: load.price ?? 0,
+
+      currency: load.currency ?? "IRR",
+
+      loading_date: load.loading_date ?? "",
+
+      status: load.status ?? "active",
+
+      description: load.description ?? "",
+    });
+  }, [load, reset]);
+
+  // ==================================================
   // Coordinates
-  // --------------------------------------------------
+  // ==================================================
 
-  const originLatitude = watch("origin_latitude");
-  const originLongitude = watch("origin_longitude");
+  // ==================================================
+  // Trade type
+  // ==================================================
 
-  const destinationLatitude = watch("destination_latitude");
-  const destinationLongitude = watch("destination_longitude");
+  const tradeType = watch("trade_type");
 
-  const originCoordinates: Coordinates | null =
-    originLatitude !== null && originLongitude !== null
-      ? {
-          lat: originLatitude,
-          lng: originLongitude,
-        }
-      : null;
+  const showBorder = tradeType === "export" || tradeType === "import";
 
-  const destinationCoordinates: Coordinates | null =
-    destinationLatitude !== null && destinationLongitude !== null
-      ? {
-          lat: destinationLatitude,
-          lng: destinationLongitude,
-        }
-      : null;
-
-  // --------------------------------------------------
-  // Mutation
-  // --------------------------------------------------
-
-  const { isPending, mutate } = useMutation({
-    mutationFn: (data: LoadData) => {
-      if (id) {
-        return updateLoad(id, data);
-      }
-
-      return createLoad(data);
-    },
-
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["loads"],
-      });
-
-      toast.success(
-        id ? "تغییرات بار با موفقیت ذخیره شد" : "بار جدید با موفقیت ثبت شد",
-      );
-
-      nav("/admin/loads");
-    },
-
-    onError: (err: Error) => {
-      toast.error(err.message);
-    },
-  });
-
-  // --------------------------------------------------
+  // ==================================================
   // Submit
-  // --------------------------------------------------
+  // ==================================================
 
   const onSubmit: SubmitHandler<LoadFormData> = (data) => {
     const loadData: LoadData = {
+      origin_country_code: data.origin_country_code,
       origin: data.origin,
+
+      destination_country_code: data.destination_country_code,
       destination: data.destination,
 
-      origin_location_url: data.origin_location_url || null,
-      destination_location_url: data.destination_location_url || null,
-
       origin_latitude: data.origin_latitude,
+
       origin_longitude: data.origin_longitude,
 
       destination_latitude: data.destination_latitude,
+
       destination_longitude: data.destination_longitude,
 
       cargo: data.cargo || null,
+
       cargo_type: data.cargo_type,
 
       vehicle_type: data.vehicle_type,
 
       trade_type: data.trade_type || null,
-      exit_border: data.exit_border || null,
+
+      exit_borders: data.exit_borders ?? [],
 
       weight: data.weight,
+
       price: data.price,
+
       currency: data.currency,
 
       loading_date: data.loading_date,
@@ -175,8 +233,32 @@ export function LoadForm() {
       description: data.description || null,
     };
 
-    mutate(loadData);
+    if (isEdit && id) {
+      updateMutation.mutate({
+        id,
+        data: loadData,
+      });
+
+      return;
+    }
+
+    createMutation.mutate(loadData);
   };
+
+  const originCountryCode = watch("origin_country_code");
+  const destinationCountryCode = watch("destination_country_code");
+
+  // ==================================================
+  // Loading edit data
+  // ==================================================
+
+  if (isEdit && isLoadLoading) {
+    return (
+      <div className="flex min-h-100 items-center justify-center">
+        <Spinner />
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto max-w-5xl space-y-8 pb-10">
@@ -186,12 +268,13 @@ export function LoadForm() {
 
       <div>
         <h2 className="text-2xl font-bold text-text">
-          {id ? "ویرایش بار" : "افزودن بار"}
+          {isEdit ? "ویرایش بار" : "افزودن بار"}
         </h2>
 
         <p className="mt-1 text-sm text-text/60">
           اطلاعات بار، مسیر و مشخصات حمل را وارد کنید.
         </p>
+        <GoToLoads to="/admin/loads" />
       </div>
 
       <form
@@ -214,10 +297,14 @@ export function LoadForm() {
             <div className="flex items-center gap-3">
               <span
                 className="
-                  flex size-8 items-center justify-center
+                  flex
+                  size-8
+                  items-center
+                  justify-center
                   rounded-lg
                   bg-primary
-                  text-sm font-bold
+                  text-sm
+                  font-bold
                   text-surface
                 "
               >
@@ -237,25 +324,65 @@ export function LoadForm() {
           </div>
 
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-            {/* Origin */}
-            <FormInput
-              label="مبدأ"
-              type="text"
-              placeholder="مثلاً تهران"
-              {...register("origin")}
-              error={errors.origin?.message}
+            <FormSelect
+              label="کشور مبدأ"
+              options={countryOptions}
+              {...register("origin_country_code")}
+              error={errors.origin_country_code?.message}
             />
 
-            {/* Destination */}
-            <FormInput
-              label="مقصد"
-              type="text"
-              placeholder="مثلاً استانبول"
-              {...register("destination")}
-              error={errors.destination?.message}
+            <Controller
+              name="origin"
+              control={control}
+              render={({ field }) => (
+                <CitySearch
+                  label="شهر مبدأ"
+                  countryCode={originCountryCode}
+                  value={field.value}
+                  onChange={field.onChange}
+                  onCitySelect={(city) => {
+                    setValue("origin_latitude", city?.latitude ?? null, {
+                      shouldDirty: true,
+                    });
+
+                    setValue("origin_longitude", city?.longitude ?? null, {
+                      shouldDirty: true,
+                    });
+                  }}
+                  error={errors.origin?.message}
+                />
+              )}
             />
 
-            {/* Cargo */}
+            <FormSelect
+              label="کشور مقصد"
+              options={countryOptions}
+              {...register("destination_country_code")}
+              error={errors.destination_country_code?.message}
+            />
+
+            <Controller
+              name="destination"
+              control={control}
+              render={({ field }) => (
+                <CitySearch
+                  label="شهر مقصد"
+                  countryCode={destinationCountryCode}
+                  value={field.value}
+                  onChange={field.onChange}
+                  onCitySelect={(city) => {
+                    setValue("destination_latitude", city?.latitude ?? null, {
+                      shouldDirty: true,
+                    });
+
+                    setValue("destination_longitude", city?.longitude ?? null, {
+                      shouldDirty: true,
+                    });
+                  }}
+                  error={errors.destination?.message}
+                />
+              )}
+            />
             <FormInput
               label="شرح بار"
               type="text"
@@ -264,39 +391,54 @@ export function LoadForm() {
               error={errors.cargo?.message}
             />
 
-            {/* Cargo type */}
-            <SelectField
+            <FormSelect
               label="نوع بار"
               options={cargoOptions}
               {...register("cargo_type")}
               error={errors.cargo_type?.message}
             />
 
-            {/* Vehicle */}
-            <SelectField
-              label="نوع خودرو"
+            <FormSelect
+              label="نوع ناوگان"
               options={VEHICLE_OPTIONS}
               {...register("vehicle_type")}
               error={errors.vehicle_type?.message}
             />
 
-            {/* Trade */}
-            <SelectField
+            <FormSelect
               label="نوع تجارت"
               options={TRADE_TYPE_OPTIONS}
               {...register("trade_type")}
               error={errors.trade_type?.message}
             />
 
-            {/* Border */}
-            <SelectField
-              label="مرز خروج"
-              options={BORDER_OPTIONS}
-              {...register("exit_border")}
-              error={errors.exit_border?.message}
-            />
-
-            {/* Weight */}
+            {showBorder && (
+              <Controller
+                name="exit_borders"
+                control={control}
+                render={({ field, fieldState }) => (
+                  <MultiSelect
+                    options={BORDER_OPTIONS}
+                    value={field.value ?? []}
+                    onChange={field.onChange}
+                    placeholder="انتخاب مرز خروج | ورود"
+                    disabled={isPending}
+                    className="h-12 flex items-center
+            w-full
+            rounded-xl
+            border border-border mt-5
+            bg-bg
+            px-4
+            text-sm
+            text-text
+            outline-none
+            transition
+            disabled:cursor-not-allowed
+            disabled:opacity-60"
+                  />
+                )}
+              />
+            )}
             <FormInput
               label="وزن (تن)"
               type="number"
@@ -305,63 +447,84 @@ export function LoadForm() {
               error={errors.weight?.message}
             />
 
-            {/* Loading date */}
-            <FormInput
-              label="تاریخ بارگیری"
-              type="date"
-              {...register("loading_date")}
-              error={errors.loading_date?.message}
+            <Controller
+              name="loading_date"
+              control={control}
+              render={({
+                field: { onChange, value },
+
+                fieldState: { error },
+              }) => (
+                <DatePickerField
+                  label="تاریخ بارگیری"
+                  value={value}
+                  onChange={onChange}
+                  error={error?.message}
+                />
+              )}
             />
           </div>
         </section>
+
         <div className="border-t border-border" />
+
+        {/* ==================================================
+            02 - Price
+        ================================================== */}
 
         <section className="p-6 md:p-8">
           <div className="flex items-center gap-3">
             <span
               className="
-                  flex size-8 items-center justify-center
-                  rounded-lg
-                  bg-primary
-                  text-sm font-bold
-                  text-surface
-                "
+                flex
+                size-8
+                items-center
+                justify-center
+                rounded-lg
+                bg-primary
+                text-sm
+                font-bold
+                text-surface
+              "
             >
               ۲
             </span>
 
             <div>
               <h3 className="text-base font-semibold text-text">
-                اطلاعات اصلی بار
+                اطلاعات مالی
               </h3>
 
               <p className="mt-0.5 text-xs text-text/50">
-                مشخصات کلی بار و حمل
+                مبلغ پیشنهادی حمل بار
               </p>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 gap-6 xl:grid-cols-2 mt-4">
-            <FormInput
-              label="قیمت"
-              type="number"
-              {...register("price")}
-              placeholder="مثلاً 250000000"
-            />
-
-            <SelectField
+          <div className="mt-4 grid grid-cols-2 gap-6 ">
+            <FormSelect
               label="ارز"
               options={CURRENCY_OPTIONS}
               {...register("currency")}
+              error={errors.currency?.message}
+            />
+
+            <FormInput
+              label="قیمت"
+              type="number"
+              placeholder="مثلاً 250000000"
+              {...register("price")}
+              error={errors.price?.message}
             />
           </div>
         </section>
 
-        {/* Divider */}
+        <div className="border-t border-border" />
+
         <div className="border-t border-border" />
 
         {/* ==================================================
-            02 - Locations
+            04 - Description
         ================================================== */}
 
         <section className="p-6 md:p-8">
@@ -369,97 +532,14 @@ export function LoadForm() {
             <div className="flex items-center gap-3">
               <span
                 className="
-                  flex size-8 items-center justify-center
+                  flex
+                  size-8
+                  items-center
+                  justify-center
                   rounded-lg
                   bg-primary
-                  text-sm font-bold
-                  text-surface
-                "
-              >
-                ۳
-              </span>
-
-              <div>
-                <h3 className="text-base font-semibold text-text">
-                  موقعیت‌های جغرافیایی
-                </h3>
-
-                <p className="mt-0.5 text-xs text-text/50">
-                  در صورت نیاز موقعیت دقیق مبدأ و مقصد را مشخص کنید.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
-            {/* Origin location */}
-
-            <LocationField
-              label="مبدأ"
-              url={watch("origin_location_url") || null}
-              coordinates={originCoordinates}
-              onUrlChange={(url) => {
-                setValue("origin_location_url", url ?? "", {
-                  shouldDirty: true,
-                  shouldValidate: true,
-                });
-              }}
-              onCoordinatesChange={(location) => {
-                setValue("origin_latitude", location?.lat ?? null, {
-                  shouldDirty: true,
-                  shouldValidate: true,
-                });
-
-                setValue("origin_longitude", location?.lng ?? null, {
-                  shouldDirty: true,
-                  shouldValidate: true,
-                });
-              }}
-            />
-
-            {/* Destination location */}
-
-            <LocationField
-              label="مقصد"
-              url={watch("destination_location_url") || null}
-              coordinates={destinationCoordinates}
-              onUrlChange={(url) => {
-                setValue("destination_location_url", url ?? "", {
-                  shouldDirty: true,
-                  shouldValidate: true,
-                });
-              }}
-              onCoordinatesChange={(location) => {
-                setValue("destination_latitude", location?.lat ?? null, {
-                  shouldDirty: true,
-                  shouldValidate: true,
-                });
-
-                setValue("destination_longitude", location?.lng ?? null, {
-                  shouldDirty: true,
-                  shouldValidate: true,
-                });
-              }}
-            />
-          </div>
-        </section>
-
-        {/* Divider */}
-        <div className="border-t border-border" />
-
-        {/* ==================================================
-            03 - Description
-        ================================================== */}
-
-        <section className="p-6 md:p-8">
-          <div className="mb-6">
-            <div className="flex items-center gap-3">
-              <span
-                className="
-                  flex size-8 items-center justify-center
-                  rounded-lg
-                  bg-primary
-                  text-sm font-bold
+                  text-sm
+                  font-bold
                   text-surface
                 "
               >
@@ -476,25 +556,28 @@ export function LoadForm() {
             </div>
           </div>
 
-          <TextAreaField
+          <FormTextarea
             label="توضیحات بار"
+            hint="اختیاری"
             rows={5}
-            placeholder="شرایط بارگیری، تخلیه، محدودیت‌ها و سایر توضیحات..."
+            placeholder="
+              شرایط بارگیری، تخلیه،
+              محدودیت‌ها و سایر توضیحات...
+            "
             {...register("description")}
             error={errors.description?.message}
           />
         </section>
 
-        {/* Divider */}
         <div className="border-t border-border" />
 
         {/* ==================================================
-            04 - Status
+            05 - Status
         ================================================== */}
 
         <section className="p-6 md:p-8">
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-            <SelectField
+            <FormSelect
               label="وضعیت بار"
               options={STATUS_OPTIONS}
               {...register("status")}
@@ -560,7 +643,7 @@ export function LoadForm() {
                 <Loader2 className="animate-spin" size={18} />
                 در حال ذخیره...
               </>
-            ) : id ? (
+            ) : isEdit ? (
               "ذخیره تغییرات"
             ) : (
               "ثبت بار"

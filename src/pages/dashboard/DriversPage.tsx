@@ -1,76 +1,168 @@
+import { useMemo, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Search } from "lucide-react";
-import { drivers, vehicles } from "../../data/mock";
-import { StatusBadge } from "../../components/ui/StatusBadge";
+
+import BaseTable from "../../components/tables/BaseTable";
+
+
+
+
+import { useDrivers } from "../../hooks/admin/useDrivers";
+import { ADMIN_PAGE_SIZE } from "../../services/apiLoads";
+import { createDriverColumns } from "../../components/columns/Drivers.columns";
+import { TableFooter } from "../../components/ui/TableFooter";
+
 
 
 export function DriversPage() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate()
+
+  const currentPage = Number(searchParams.get("page")) || 1;
+
+  const pageSize = Number(searchParams.get("pageSize")) || ADMIN_PAGE_SIZE;
+
+  const queryParam = searchParams.get("query") ?? "";
+
+  const [query, setQuery] = useState(queryParam);
+
+  const { data, isPending, isError, error } = useDrivers(
+    currentPage,
+    pageSize,
+    queryParam,
+  );
+
+  const drivers = data?.data ?? [];
+  const totalItems = data?.total ?? 0;
+
+   const columns = createDriverColumns({
+     onView: (id) => {
+       navigate(`/admin/drivers/${id}`);
+     },
+     onRequestView(id) {
+        navigate(`/admin/requests/${id}`);
+     },
+   });
+
+  const updateSearchParams = (
+    updates: Record<string, string | number | null>,
+  ) => {
+    const params = new URLSearchParams(searchParams);
+
+    Object.entries(updates).forEach(([key, value]) => {
+      if (value === null || value === "") {
+        params.delete(key);
+      } else if (key === "page" && value === 1) {
+        params.delete(key);
+      } else {
+        params.set(key, String(value));
+      }
+    });
+
+    setSearchParams(params);
+  };
+
+  const handleSearch = () => {
+    updateSearchParams({
+      query: query.trim() || null,
+      page: 1,
+    });
+  };
+
+  if (isError) {
+    return (
+      <div className="rounded-xl border border-border bg-surface p-6">
+        <p className="text-sm text-danger">
+          {error instanceof Error ? error.message : "خطا در دریافت رانندگان"}
+        </p>
+      </div>
+    );
+  }
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       {/* Header */}
-      <div>
-        <h2 className="text-2xl font-bold text-text">رانندگان</h2>
-        <p className="text-text-2 text-sm">مدیریت رانندگان و خودروهای مرتبط</p>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 className="text-xl font-bold text-text">رانندگان</h1>
+
+          <p className="mt-1 text-sm text-text-2">
+            مدیریت رانندگان و خودروهای مرتبط
+          </p>
+        </div>
+
+        <div className="text-sm text-primary p-1 rounded-lg bg-primary/10">
+          {totalItems.toLocaleString("fa-IR")} راننده
+        </div>
       </div>
 
-      {/* Toolbar */}
-      <div className="bg-surface border border-border p-4 rounded-xl flex items-center">
-        <div className="relative w-full md:w-96">
-          <span className="absolute inset-y-0 right-3 flex items-center pointer-events-none text-muted">
-            <Search size={18} />
-          </span>
+      {/* Search */}
+      <div className="flex w-full sm:max-w-md">
+        <div className="relative w-full">
+          <Search
+            className="
+              pointer-events-none
+              absolute right-3 top-1/2
+              h-4 w-4
+              -translate-y-1/2
+              text-text-2
+            "
+          />
+
           <input
-            placeholder="جستجوی نام، موبایل، پلاک یا شناسه..."
-            className="w-full pl-4 pr-10 py-2.5 bg-surface-2 border border-border rounded-lg text-text text-sm focus:ring-2 focus:ring-primary outline-none transition-all"
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter") {
+                handleSearch();
+              }
+            }}
+            placeholder="جستجوی نام، موبایل، کد ملی، پلاک یا کد ترانزیت..."
+            className="
+              h-10 w-full
+              rounded-lg
+              border border-border
+              bg-surface
+              pr-10 pl-3
+              text-sm text-text
+              outline-none
+              transition-colors
+              placeholder:text-text-2
+              focus:border-primary
+            "
           />
         </div>
       </div>
 
-      {/* Table Section */}
-      <div className="w-full overflow-x-auto bg-surface border border-border rounded-xl shadow-sm">
-        <table className="w-full text-right border-collapse">
-          <thead>
-            <tr className="border-b border-border bg-surface-2 text-text-2 text-xs font-semibold select-none">
-              <th className="p-4">نام</th>
-              <th className="p-4">شماره موبایل</th>
-              <th className="p-4">خودروهای مرتبط</th>
-              <th className="p-4">آخرین درخواست</th>
-              <th className="p-4">وضعیت</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-border/60 text-sm text-text">
-            {drivers.map((d) => (
-              <tr
-                key={d.id}
-                className="hover:bg-surface-2/40 transition-colors"
-              >
-                <td className="p-4 font-medium">{d.name}</td>
-                <td className="p-4 font-mono text-text-2">{d.phone}</td>
-                <td className="p-4">
-                  <div className="flex flex-wrap gap-1.5">
-                    {d.vehicleIds.map((id) => {
-                      const vehicle = vehicles.find((v) => v.id === id);
-                      return vehicle ? (
-                        <span
-                          key={id}
-                          className="px-2 py-0.5 rounded-md bg-surface-2 border border-border text-xs text-text-2 font-mono"
-                        >
-                          {vehicle.plate}
-                        </span>
-                      ) : null;
-                    })}
-                  </div>
-                </td>
-                <td className="p-4 text-text-2">{d.lastRequest}</td>
-                <td className="p-4">
-                  <StatusBadge
-                    status={d.status === "فعال" ? "فعال" : "لغو شده"}
-                  />
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      {/* Table */}
+      <div className="overflow-hidden rounded-xl border border-border bg-surface">
+        <BaseTable
+          data={drivers}
+          columns={columns}
+          isPending={isPending}
+          
+        />
       </div>
+
+      {/* Pagination */}
+      {totalItems > pageSize && (
+        <TableFooter
+          pageSize={pageSize}
+          totalItems={totalItems}
+          currentPage={currentPage}
+          onPageSizeChange={(size) => {
+            updateSearchParams({
+              page: 1,
+              pageSize: size,
+            });
+          }}
+          onPageChange={(page) => {
+            updateSearchParams({
+              page,
+            });
+          }}
+        />
+      )}
     </div>
   );
 }

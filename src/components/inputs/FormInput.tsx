@@ -8,7 +8,7 @@ interface FormInputProps extends InputHTMLAttributes<HTMLInputElement> {
 export const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
   ({ label, error, className = "", ...props }, ref) => {
     return (
-      <div className="w-full flex flex-col gap-1.5">
+      <div className="w-full flex flex-col gap-1.5 ">
         {label && (
           <label className="text-xs font-medium text-text/80 pl-1">
             {label}

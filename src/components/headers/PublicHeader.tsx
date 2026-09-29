@@ -1,9 +1,11 @@
 // components/layout/PublicHeader.tsx
 import { NavLink, useLocation } from "react-router-dom";
 import { Package } from "lucide-react";
-import ThemeToggle from "../../components/ui/ThemeToggle";
+
 import { useBasket } from "../../contexts/BasketContext";
 import { Button } from "../buttons/Button";
+import ThemeToggle from "../ui/ThemeToggle";
+import Logo from "../ui/Logo";
 
 export default function PublicHeader() {
   const { basket } = useBasket();
@@ -20,11 +22,9 @@ export default function PublicHeader() {
     }`;
 
   return (
-    <header className="h-16 fixed w-full bg-background/60 z-40 backdrop-blur-lg flex justify-between items-center px-6 border-b border-border">
+    <header className="h-16 fixed w-full  z-40 backdrop-blur-lg flex justify-between items-center px-6 border-b border-border">
       {/* Logo */}
-      <NavLink to="/" className="text-primary font-extrabold text-3xl">
-        ShowBar
-      </NavLink>
+     <Logo />
 
       {/* Desktop Nav - Hidden on mobile */}
       <div className="hidden md:flex items-center h-full">
@@ -50,13 +50,13 @@ export default function PublicHeader() {
 
       {/* Actions */}
       <div className="flex items-center gap-3">
-        <Button>
+        <Button >
           <NavLink to="/track">پیگیری درخواست‌ها</NavLink>
         </Button>
         <ThemeToggle />
         <NavLink
           to="/basket"
-          className="text-xs md:flex hidden items-center justify-center gap-1 border border-border rounded-full hover:bg-surface/75  p-1.5 min-w-20  "
+          className="text-xs md:flex hidden items-center justify-center gap-1 border border-border rounded-full hover:bg-surface/75  p-1.5 min-w-20 hover:border-primary "
         >
           <Package size={16} />
 

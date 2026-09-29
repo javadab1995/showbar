@@ -20,6 +20,7 @@ type MultiSelectProps = {
   onChange: (value: string[]) => void;
   placeholder?: string;
   disabled?: boolean;
+  className?: string;
 };
 
 export function MultiSelect({
@@ -28,6 +29,7 @@ export function MultiSelect({
   onChange,
   placeholder = "انتخاب کنید",
   disabled = false,
+  className=""
 }: MultiSelectProps) {
   const [open, setOpen] = useState(false);
 
@@ -90,25 +92,8 @@ export function MultiSelect({
         type="button"
         disabled={disabled}
         {...getReferenceProps()}
-        className="
-          flex
-          min-h-9
-          w-full
-          items-center
-          justify-between
-          gap-2
-          rounded-full
-          border
-          border-border
-          px-3
-          py-1
-          text-sm
-          text-text
-          transition
-          hover:border-primary
-          disabled:cursor-not-allowed
-          disabled:opacity-50
-        "
+        className={`${className ? className : "flex min-h-9 w-full items-center justify-between gap-2 rounded-full border border-border px-3 py-1 text-sm text-text transition hover:border-primary disabled:cursor-not-allowed disabled:opacity-50"}`}
+         
       >
         <div className="flex min-w-0 flex-1 flex-wrap gap-1.5">
           {selectedOptions.length === 0 ? (

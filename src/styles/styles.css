@@ -1,13 +1,12 @@
-
-
 @import url("https://fonts.googleapis.com/css2?family=Markazi+Text:wght@400..700&display=swap");
+
 @import "tailwindcss";
+
 /* =========================================================
    SHOWBAR DESIGN TOKENS
    ========================================================= */
 
-   @theme inline {
-  /* Colors */
+@theme inline {
   --color-primary: var(--primary);
   --color-primary-dark: var(--primary-dark);
   --color-primary-soft: var(--primary-soft);
@@ -22,194 +21,22 @@
   --color-text-2: var(--text-2);
   --color-muted: var(--muted);
 
-  --color-success: var(--success) !important;
-  --color-warning: var(--warning) !important;
-  --color-danger: var(--danger) !important;
-  
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
 
-  /* Font */
-  --font-sans: var(--font-sans) !important;
+  --font-sans: var(--font-family);
 }
 
-@utility filter-select {
-  @apply  w-auto rounded-full hover:border-primary border border-border text-sm  px-3 py-1 h-9 min-w-0 text-text outline-none transition ;
-}
-
-@utility filter-select-hover {
-  @apply hover:border-primary;
-}
-@utility bg-primary-radial {
-  background:
-    radial-gradient(
-      ellipse 9px 6px at 14% 25%,
-      transparent 45%,
-      var(--color-primary-dark) 48% 62%,
-      transparent 65%
-    ),
-    radial-gradient(
-      ellipse 12px 8px at 40% 70%,
-      transparent 43%,
-      var(--color-primary-dark) 46% 60%,
-      transparent 63%
-    ),
-    radial-gradient(
-      ellipse 7px 11px at 66% 25%,
-      transparent 44%,
-      var(--color-primary-dark) 47% 61%,
-      transparent 64%
-    ),
-    radial-gradient(
-      ellipse 14px 7px at 86% 72%,
-      transparent 43%,
-      var(--color-primary-dark) 46% 60%,
-      transparent 63%
-    ),
-    radial-gradient(
-      ellipse 5px 3px at 25% 80%,
-      var(--color-primary-dark) 0 70%,
-      transparent 73%
-    ),
-    linear-gradient(
-      135deg,
-      var(--color-primary),
-      var(--color-primary-dark)
-    );
-}
-@utility bg-surface-radial {
-  background:
-    radial-gradient(
-      ellipse 9px 6px at 14% 25%,
-      transparent 45%,
-      var(--color-text-2) 48% 62%,
-      transparent 65%
-    ),
-    radial-gradient(
-      ellipse 12px 8px at 40% 70%,
-      transparent 43%,
-      var(--color-text-2) 46% 60%,
-      transparent 63%
-    ),
-    radial-gradient(
-      ellipse 7px 11px at 66% 25%,
-      transparent 44%,
-      var(--color-text-2) 47% 61%,
-      transparent 64%
-    ),
-    radial-gradient(
-      ellipse 14px 7px at 86% 72%,
-      transparent 43%,
-      var(--color-text-2) 46% 60%,
-      transparent 63%
-    ),
-    radial-gradient(
-      ellipse 5px 3px at 25% 80%,
-      var(--color-text-2) 0 70%,
-      transparent 73%
-    ),
-    linear-gradient(
-      135deg,
-      var(--color-text),
-      var(--color-text-2)
-    );
-}
-@utility bg-login-pattern {
-  background:
-    /* لکه‌های بزرگ */
-    radial-gradient(
-      ellipse 34px 22px at 8% 14%,
-      var(--color-primary-dark) 0%,
-      var(--color-primary-dark) 62%,
-      transparent 66%
-    ),
-
-    radial-gradient(
-      ellipse 26px 38px at 24% 72%,
-      var(--color-primary-dark) 0%,
-      var(--color-primary-dark) 60%,
-      transparent 65%
-    ),
-
-    radial-gradient(
-      ellipse 42px 25px at 48% 18%,
-      var(--color-primary-dark) 0%,
-      var(--color-primary-dark) 58%,
-      transparent 64%
-    ),
-
-    radial-gradient(
-      ellipse 30px 44px at 72% 64%,
-      var(--color-primary-dark) 0%,
-      var(--color-primary-dark) 58%,
-      transparent 64%
-    ),
-
-    radial-gradient(
-      ellipse 46px 28px at 94% 22%,
-      var(--color-primary-dark) 0%,
-      var(--color-primary-dark) 60%,
-      transparent 66%
-    ),
-
-    /* لکه‌های متوسط */
-    radial-gradient(
-      ellipse 16px 11px at 17% 42%,
-      var(--color-primary-dark) 0%,
-      var(--color-primary-dark) 62%,
-      transparent 68%
-    ),
-
-    radial-gradient(
-      ellipse 12px 18px at 37% 86%,
-      var(--color-primary-dark) 0%,
-      var(--color-primary-dark) 60%,
-      transparent 67%
-    ),
-
-    radial-gradient(
-      ellipse 19px 13px at 63% 40%,
-      var(--color-primary-dark) 0%,
-      var(--color-primary-dark) 60%,
-      transparent 67%
-    ),
-
-    radial-gradient(
-      ellipse 14px 21px at 84% 86%,
-      var(--color-primary-dark) 0%,
-      var(--color-primary-dark) 60%,
-      transparent 67%
-    ),
-
-    /* لکه‌های کوچک */
-    radial-gradient(
-      circle 7px at 32% 30%,
-      var(--color-primary-dark) 0%,
-      var(--color-primary-dark) 62%,
-      transparent 68%
-    ),
-
-    radial-gradient(
-      circle 5px at 55% 78%,
-      var(--color-primary-dark) 0%,
-      var(--color-primary-dark) 62%,
-      transparent 68%
-    ),
-
-    radial-gradient(
-      circle 8px at 78% 28%,
-      var(--color-primary-dark) 0%,
-      var(--color-primary-dark) 62%,
-      transparent 68%
-    ),
-
-    /* پایه */
-    linear-gradient(
-      135deg,
-      var(--color-primary),
-      var(--color-primary-dark)
-    );
-}
-@layer base {
 :root {
+  --font-family: "Markazi Text", Tahoma, sans-serif;
+}
+
+/* =========================================================
+   LIGHT THEME
+   ========================================================= */
+
+[data-theme="light"] {
   --primary: #0D674E;
   --primary-dark: #09543F;
   --primary-soft: #EAF5F1;
@@ -225,10 +52,9 @@
   --muted: #9AA19F;
 
   --success: #16A96A;
-  --warning: #E99A18;
+  --warning: #EE7C37;
   --danger: #DC454B;
 
- 
   --gradient-primary-soft:
     linear-gradient(
       135deg,
@@ -238,19 +64,13 @@
 
   --shadow:
     0 8px 28px rgba(22, 35, 31, 0.06);
-
-
-  /* Typography */
-  --font-sans: "Markazi Text", Tahoma, sans-serif;
 }
-
 
 /* =========================================================
    DARK THEME
    ========================================================= */
 
-:root[data-theme="dark"] {
-
+[data-theme="dark"] {
   --primary: #39A889;
   --primary-dark: #2C8D74;
   --primary-soft: #123B32;
@@ -266,13 +86,11 @@
   --muted: #7F8C87;
 
   --success: #35C98A;
-  --warning: #F5B84B;
+  --warning: #F59D4B;
   --danger: #FF6B70;
 
- 
-
   --gradient-primary-soft:
-    radial-gradient(
+    linear-gradient(
       135deg,
       #123B32 0%,
       #18231F 100%
@@ -280,55 +98,188 @@
 
   --shadow:
     0 8px 28px rgba(0, 0, 0, 0.18);
-
-}
 }
 
 
-/* =========================================================
-   TAILWIND SEMANTIC TOKENS
-   ========================================================= */
+@utility filter-select {
+  @apply w-auto rounded-full border border-border px-3 py-1 text-sm 
+    h-9 min-w-0  outline-none transition;
+}
+
+@utility filter-select-hover {
+  @apply hover:border-primary;
+}
+
+@utility bg-primary-radial {
+  background:
+    radial-gradient(
+      ellipse 9px 6px at 14% 25%,
+      transparent 45%,
+      var(--primary-dark) 48% 62%,
+      transparent 65%
+    ),
+    radial-gradient(
+      ellipse 12px 8px at 40% 70%,
+      transparent 43%,
+      var(--primary-dark) 46% 60%,
+      transparent 63%
+    ),
+    radial-gradient(
+      ellipse 7px 11px at 66% 25%,
+      transparent 44%,
+      var(--primary-dark) 47% 61%,
+      transparent 64%
+    ),
+    radial-gradient(
+      ellipse 14px 7px at 86% 72%,
+      transparent 43%,
+      var(--primary-dark) 46% 60%,
+      transparent 63%
+    ),
+    radial-gradient(
+      ellipse 5px 3px at 25% 80%,
+      var(--primary-dark) 0 70%,
+      transparent 73%
+    ),
+    linear-gradient(
+      135deg,
+      var(--primary),
+      var(--primary-dark)
+    );
+}
+
+@utility bg-surface-radial {
+  background:
+    radial-gradient(
+      ellipse 9px 6px at 14% 25%,
+      transparent 45%,
+      var(--text-2) 48% 62%,
+      transparent 65%
+    ),
+    radial-gradient(
+      ellipse 12px 8px at 40% 70%,
+      transparent 43%,
+      var(--text-2) 46% 60%,
+      transparent 63%
+    ),
+    radial-gradient(
+      ellipse 7px 11px at 66% 25%,
+      transparent 44%,
+      var(--text-2) 47% 61%,
+      transparent 64%
+    ),
+    radial-gradient(
+      ellipse 14px 7px at 86% 72%,
+      transparent 43%,
+      var(--text-2) 46% 60%,
+      transparent 63%
+    ),
+    radial-gradient(
+      ellipse 5px 3px at 25% 80%,
+      var(--text-2) 0 70%,
+      transparent 73%
+    ),
+    linear-gradient(
+      135deg,
+      var(--text),
+      var(--text-2)
+    );
+}
+
+@utility bg-login-pattern {
+  background:
+    radial-gradient(
+      ellipse 34px 22px at 8% 14%,
+      var(--primary-dark) 0%,
+      var(--primary-dark) 62%,
+      transparent 66%
+    ),
+    radial-gradient(
+      ellipse 26px 38px at 24% 72%,
+      var(--primary-dark) 0%,
+      var(--primary-dark) 60%,
+      transparent 65%
+    ),
+    radial-gradient(
+      ellipse 42px 25px at 48% 18%,
+      var(--primary-dark) 0%,
+      var(--primary-dark) 58%,
+      transparent 64%
+    ),
+    radial-gradient(
+      ellipse 30px 44px at 72% 64%,
+      var(--primary-dark) 0%,
+      var(--primary-dark) 58%,
+      transparent 64%
+    ),
+    radial-gradient(
+      ellipse 46px 28px at 94% 22%,
+      var(--primary-dark) 0%,
+      var(--primary-dark) 60%,
+      transparent 66%
+    ),
+    radial-gradient(
+      ellipse 16px 11px at 17% 42%,
+      var(--primary-dark) 0%,
+      var(--primary-dark) 62%,
+      transparent 68%
+    ),
+    radial-gradient(
+      ellipse 12px 18px at 37% 86%,
+      var(--primary-dark) 0%,
+      var(--primary-dark) 60%,
+      transparent 67%
+    ),
+    radial-gradient(
+      ellipse 19px 13px at 63% 40%,
+      var(--primary-dark) 0%,
+      var(--primary-dark) 60%,
+      transparent 67%
+    ),
+    radial-gradient(
+      ellipse 14px 21px at 84% 86%,
+      var(--primary-dark) 0%,
+      var(--primary-dark) 60%,
+      transparent 67%
+    ),
+    radial-gradient(
+      circle 7px at 32% 30%,
+      var(--primary-dark) 0%,
+      var(--primary-dark) 62%,
+      transparent 68%
+    ),
+    radial-gradient(
+      circle 5px at 55% 78%,
+      var(--primary-dark) 0%,
+      var(--primary-dark) 62%,
+      transparent 68%
+    ),
+    radial-gradient(
+      circle 8px at 78% 28%,
+      var(--primary-dark) 0%,
+      var(--primary-dark) 62%,
+      transparent 68%
+    ),
+    linear-gradient(
+      135deg,
+      var(--primary),
+      var(--primary-dark)
+    );
+}
 
 
 html {
-  font-family: var(--font-sans) !important;
-  background: var(--bg);
-  color: var(--text);
+  font-family: var(--font-family);
 }
 
 body {
   margin: 0;
-  background: var(--bg);
-  color: var(--text);
-  transition:
-    background-color 180ms ease,
-    color 180ms ease;
-}
-option{
-  background-color: var(--primary-dark);
-  color: var(--bg);
-  font-size: 12px;
-}
-
-input:input:-internal-autofill-selected{
-background-color: var(--color-primary-soft) 70%  !important;
-}
-
-
-/* =========================================================
-   BASE
-   ========================================================= */
-* {
-  box-sizing: border-box;
+  font-family: var(--font-family);
 }
 
 
 
-.bg-gradient-primary-soft {
-  background: var(--gradient-primary-soft);
-}
-
-
+/* From Uiverse.io by vinodjangid07 */ 
 .loader {
   width: fit-content;
   height: fit-content;
@@ -429,3 +380,5 @@ background-color: var(--color-primary-soft) 70%  !important;
     transform: translateX(-350px);
   }
 }
+
+

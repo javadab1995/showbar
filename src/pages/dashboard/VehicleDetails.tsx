@@ -1,111 +1,311 @@
-import { ArrowRight, UserRound, Truck, History, Info } from "lucide-react";
+import {
+  ArrowRight,
+  UserRound,
+  Truck,
+  History,
+  Package,
+  Phone,
+} from "lucide-react";
+
 import { Link, useParams } from "react-router-dom";
-import { drivers, vehicles, requests } from "../../data/mock";
+
 import { StatusBadge } from "../../components/ui/StatusBadge";
+import Spinner from "../../components/widgets/Spinner";
+import VehicleLabel from "../../components/labels/VehicleLabel";
+
+import { useVehicleDetails } from "../../hooks/admin/useVehicleDetails";
+import { toPersianDigits } from "../../helpers/number";
+import VehiclePlate from "../../components/ui/VehiclePlate";
 
 
 export function VehicleDetails() {
-  const { id } = useParams();
-  const v = vehicles.find((x) => x.id === id);
+  const { id } = useParams<{ id: string }>();
 
-  if (!v)
-    return <div className="text-center py-20 text-text-2">خودرو پیدا نشد</div>;
+  const { data, isPending, isError } = useVehicleDetails(id);
 
-  const ds = drivers.filter((d) => v.drivers.includes(d.id));
+
+  if (isPending) {
+    return (
+      <div className="flex h-96 items-center justify-center">
+        <Spinner />
+      </div>
+    );
+  }
+
+  if (isError || !data) {
+    return (
+      <div className="py-20 text-center text-sm text-text-2">
+        خودرو پیدا نشد.
+      </div>
+    );
+  }
+
+  const { vehicle, drivers, assignments, requests } = data;
 
   return (
-    <div className="max-w-6xl mx-auto space-y-8 pb-12">
+    <div className="mx-auto max-w-6xl space-y-6 pb-12">
       {/* Header */}
       <div className="flex items-center justify-between">
         <Link
           to="/admin/vehicles"
-          className="flex items-center gap-2 text-text-2 hover:text-primary transition-colors font-medium"
+          className="
+            flex items-center gap-2
+            text-sm font-medium
+            text-text-2
+            transition-colors
+            hover:text-primary
+          "
         >
-          <ArrowRight className="w-4 h-4" /> بازگشت به لیست
+          <ArrowRight size={16} />
+          بازگشت به خودروها
         </Link>
-        <StatusBadge status={v.status === "فعال" ? "فعال" : "لغو شده"} />
+
+        <StatusBadge status={vehicle.status} />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Left Column: Vehicle Info */}
-        <div className="lg:col-span-2 space-y-6">
-          <section className="bg-surface border border-border rounded-3xl p-8 shadow-sm">
-            <div className="flex items-center gap-4 mb-8">
-              <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center text-primary">
-                <Truck className="w-8 h-8" />
-              </div>
-              <div>
-                <h2 className="text-3xl font-bold text-text">{v.type}</h2>
-                <p className="text-text-2 mt-1">
-                  شناسه ترانزیتی:{" "}
-                  <span className="font-mono">{v.transitId}</span>
-                </p>
-              </div>
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        {/* Vehicle Info */}
+        <section
+          className="
+            space-y-5
+            rounded-2xl
+            border border-border
+            bg-surface
+            p-6
+            lg:col-span-2
+          "
+        >
+          <div className="flex items-center gap-4">
+            <div
+              className="
+                flex h-14 w-14
+                items-center justify-center
+                rounded-2xl
+                bg-primary/10
+                text-primary
+              "
+            >
+              <Truck size={28} />
             </div>
 
-            {/* Simulated Iranian Plate */}
-            <div className="bg-white border-2 border-slate-800 rounded-lg p-2 w-fit mx-auto flex items-center font-mono text-4xl tracking-widest shadow-lg">
-              <span className="bg-blue-700 text-white px-3 py-1 rounded-sm text-lg mr-3 flex flex-col items-center leading-none">
-                <span className="text-[10px]">I.R.</span>
-                <span className="text-[12px]">IRAN</span>
-              </span>
-              <span className="text-black font-bold">{v.plate}</span>
+            <div>
+              <h1 className="text-2xl font-bold text-text">
+                <VehicleLabel value={vehicle.vehicle_type} />
+              </h1>
             </div>
-          </section>
-
-          {/* History */}
-          <section className="bg-surface border border-border rounded-3xl overflow-hidden shadow-sm">
-            <div className="p-6 border-b border-border flex items-center gap-3">
-              <History className="w-5 h-5 text-primary" />
-              <h3 className="font-bold text-text">تاریخچه درخواست‌ها</h3>
-            </div>
-            <div className="divide-y divide-border">
-              {requests
-                .filter((r) => r.vehicleId === v.id)
-                .map((r) => (
-                  <div
-                    key={r.id}
-                    className="p-5 flex items-center justify-between hover:bg-surface-2/50 transition-colors"
-                  >
-                    <div className="flex flex-col">
-                      <span className="font-medium text-text">{r.id}</span>
-                      <span className="text-sm text-text-2">{r.createdAt}</span>
-                    </div>
-                    <StatusBadge status={r.status} />
-                  </div>
-                ))}
-            </div>
-          </section>
-        </div>
-
-        {/* Right Column: Drivers */}
-        <section className="bg-surface border border-border rounded-3xl shadow-sm h-fit">
-          <div className="p-6 border-b border-border flex items-center justify-between">
-            <h3 className="font-bold text-text flex items-center gap-2">
-              <UserRound className="w-5 h-5 text-primary" /> رانندگان
-            </h3>
-            <span className="text-xs bg-surface-2 px-2 py-1 rounded-full text-text-2">
-              {ds.length} نفر
-            </span>
           </div>
-          <div className="p-4 space-y-2">
-            {ds.map((d) => (
-              <div
-                key={d.id}
-                className="flex items-center gap-4 p-4 rounded-xl bg-surface-2/50 hover:bg-surface-2 transition-all"
-              >
-                <div className="w-10 h-10 rounded-full bg-border flex items-center justify-center">
-                  <UserRound className="w-5 h-5 text-text-2" />
+
+          <div
+            className="
+              rounded-xl
+              border border-border
+              bg-bg
+              p-5
+            "
+          >
+            <div className="flex md:flex-row flex-col justify-between md:items-center gap-4">
+              <InfoItem
+                label="نوع شناسه"
+                value={vehicle.identifier_type === "PLATE" ? "پلاک" : "ترانزیت"}
+              />
+              <VehiclePlate
+                type={vehicle.identifier_type}
+                value={vehicle.transit_code || vehicle.plate}
+              />
+            </div>
+          </div>
+        </section>
+
+        {/* Drivers */}
+        <section
+          className="
+            h-fit
+            rounded-2xl
+            border border-border
+            bg-surface
+          "
+        >
+          <Header
+            icon={<UserRound size={18} />}
+            title="رانندگان"
+            count={drivers.length}
+          />
+
+          <div className="space-y-2 p-4">
+            {drivers.length === 0 ? (
+              <Empty text="راننده‌ای ثبت نشده است" />
+            ) : (
+              drivers?.map((item) => (
+                <div
+                  key={item.id}
+                  className="
+                    flex items-center gap-3
+                    rounded-xl
+                    bg-surface-2
+                    p-3
+                  "
+                >
+                  <div
+                    className="
+                      flex h-10 w-10
+                      items-center justify-center
+                      rounded-full
+                      bg-primary/10
+                      text-primary
+                    "
+                  >
+                    <UserRound size={18} />
+                  </div>
+
+                  <div>
+                    <p className="font-medium text-text">{item.driver?.name}</p>
+
+                    <p className="flex items-center gap-1 text-xs text-text-2">
+                      <Phone size={12} />
+                      {toPersianDigits(item?.driver?.phone)}
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <p className="font-bold text-text">{d.name}</p>
-                  <p className="text-sm text-text-2 font-mono">{d.phone}</p>
-                </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </section>
       </div>
+
+      {/* Assignments History */}
+      <section
+        className="
+          rounded-2xl
+          border border-border
+          bg-surface
+        "
+      >
+        <Header
+          icon={<History size={18} />}
+          title="سوابق حمل"
+          count={assignments.length}
+        />
+
+        <div className="divide-y divide-border">
+          {assignments.length === 0 ? (
+            <Empty text="سابقه حملی ثبت نشده است" />
+          ) : (
+            assignments.map((item) => (
+              <div
+                key={item.id}
+                className="
+                  flex flex-col gap-3
+                  p-5
+                  sm:flex-row
+                  sm:items-center
+                  sm:justify-between
+                "
+              >
+                <div>
+                  <div className="flex items-center gap-2 font-bold text-text">
+                    <Package size={16} />
+
+                    {item.load?.origin}
+
+                    <span>→</span>
+
+                    {item.load?.destination}
+                  </div>
+
+                  <p className="mt-2 text-sm text-text-2">
+                    راننده: {item.driver?.name}
+                  </p>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      </section>
+
+      {/* Requests */}
+      <section
+        className="
+          rounded-2xl
+          border border-border
+          bg-surface
+        "
+      >
+        <Header
+          icon={<History size={18} />}
+          title="درخواست‌های ثبت شده"
+          count={requests.length}
+        />
+
+        <div className="divide-y divide-border">
+          {requests.map((request) => (
+            <div
+              key={request.id}
+              className="flex items-center justify-between p-5"
+            >
+              <div>
+                <p className="font-medium text-text">{request.driver?.name}</p>
+
+                <p className="text-xs text-text-2">
+                  {request.loads.length} بار انتخاب شده
+                </p>
+              </div>
+
+              <StatusBadge status={request.status} />
+            </div>
+          ))}
+        </div>
+      </section>
     </div>
   );
+}
+
+function Header({
+  icon,
+  title,
+  count,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  count: number;
+}) {
+  return (
+    <div
+      className="
+        flex items-center justify-between
+        border-b border-border
+        p-5
+      "
+    >
+      <h3 className="flex items-center gap-2 font-bold text-text">
+        <span className="text-primary">{icon}</span>
+        {title}
+      </h3>
+
+      <span
+        className="
+          rounded-full
+          bg-surface-2
+          px-2.5 py-1
+          text-xs
+          text-text-2
+        "
+      >
+        {count}
+      </span>
+    </div>
+  );
+}
+
+function InfoItem({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <p className="text-xs text-text-2">{label}</p>
+
+      <p className="mt-1 font-medium text-text">{value}</p>
+    </div>
+  );
+}
+
+function Empty({ text }: { text: string }) {
+  return <div className="p-8 text-center text-sm text-text-2">{text}</div>;
 }

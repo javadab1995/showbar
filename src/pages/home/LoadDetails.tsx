@@ -1,63 +1,111 @@
  import {
+   ArrowDownToLine,
    ArrowLeft,
-  ArrowRight,
+
+  ArrowLeftRight,
+
+  ArrowUpFromLine,
+
   CalendarDays,
-  Check,
+
   CircleDollarSign,
+  Layers,
   MapPin,
   Plus,
-  PlusSquare,
   Scale,
   Truck,
 } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 
-import { loads, money } from "../../data/mock";
+
 import { useBasket } from "../../contexts/BasketContext";
 
 import { StatusBadge } from "../../components/ui/StatusBadge";
 import { Button } from "../../components/buttons/Button";
 import GoToLoads from "../../components/buttons/GoToLoads";
+import { useLoad } from "../../hooks/other/useLoad";
+
+import { toPersianDate } from "../../helpers/date";
+import { formatMoney } from "../../helpers/format";
+import CurrencyFlag from "../../components/widgets/CurrencyFlag";
+import { BORDER_OPTIONS, VEHICLE_OPTIONS } from "../../data/options";
+import { toPersianDigits } from "../../helpers/number";
+import { getExitBorderLabels } from "../../helpers/exitBorders";
+
+
+
+
+const TRADE_ICONS = {
+  export: ArrowUpFromLine,
+  import: ArrowDownToLine,
+  domestic: ArrowLeftRight,
+} as const;
+
 
 export function LoadDetails() {
   const { id } = useParams();
   const { basket, setBasket } = useBasket();
 
-  const load = loads.find((item) => item.id === id);
 
-  if (!load) {
+
+  const { data: load, isLoading, isError } = useLoad(id);
+  
+
+
+
+ 
+
+
+
+  if (isLoading) {
     return (
-      <section className="mx-auto w-full px-6 py-20 ">
-        <div
-          className="
-            flex min-h-60
-            items-center justify-center
-            rounded-xl
-            border border-borde
-            text-sm text-text-2
-          "
-        >
-          بار موردنظر پیدا نشد.
-        </div>
-      </section>
+      <div className="space-y-3">
+        {[1, 2, 3].map((item) => (
+          <div
+            key={item}
+            className="h-24 animate-pulse rounded-2xl bg-border"
+          />
+        ))}
+      </div>
     );
   }
 
-  const selected = basket.includes(load.id);
-  const active = load.status === "فعال";
-
-  const toggleBasket = () => {
-    setBasket(
-      selected
-        ? basket.filter((item) => item !== load.id)
-        : [...basket, load.id],
+  if (isError || !load) {
+    return (
+      <div className="rounded-2xl border border-border bg-surface p-6 text-center">
+        <p className="text-sm text-danger">دریافت اعلان‌ها با خطا مواجه شد.</p>
+      </div>
     );
-  };
+  }
+
+   
+
+
+  const vehicleLabel =
+    VEHICLE_OPTIONS.find((option) => option.value === load.vehicle_type)
+      ?.label ?? "سایر";
+
+
+
+  const IconComponent =
+    TRADE_ICONS[load.trade_type as keyof typeof TRADE_ICONS] ?? ArrowLeftRight;
+
+    const selected = basket.includes(load.id);
+    const active = load.status === "active";
+
+    const toggleBasket = () => {
+      setBasket(
+        selected
+          ? basket.filter((item) => item !== load.id)
+          : [...basket, load.id],
+      );
+    };
+
 
   return (
     <section className="mx-auto w-full px-6 py-20">
       {/* Back */}
-     <GoToLoads />
+      <GoToLoads to="/loads" />
       {/* Hero */}
       <section
         className="
@@ -135,7 +183,7 @@ export function LoadDetails() {
             "
           >
             <CalendarDays size={14} />
-            منتشر شده: {load.createdAt}
+            منتشر شده: {toPersianDate(load.created_at)}
           </div>
         </div>
       </section>
@@ -175,21 +223,27 @@ export function LoadDetails() {
               <InfoItem
                 icon={Scale}
                 label="وزن بار"
-                value={`${load.weight} تن`}
+                value={`${toPersianDigits(load.weight)} تن`}
               />
 
-              <InfoItem icon={Truck} label="نوع ناوگان" value={load.vehicle} />
+              <InfoItem icon={Truck} label="نوع ناوگان" value={vehicleLabel} />
+              
+
+           
+              {load.exit_borders && (
+                <InfoItem icon={Layers} label="مرز خروج" value={getExitBorderLabels(load.exit_borders)} />
+              )}
 
               <InfoItem
                 icon={CalendarDays}
                 label="تاریخ بارگیری"
-                value={load.date}
+                value={toPersianDate(load.loading_date)}
               />
 
               <InfoItem
                 icon={CircleDollarSign}
                 label="کرایه حمل"
-                value={money(load.price)}
+                value={formatMoney(load.price)}
                 highlighted
               />
 
@@ -223,61 +277,6 @@ export function LoadDetails() {
               {load.description}
             </p>
           </section>
-
-          {/* Requirements */}
-          <section
-            className="
-              rounded-2xl
-              border border-border
-              p-5
-              sm:p-6
-            "
-          >
-            <h2 className="text-base font-semibold text-text">
-              شرایط و الزامات
-            </h2>
-
-            {load.requirements.length > 0 ? (
-              <div className="mt-4 space-y-2.5">
-                {load.requirements.map((requirement) => (
-                  <div
-                    key={requirement}
-                    className="
-                      flex
-                      items-center
-                      gap-2.5
-                      rounded-lg
-                      px-3.5
-                      py-3
-                      text-sm
-                      text-text
-                    "
-                  >
-                    <span
-                      className="
-                        flex
-                        h-5
-                        w-5
-                        shrink-0
-                        items-center
-                        justify-center
-                        rounded-full
-                        bg-primary-soft
-                        text-primary
-                      "
-                    >
-                      <Check size={13} strokeWidth={2.5} />
-                    </span>
-                    {requirement}
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="mt-3 text-sm text-text-2">
-                برای این بار الزام خاصی ثبت نشده است.
-              </p>
-            )}
-          </section>
         </div>
 
         {/* Action */}
@@ -292,14 +291,16 @@ export function LoadDetails() {
             "
           >
             <div className="border-b border-border pb-4">
-              <span className="text-xs text-text-2">کرایه </span>
+              <span className="text-xs text-text-2 flex gap-6">
+                <span>کرایه</span>
+                <CurrencyFlag currency={load.currency} />
+              </span>
 
-              <div className="mt-1 flex items-baseline gap-1.5">
+              <div className=" flex  items-baseline gap-1.5 mt-2">
                 <strong className="text-xl font-bold text-primary">
-                  {money(load.price)}
+                  {formatMoney(load.price)}
                 </strong>
-
-                <span className="text-xs text-text-2">تومان</span>
+                <span>{load.currency === "IRR" ? "تومان" : "دلار"}</span>
               </div>
             </div>
 
@@ -385,7 +386,7 @@ type InfoItemProps = {
     className?: string;
   }>;
   label: string;
-  value: string;
+  value: string | null | undefined | string[];
   highlighted?: boolean;
 };
 

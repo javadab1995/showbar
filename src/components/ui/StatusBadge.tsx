@@ -1,21 +1,38 @@
+
 import {
-  CheckCircle2,
-  Clock3,
-  CircleX,
-  CircleDot,
   CheckCircle,
+  CheckCircle2,
+  CircleDot,
+  CircleX,
+  Clock3,
+  type LucideIcon,
 } from "lucide-react";
 
 import type {
+  DriverRequestLoadStatus,
+  DriverRequestStatus,
+  DriverStatus,
+  LoadNotificationStatus,
   LoadStatus,
-  NotificationStatus,
-  RequestStatus,
-} from "../../types";
+  VehicleStatus,
+} from "../../types/status";
 
-type Status = LoadStatus | RequestStatus | NotificationStatus;
+type Status =
+  | LoadStatus
+  | DriverRequestStatus
+  | DriverRequestLoadStatus
+  | LoadNotificationStatus
+  | VehicleStatus
+  | DriverStatus;
 
 type StatusBadgeProps = {
   status: Status;
+};
+
+type StatusConfig = {
+  label: string;
+  category: "success" | "warning" | "danger" | "muted";
+  icon: LucideIcon;
 };
 
 const statusConfig = {
@@ -23,6 +40,12 @@ const statusConfig = {
     label: "فعال",
     category: "success",
     icon: CheckCircle2,
+  },
+
+  inactive: {
+    label: "غیرفعال",
+    category: "muted",
+    icon: CircleDot,
   },
 
   reserved: {
@@ -67,19 +90,18 @@ const statusConfig = {
     icon: CircleX,
   },
 
+  confirmed: {
+    label: "تأیید شده",
+    category: "success",
+    icon: CheckCircle,
+  },
+
   notified: {
     label: "اطلاع داده شد",
     category: "muted",
     icon: CircleDot,
   },
-} as const satisfies Record<
-  Status,
-  {
-    label: string;
-    category: "success" | "warning" | "danger" | "muted";
-    icon: typeof CircleDot;
-  }
->;
+} satisfies Record<Status, StatusConfig>;
 
 const categoryStyles = {
   success: "text-success",
@@ -96,9 +118,9 @@ export function StatusBadge({ status }: StatusBadgeProps) {
 
   return (
     <span className={`flex items-center gap-1 ${colorClass}`}>
-      <Icon size={14} className={colorClass} />
-
+      <Icon size={14} />
       {config.label}
     </span>
   );
 }
+

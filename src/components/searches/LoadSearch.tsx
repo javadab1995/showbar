@@ -11,7 +11,7 @@ export function LoadSearch({ value, onChange }: LoadSearchProps) {
       className="
         relative mb-5 flex h-10 max-w-4xl
         items-center gap-1.5
-        rounded-lg border border-border
+        rounded-full border border-border
         p-1 px-4
       "
     >
@@ -30,19 +30,7 @@ export function LoadSearch({ value, onChange }: LoadSearchProps) {
         "
       />
 
-      <button
-        type="button"
-        className="
-          absolute left-0 flex h-full
-          items-center gap-2
-          rounded-lg bg-primary-radial
-          px-2 py-1 text-surface
-        "
-      >
-        <span className="text-sm">جستجو</span>
-
-        <SearchIcon size={16} />
-      </button>
+     
     </div>
   );
 }

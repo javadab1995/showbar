@@ -1,5 +1,5 @@
-export const formatMoney = (value) =>
-  new Intl.NumberFormat("fa-IR").format(value ?? 0);
+export const formatMoney = (value, currency) =>
+  new Intl.NumberFormat("fa-IR").format(value ?? 0) + `   ${currency === "IRR" ? "تومان" : "دلار"}`;
 
 export function formatTime(timeString) {
   if (!timeString) return "";

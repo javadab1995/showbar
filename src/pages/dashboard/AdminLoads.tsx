@@ -1,34 +1,32 @@
-import { Copy, Edit, Eye, Plus, Search, StopCircle, Trash } from "lucide-react";
+import { Plus, Search } from "lucide-react";
 
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 
 import { useState } from "react";
 
-import { money } from "../../data/mock";
-
-import { StatusBadge } from "../../components/ui/StatusBadge";
-
-import { TableFooter } from "../../components/ui/TableFooter";
-
-import { EmptyState } from "../../components/ui/EmptyState";
-
 import { Modal } from "../../components/ui/Modal";
 
 import { Button } from "../../components/buttons/Button";
 
-import DropdownMenu from "../../components/dropdown/DropdownMenu";
+import { useAdminLoads } from "../../hooks/admin/useAdminLoads";
 
-import Spinner from "../../components/widgets/Spinner";
+import { useDebounce } from "../../hooks/other/useDebounce";
 
-import { useAdminLoads } from "../../hooks/useAdminLoads";
 
-import { useDebounce } from "../../hooks/useDebounce";
-
-import type { LoadStatus } from "../../types";
 
 import { ADMIN_PAGE_SIZE } from "../../services/apiLoads";
-import { toPersianDate } from "../../helpers/date";
-import { toPersianDigits } from "../../helpers/number";
+import { createLoadColumns } from "../../components/columns/AdminLoads.columns";
+import BaseTable from "../../components/tables/BaseTable";
+import { useDuplicateLoad } from "../../hooks/admin/useDuplicateLoad";
+import { useArchiveLoad } from "../../hooks/admin/useArchiveLoad";
+import { useUpdateLoadStatus } from "../../hooks/admin/useUpdateLoadStatus";
+import { TableFooter } from "../../components/ui/TableFooter";
+import Tabs from "../../components/tabs/Tabs";
+import { LoadStatus } from "../../types/status";
+
+type LoadView = "active" | "archived";
+type LoadSort = "newest" | "oldest";
+
 
 export function AdminLoads() {
   // ======================================
@@ -42,8 +40,15 @@ export function AdminLoads() {
   // ======================================
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const currentPage = Number(searchParams.get("page")) || 1;
- 
+const currentPage = Number(searchParams.get("page")) || 1;
+
+  const pageSize = Number(searchParams.get("pageSize")) || ADMIN_PAGE_SIZE;
+
+const view = (searchParams.get("view") || "active") as LoadView;
+
+const sort = (searchParams.get("sort") || "newest") as LoadSort;
+
+  const archivedPage = view === "archived";
 
   const updateSearchParams = (
     updates: Record<string, string | number | null>,
@@ -65,82 +70,106 @@ export function AdminLoads() {
 
   const [status, setStatus] = useState<LoadStatus | "">("");
 
-  const [sort, setSort] = useState<"newest" | "oldest">("newest");
 
-
-
-  
-
-
-  const [pageSize, setPageSize] = useState(ADMIN_PAGE_SIZE);
 
   // ======================================
   // Delete Modal
   // ======================================
 
-  const [deleteId, setDeleteId] = useState<string | null>(null);
- 
+  const [archived, setArchived] = useState<string | null>(null);
+
   // ======================================
   // Debounced Search
   // ======================================
 
   const debouncedQuery = useDebounce(query, 500);
 
-
-
   // ======================================
   // Server Data
   // ======================================
 
-const {
-  data,
-  isLoading,
-  isFetching,
-  error: isError,
-} = useAdminLoads({
-  page:currentPage,
-  pageSize: ADMIN_PAGE_SIZE,
-  query:debouncedQuery,
-  status,
-  sort,
-});
-  
-  
-    const loads = data?.data ?? [];
-    const totalCount = data?.count ?? 0;
+  const {
+    data,
+    isPending,
+     isError,
+    error
+    
+  } = useAdminLoads({
+    page: currentPage,
+    pageSize,
+    query: debouncedQuery,
+    status,
+    sort,
+    archived:archivedPage
+  });
+
+
+  const totalItems = data?.total ?? 0;
+
+
+  const duplicateMutation = useDuplicateLoad();
+  const archivedMutation = useArchiveLoad();
+  const updatedStatusMutation = useUpdateLoadStatus();
+
  
+  const loads = data?.data ?? [];
 
 
-const handleSearchChange = (value: string) => {
-  setQuery(value);
-  updateSearchParams({ page: 1 });
-};
+ const columns = createLoadColumns({
+   onView: (id) => navigate(`/admin/loads/${id}`),
+
+   onEdit: (id) => navigate(`/admin/loads/${id}/edit`),
+
+   onDuplicate: (id) => {
+     duplicateMutation.mutate(id);
+   },
+
+   onUpdateStatus: (id, status) => {
+     updatedStatusMutation.mutate({
+       id,
+       status,
+     });
+   },
+
+   onArchived: (id) => {
+     archivedMutation.mutate(id);
+   },
+ });
+
+  const handleSearchChange = (value: string) => {
+    setQuery(value);
+    updateSearchParams({ page: 1 });
+  };
   // ======================================
   // Status Change
   // ======================================
 
   const handleStatusChange = (value: string) => {
     setStatus(value as LoadStatus | "");
-     updateSearchParams({ page: 1 });
+    updateSearchParams({ page: 1 });
   };
 
   // ======================================
   // Sort Change
   // ======================================
 
-  const handleSortChange = (value: "newest" | "oldest") => {
-    setSort(value);
-     updateSearchParams({ page: 1 });
-  };
-
+ const handleSortChange = (value: LoadSort) => {
+   updateSearchParams({
+     page: 1,
+     sort: value,
+   });
+ };
   // ======================================
   // Page Size Change
   // ======================================
 
-  const handlePageSizeChange = (size: number) => {
-    setPageSize(size);
-     updateSearchParams({ page: 1 });
-  };
+
+  const handleViewChange = (value: LoadView) => {
+    updateSearchParams({
+      page: 1,
+      view: value,
+    });
+  }
 
   return (
     <div className="space-y-6">
@@ -212,6 +241,21 @@ const handleSearchChange = (value: string) => {
           Toolbar
       ====================================== */}
 
+      <Tabs
+        value={view}
+        onChange={handleViewChange}
+        items={[
+          {
+            id: "active",
+            label: "بارهای فعال",
+          },
+          {
+            id: "archived",
+            label: "آرشیو",
+          },
+        ]}
+      />
+
       <div
         className="
           flex
@@ -266,10 +310,11 @@ const handleSearchChange = (value: string) => {
               pr-10
               text-sm
               text-text
+              
               outline-none
               transition-all
-              focus:ring-2
-              focus:ring-primary
+               focus:border-primary focus:ring-4 focus:ring-primary/10
+              
             "
           />
         </div>
@@ -319,30 +364,26 @@ const handleSearchChange = (value: string) => {
           </select>
 
           {/* Sort */}
-
           <select
             value={sort}
-            onChange={(e) =>
-              handleSortChange(e.target.value as "newest" | "oldest")
-            }
+            onChange={(e) => handleSortChange(e.target.value as LoadSort)}
             className="
-              cursor-pointer
-              rounded-lg
-              border
-              border-border
-              bg-surface-2
-              px-3
-              py-2.5
-              text-sm
-              text-text
-              outline-none
-              transition-all
-              focus:ring-2
-              focus:ring-primary
-            "
+    cursor-pointer
+    rounded-lg
+    border
+    border-border
+    bg-surface-2
+    px-3
+    py-2.5
+    text-sm
+    text-text
+    outline-none
+    transition-all
+    focus:ring-2
+    focus:ring-primary
+  "
           >
             <option value="newest">جدیدترین</option>
-
             <option value="oldest">قدیمی‌ترین</option>
           </select>
         </div>
@@ -352,7 +393,8 @@ const handleSearchChange = (value: string) => {
           Error
       ====================================== */}
 
-      {isError && (
+
+      {isError ? (
         <div
           className="
             rounded-xl
@@ -364,285 +406,42 @@ const handleSearchChange = (value: string) => {
             text-danger
           "
         >
-          {isError instanceof Error ? isError.message : "خطایی رخ داد"}
+          {error instanceof Error ? error.message : "خطایی رخ داد"}
         </div>
+      ) : (
+        <>
+          <BaseTable data={loads} columns={columns} isPending={isPending} />
+          <TableFooter
+            pageSize={pageSize}
+            totalItems={totalItems}
+            currentPage={currentPage}
+            onPageSizeChange={(size) => {
+              updateSearchParams({
+                page: 1,
+                pageSize: size,
+              });
+            }}
+            onPageChange={(page) => {
+              updateSearchParams({
+                page,
+              });
+            }}
+          />
+        </>
       )}
 
       {/* ======================================
           Table
       ====================================== */}
 
-      <div
-        className="
-          relative
-          w-full
-          overflow-x-auto
-          rounded-xl
-          border
-          border-border
-          bg-surface
-          shadow-sm
-        "
-      >
-        {/* Table Loading Overlay */}
-
-        {isFetching && (
-          <div
-            className="
-              absolute
-              inset-0
-              z-20
-              flex
-              items-center
-              justify-center
-              bg-surface/60
-              backdrop-blur-[1px]
-            "
-          >
-            <Spinner />
-          </div>
-        )}
-
-        {isLoading ? (
-          <div
-            className="
-              flex
-              min-h-100
-              items-center
-              justify-center
-            "
-          >
-            <Spinner />
-          </div>
-        ) : loads.length ? (
-          <>
-            <table
-              className="
-                w-full
-                border-collapse
-                text-right
-              "
-            >
-              <thead>
-                <tr
-                  className="
-                    border-b
-                    border-border
-                    bg-surface-2
-                    text-xs
-                    font-semibold
-                    text-text-2
-                  "
-                >
-                  <th className="p-4">مسیر</th>
-
-                  <th className="p-4">نوع بار</th>
-
-                  <th className="p-4">وزن</th>
-
-                  <th className="p-4">خودرو</th>
-
-                  <th className="p-4">تاریخ بارگیری</th>
-
-                  <th className="p-4">کرایه</th>
-
-                  <th className="p-4">وضعیت</th>
-
-                  <th className="p-4">تاریخ ثبت</th>
-
-                  <th className="w-12 p-4" />
-                </tr>
-              </thead>
-
-              <tbody
-                className="
-                  divide-y
-                  divide-border/60
-                  text-sm
-                  text-text
-                "
-              >
-                {loads.map((load) => (
-                  <tr
-                    key={load.id}
-                    className="
-                      transition-colors
-                      hover:bg-surface-2/40
-                    "
-                  >
-                    {/* Route */}
-
-                    <td className="p-4">
-                      <Link
-                        className="
-                          font-medium
-                          text-primary
-                          transition-colors
-                          hover:text-primary-dark
-                        "
-                        to={`/admin/loads/${load.id}`}
-                      >
-                        {load.origin}
-                        {" ← "}
-                        {load.destination}
-                      </Link>
-                    </td>
-
-                    {/* Cargo */}
-
-                    <td className="p-4">{load.cargo || "-"}</td>
-
-                    {/* Weight */}
-
-                    <td
-                      className="
-                        p-4
-                        font-mono
-                      "
-                    >
-                      {toPersianDigits(load.weight)} تن
-                    </td>
-
-                    {/* Vehicle */}
-
-                    <td className="p-4">{load.vehicle_type}</td>
-
-                    {/* Loading Date */}
-
-                    <td className="p-4">{toPersianDate(load.loading_date)}</td>
-
-                    {/* Price */}
-
-                    <td
-                      className="
-                        p-4
-                        font-mono
-                        font-medium
-                        text-primary
-                      "
-                    >
-                      {money(load.price)}
-                    </td>
-
-                    {/* Status */}
-
-                    <td className="p-4">
-                      <StatusBadge status={load.status} />
-                    </td>
-
-                    {/* Created At */}
-
-                    <td
-                      className="
-                        p-4
-                        text-xs
-                        text-text-2
-                      "
-                    >
-                      {toPersianDate(load.created_at) || "-"}
-                    </td>
-
-                    {/* Actions */}
-
-                    <td
-                      className="
-                        p-4
-                        text-center
-                      "
-                    >
-                      <DropdownMenu
-                        items={[
-                          {
-                            label: "مشاهده بار",
-
-                            icon: Eye,
-
-                            onClick: () => {
-                              navigate(`/admin/loads/${load.id}`);
-                            },
-                          },
-
-                          {
-                            label: "ویرایش بار",
-
-                            icon: Edit,
-
-                            onClick: () => {
-                              navigate(`/admin/loads/${load.id}/edit`);
-                            },
-                          },
-
-                          {
-                            label: "تکرار",
-
-                            icon: Copy,
-
-                            onClick: () => {
-                              navigate(`/admin/loads/new?copy=${load.id}`);
-                            },
-                          },
-
-                          {
-                            label: "حذف کامل",
-
-                            icon: Trash,
-
-                            danger: true,
-
-                            onClick: () => {
-                              setDeleteId(load.id);
-                            },
-                          },
-
-                          {
-                            label: "غیرفعال",
-
-                            icon: StopCircle,
-
-                            warning: true,
-
-                            onClick: () => {
-                              // بعداً mutation
-                            },
-                          },
-                        ]}
-                      />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-
-            {/* ======================================
-                Pagination
-            ====================================== */}
-
-            <TableFooter
-              totalItems={totalCount}
-              pageSize={pageSize}
-              currentPage={currentPage}
-              onPageSizeChange={handlePageSizeChange}
-              onPageChange={(page) => updateSearchParams({ page })}
-            />
-          </>
-        ) : (
-          <div className="p-8">
-            <EmptyState
-              title="باری وجود ندارد"
-              text="عبارت جستجو یا فیلترها را تغییر دهید."
-            />
-          </div>
-        )}
-      </div>
-
       {/* ======================================
           Delete Modal
       ====================================== */}
 
       <Modal
-        open={Boolean(deleteId)}
+        open={Boolean(archived)}
         title="حذف بار"
-        onClose={() => setDeleteId(null)}
+        onClose={() => setArchived(null)}
       >
         <div className="space-y-4">
           <p
@@ -652,7 +451,7 @@ const handleSearchChange = (value: string) => {
               text-text-2
             "
           >
-            آیا از حذف این بار مطمئن هستید؟ این عملیات قابل بازگشت نیست.
+            آیا از آرشیو این بار مطمئن هستید؟.
           </p>
 
           <div
@@ -674,7 +473,7 @@ const handleSearchChange = (value: string) => {
                 p-2.5
                 text-text
               "
-              onClick={() => setDeleteId(null)}
+              onClick={() => setArchived(null)}
             >
               انصراف
             </Button>
@@ -693,10 +492,10 @@ const handleSearchChange = (value: string) => {
               onClick={() => {
                 // بعداً delete mutation
 
-                setDeleteId(null);
+                setArchived(null);
               }}
             >
-              حذف بار
+              آرشیو بار
             </Button>
           </div>
         </div>

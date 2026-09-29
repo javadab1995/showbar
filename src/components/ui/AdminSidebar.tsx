@@ -1,7 +1,9 @@
-// components/layout/AdminSidebar.tsx
+
 import { useNavigate, useLocation } from "react-router-dom";
 import { LogOut, X } from "lucide-react";
-import { navItems } from "../../data/mock";
+import { navItems } from "../../data/menu-data";
+import { useAuth } from "../../auth/AuthProvider";
+import Logo from "./Logo";
 
 interface SidebarProps {
   mobileOpen: boolean;
@@ -9,8 +11,20 @@ interface SidebarProps {
 }
 
 export const AdminSidebar = ({ mobileOpen, setMobileOpen }: SidebarProps) => {
+  const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const isSuperAdmin = user?.role === "super_admin"
+  
+  const filteredNavItems = navItems.filter((item) => {
+    if (item.path === "/admin/add-admin" || item.path === "/admin/users") {
+      return isSuperAdmin;
+    }
+
+    return true;
+  });
+
+
 
   return (
     <aside
@@ -20,12 +34,7 @@ export const AdminSidebar = ({ mobileOpen, setMobileOpen }: SidebarProps) => {
     >
       <div className="h-full flex flex-col p-6">
         <div className="flex items-center justify-between mb-10">
-          <div className="flex items-center gap-3 font-bold text-xl text-text">
-            <div className="w-8 h-8 bg-primary-radial rounded-xl flex items-center justify-center text-surface">
-              S
-            </div>
-            <span>ShowBar</span>
-          </div>
+         <Logo />
           <button
             className="lg:hidden p-2 text-text-2 hover:bg-surface-2 rounded-lg"
             onClick={() => setMobileOpen(false)}
@@ -35,8 +44,9 @@ export const AdminSidebar = ({ mobileOpen, setMobileOpen }: SidebarProps) => {
         </div>
 
         <nav className="flex-1 space-y-2">
-          {navItems.map((item) => {
+          {filteredNavItems.map((item) => {
             const Icon = item.icon;
+           
             const active =
               location.pathname === item.path ||
               (item.path !== "/admin" &&
@@ -62,12 +72,13 @@ export const AdminSidebar = ({ mobileOpen, setMobileOpen }: SidebarProps) => {
         </nav>
 
         <button
-          className="flex items-center gap-3 px-4 py-3 text-text-2 hover:text-danger transition-colors"
-          onClick={() => navigate("/admin/login")}
+          className="flex  items-center gap-3 px-4 py-3 text-text-2 hover:text-danger transition-colors"
+          onClick={signOut}
         >
           <LogOut size={20} />
           خروج
         </button>
+        <span className="text-primary "> {user?.email}</span>
       </div>
     </aside>
   );

@@ -1,10 +1,13 @@
 import { ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-export default function GoToLoads() {
+type To = {
+  to: string;
+}
+export default function GoToLoads({to}:To) {
     return (
       <Link
-        to="/loads"
+        to={to}
         className="
             my-5
             inline-flex
@@ -21,7 +24,7 @@ export default function GoToLoads() {
           "
       >
         <ChevronRight
-          className="group-hover:-translate-x-0.5 transition-all  duration-200
+          className="group-hover:translate-x-0.5 transition-all  duration-200
             ease-in-out"
           size={18}
         />

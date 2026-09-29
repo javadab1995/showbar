@@ -1,38 +1,20 @@
-import {
-  LoaderCircle,
-  MapPin,
-} from "lucide-react";
-import {
-  useState,
-} from "react";
-import { Coordinates } from "../../types/load";
+import { LoaderCircle, MapPin } from "lucide-react";
+import { useState } from "react";
 
-
+import type { Coordinates } from "../../types/load";
 
 type NearMeFilterProps = {
   enabled: boolean;
-  onChange: (
-    enabled: boolean,
-    coordinates: Coordinates | null,
-  ) => void;
+  onChange: (enabled: boolean, coordinates: Coordinates | null) => void;
 };
 
-export function NearMeFilter({
-  enabled,
-  onChange,
-}: NearMeFilterProps) {
-  const [loading, setLoading] =
-    useState(false);
-
-  const [error, setError] =
-    useState<string | null>(null);
+export function NearMeFilter({ enabled, onChange }: NearMeFilterProps) {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const getLocation = () => {
     if (!navigator.geolocation) {
-      setError(
-        "مرورگر شما از موقعیت مکانی پشتیبانی نمی‌کند.",
-      );
-
+      setError("مرورگر شما از موقعیت مکانی پشتیبانی نمی‌کند.");
       return;
     }
 
@@ -41,42 +23,27 @@ export function NearMeFilter({
 
     navigator.geolocation.getCurrentPosition(
       (position) => {
-       const coordinates: Coordinates = {
-         lat: position.coords.latitude,
-         lng: position.coords.longitude,
-       };
+        const coordinates: Coordinates = {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+        };
 
         setLoading(false);
-
         onChange(true, coordinates);
       },
-
       (error) => {
         setLoading(false);
 
-        if (
-          error.code ===
-          error.PERMISSION_DENIED
-        ) {
-          setError(
-            "دسترسی به موقعیت مکانی داده نشد.",
-          );
-        } else if (
-          error.code ===
-          error.POSITION_UNAVAILABLE
-        ) {
-          setError(
-            "موقعیت مکانی در دسترس نیست.",
-          );
+        if (error.code === error.PERMISSION_DENIED) {
+          setError("دسترسی به موقعیت مکانی داده نشد.");
+        } else if (error.code === error.POSITION_UNAVAILABLE) {
+          setError("موقعیت مکانی در دسترس نیست.");
         } else {
-          setError(
-            "دریافت موقعیت مکانی ناموفق بود.",
-          );
+          setError("دریافت موقعیت مکانی ناموفق بود.");
         }
 
         onChange(false, null);
       },
-
       {
         enableHighAccuracy: true,
         timeout: 10000,
@@ -96,28 +63,27 @@ export function NearMeFilter({
   };
 
   return (
-    <div className="flex flex-col gap-1.5 xl:col-span-2">
+    <div className="flex flex-col gap-1.5">
       <button
         type="button"
         onClick={handleChange}
         disabled={loading}
         className="
           flex
-          py-1
+          h-9
           items-center
           gap-2
           rounded-full
           border
           border-border
           px-3
+          py-1
           text-xs
           text-text
           transition
           hover:border-primary
           disabled:cursor-wait
           disabled:opacity-60
-          h-9
-          xl:col-span-2
         "
       >
         {loading ? (
@@ -130,8 +96,6 @@ export function NearMeFilter({
         )}
 
         <span>نزدیک‌ترین به من</span>
-
-        {/* Switch */}
 
         <span
           className={`
@@ -147,7 +111,7 @@ export function NearMeFilter({
           `}
         >
           <span
-            className={` 
+            className={`
               h-4
               w-4
               rounded-full

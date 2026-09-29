@@ -1,20 +1,24 @@
- import { motion } from "framer-motion";
+import { motion } from "framer-motion";
 
 import {
-BORDER_OPTIONS,
+  BORDER_OPTIONS,
   cargoOptions,
-  cityOptions,
+  countryOptions,
   fleetOptions,
   tonnageOptions,
 } from "../../data/options";
 
 import { MultiSelect } from "../selects/MultiSelect";
 import { NearMeFilter } from "../filters/NearMeFilter";
+import { CitySearch } from "../inputs/CitySearch";
 
 import type {
   Coordinates,
   LoadFilters as LoadFiltersType,
+  TradeType,
 } from "../../types/load";
+import { FilterCitySearch } from "./CityFilterSearch";
+import { CustomSelect } from "../inputs/CustomSelect";
 
 type LoadFiltersProps = {
   filters: LoadFiltersType;
@@ -24,10 +28,7 @@ type LoadFiltersProps = {
     value: LoadFiltersType[K],
   ) => void;
 
-  onNearMeChange: (
-    enabled: boolean,
-    coordinates: Coordinates | null,
-  ) => void;
+  onNearMeChange: (enabled: boolean, coordinates: Coordinates | null) => void;
 
   onReset: () => void;
 };
@@ -38,21 +39,46 @@ export function LoadFilters({
   onNearMeChange,
   onReset,
 }: LoadFiltersProps) {
+  const handleOriginCountryChange = (countryCode: string) => {
+    onChange("origin_country_code", countryCode);
+    onChange("origin", "");
+    onChange("origin_city_geoname_id", undefined);
+  };
+
+  const handleDestinationCountryChange = (countryCode: string) => {
+    onChange("destination_country_code", countryCode);
+    onChange("destination", "");
+    onChange("destination_city_geoname_id", undefined);
+  };
+
+
   return (
     <div
       className="
-        flex items-center gap-2.5
-        overflow-x-auto flex-nowrap
+        flex
+        items-center
+        gap-2.5
+        overflow-x-auto
+        flex-nowrap
         pb-2
+        scrollbar-gutter-both
+        scrollbar-thin
+        scrollbar-thumb-primary-dark
       "
     >
       {/* Trade type */}
       <div
         className="
-          relative flex h-9 shrink-0
-          items-center rounded-full
-          border border-border
-          bg-surface p-1
+          relative
+          flex
+          h-9
+          shrink-0
+          items-center
+          rounded-full
+          border
+          border-border
+          bg-surface
+          p-1
         "
       >
         {[
@@ -64,41 +90,44 @@ export function LoadFilters({
             value: "import",
             label: "واردات",
           },
+          {
+            value: "domestic",
+            label: "داخلی",
+          },
         ].map((item) => {
-          const active =
-            filters.tradeType === item.value;
+          const active = filters.tradeType === item.value;
 
           return (
             <button
               key={item.value}
               type="button"
               onClick={() =>
-                onChange(
-                  "tradeType",
-                  active
-                    ? ""
-                    : item.value as "export" | "import",
-                )
+                onChange("tradeType", active ? "" : (item.value as TradeType))
               }
-              className={` 
-                relative z-10
-                flex h-7 shrink-0
-                items-center justify-center
-                rounded-full px-4
-                text-xs font-medium
-                transition-colors duration-300
-                ${
-                  active
-                    ? "text-surface"
-                    : "text-text-2 hover:text-text"
-                }
+              className={`
+                relative
+                z-10
+                flex
+                h-7
+                shrink-0
+                items-center
+                justify-center
+                rounded-full
+                px-4
+                text-xs
+                font-medium
+                transition-colors
+                duration-300
+                ${active ? "text-surface" : "text-text-2 hover:text-text"}
               `}
             >
               {active && (
                 <motion.div
                   layoutId="activeTradeTab"
                   className="
-                    absolute inset-0 -z-10
+                    absolute
+                    inset-0
+                    -z-10
                     rounded-full
                     bg-primary-radial
                   "
@@ -117,152 +146,138 @@ export function LoadFilters({
       </div>
 
       {/* Cargo */}
-      <select
+      <CustomSelect
         value={filters.cargo}
-        onChange={(event) =>
-          onChange("cargo", event.target.value)
-        }
-        className={` 
-          filter-select shrink-0
-          transition-all duration-300
-          ${filters.cargo ? "bg-primary-radial text-surface" : ""}
-        `}
-      >
-        <option value="">
-          نوع بار
-        </option>
-
-        {cargoOptions.map((option) => (
-          <option
-            key={option.value}
-            value={option.value}
-          >
-            {option.label}
-          </option>
-        ))}
-      </select>
+        options={cargoOptions}
+        placeholder="نوع بار"
+        onChange={(value) => onChange("cargo", value)}
+      />
 
       {/* Tonnage */}
-      <select
+      <CustomSelect
         value={filters.tonnage}
-        onChange={(event) =>
-          onChange("tonnage", event.target.value)
-        }
-        className={` 
-          filter-select shrink-0
-          transition-all duration-300
-          ${filters.tonnage ? "bg-primary-radial text-surface" : ""}
-        `}
-      >
-        <option value="">
-          تناژ
-        </option>
+        options={tonnageOptions}
+        placeholder="تناژ"
+        onChange={(value) => onChange("tonnage", value)}
+      />
 
-        {tonnageOptions.map((option) => (
-          <option
-            key={option.value}
-            value={option.value}
-          >
-            {option.label}
-          </option>
-        ))}
-      </select>
- {/* Fleet */}
-      <select
+      {/* Fleet */}
+      <CustomSelect
         value={filters.fleetType}
-        onChange={(event) =>
-          onChange("fleetType", event.target.value)
-        }
-        className={` 
-          filter-select shrink-0
-          transition-all duration-300
-          ${filters.fleetType ? "bg-primary-radial text-surface" : ""}
-        `}
+        options={fleetOptions}
+        placeholder="ناوگان"
+        onChange={(value) => onChange("fleetType", value)}
+      />
+      {/* Origin */}
+      <div
+        className="
+          flex
+          shrink-0
+          items-center
+          gap-1.5
+          rounded-full
+          border
+          border-border
+          
+          p-1
+        "
       >
-        <option value="">
-          ناوگان
-        </option>
+        <select
+          value={filters.origin_country_code ?? ""}
+          onChange={(event) => handleOriginCountryChange(event.target.value)}
+          className="
+            h-7
+            
+            border-l border-border
+            bg-transparent
+            px-1
+           
+            text-xs
+            text-text
+            outline-none
+          "
+        >
+          <option value="">کشور مبدأ</option>
 
-        {fleetOptions.map((option) => (
-          <option
-            key={option.value}
-            value={option.value}
-          >
-            {option.label}
-          </option>
-        ))}
-      </select>
+          {countryOptions.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+        <FilterCitySearch
+          countryCode={filters.origin_country_code ?? ""}
+          value={filters.origin}
+          onChange={(value) => onChange("origin", value)}
+          onCitySelect={(city) => onChange("origin_city_geoname_id", city?.id)}
+          placeholder="شهر مبدأ"
+        />
+      </div>
+
+      {/* Destination */}
+      <div
+        className="
+          flex
+          shrink-0
+          items-center
+          gap-1.5
+          rounded-full
+          border
+          border-border
+          bg-surface
+          p-1
+        "
+      >
+        <select
+          value={filters.destination_country_code ?? ""}
+          onChange={(event) =>
+            handleDestinationCountryChange(event.target.value)
+          }
+          className="
+            h-7
+            
+            border-l border-border
+            bg-transparent
+            px-1
+           
+            text-xs
+            text-text
+            outline-none
+          "
+        >
+          <option value="">کشور مقصد</option>
+
+          {countryOptions.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+
+        <FilterCitySearch
+          countryCode={filters.destination_country_code ?? ""}
+          value={filters.destination}
+          onChange={(value) => onChange("destination", value)}
+          onCitySelect={(city) =>
+            onChange("destination_city_geoname_id", city?.id)
+          }
+          placeholder="شهر مقصد"
+        />
+      </div>
 
       {/* Border */}
       <div className="shrink-0">
         <MultiSelect
           options={BORDER_OPTIONS}
           value={filters.borders}
-          onChange={(value) =>
-            onChange("borders", value)
-          }
+          onChange={(value) => onChange("borders", value)}
           placeholder="مرز خروج"
         />
       </div>
 
-      {/* Origin */}
-      <select
-        value={filters.origin}
-        onChange={(event) =>
-          onChange("origin", event.target.value)
-        }
-        className={` 
-          filter-select shrink-0
-          transition-all duration-300
-          ${filters.origin ? "bg-primary-radial text-surface" : ""}
-        `}
-      >
-        <option value="">
-          مبدأ
-        </option>
-
-        {cityOptions.map((option) => (
-          <option
-            key={option.value}
-            value={option.value}
-          >
-            {option.label}
-          </option>
-        ))}
-      </select>
-
-      {/* Destination */}
-      <select
-        value={filters.destination}
-        onChange={(event) =>
-          onChange("destination", event.target.value)
-        }
-        className={` 
-          filter-select shrink-0
-          transition-all duration-300
-          ${filters.destination ? "bg-primary-radial text-surface" : ""}
-        `}
-      >
-        <option value="">
-          مقصد
-        </option>
-
-        {cityOptions.map((option) => (
-          <option
-            key={option.value}
-            value={option.value}
-          >
-            {option.label}
-          </option>
-        ))}
-      </select>
-
       {/* Near me */}
       <div className="shrink-0">
-        <NearMeFilter
-          enabled={filters.nearest}
-          onChange={onNearMeChange}
-        />
+        <NearMeFilter enabled={filters.nearest} onChange={onNearMeChange} />
       </div>
 
       {/* Reset */}
@@ -270,11 +285,17 @@ export function LoadFilters({
         type="button"
         onClick={onReset}
         className="
-          h-9 shrink-0 rounded-full
-          border border-border
-          px-3 py-1
-          text-sm text-text-2
-          transition hover:text-danger
+          h-9
+          shrink-0
+          rounded-full
+          border
+          border-border
+          px-3
+          py-1
+          text-sm
+          text-text-2
+          transition
+          hover:text-danger
         "
       >
         پاک کردن فیلترها

@@ -65,8 +65,7 @@ export function filterLoads(
 
     const matchesBorder =
       filters.borders.length === 0 ||
-      (load.exit_border !== null && filters.borders.includes(load.exit_border));
-
+      load.exit_borders.some((border) => filters.borders.includes(border));
     // =========================
     // Weight
     // =========================

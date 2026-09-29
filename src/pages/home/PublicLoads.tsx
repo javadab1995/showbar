@@ -18,9 +18,9 @@ import { LoadFilters as LoadFiltersComponent } from "../../components/filters/Lo
 
 
 
-import { useInfiniteScroll } from "../../hooks/useInfiniteScroll";
-import { usePublicLoads } from "../../hooks/usePublicLoads";
-import { Loader, LoaderCircle } from "lucide-react";
+import { useInfiniteScroll } from "../../hooks/other/useInfiniteScroll";
+import { usePublicLoads } from "../../hooks/public/usePublicLoads";
+import { Loader } from "lucide-react";
 import Spinner from "../../components/widgets/Spinner";
 
 export function PublicLoads() {
@@ -68,7 +68,7 @@ export function PublicLoads() {
     isFetchingNextPage,
 
     fetchNextPage,
-  } = usePublicLoads(query, filters);
+  } = usePublicLoads(query, filters, userLocation);
 
   // ==================================
   // Infinite Scroll
@@ -133,15 +133,7 @@ export function PublicLoads() {
   // Loading
   // ==================================
 
-  if (isLoading) {
-    return (
-      <section className="mx-auto flex flex-col justify-between items-center w-full h-full py-52">
-        <Spinner />
-        در حال دریافت بارها...
-      
-      </section>
-    );
-  }
+  
 
   // ==================================
   // Error
@@ -184,16 +176,25 @@ export function PublicLoads() {
 
       {/* Summary */}
 
-      <LoadResultSummary count={totalCount} />
+      {isLoading ? (
+        <section className="mx-auto flex flex-col justify-between items-center w-full h-full py-52">
+          <Spinner />
+          در حال دریافت بارها...
+        </section>
+      ) : (
+        <>
+          <LoadResultSummary count={totalCount} />
 
-      {/* Loads */}
+          {/* Loads */}
 
-      <LoadList
-        loads={loads}
-        basket={basket}
-        onToggleBasket={toggleBasket}
-        lastItemRef={lastItemRef}
-      />
+          <LoadList
+            loads={loads}
+            basket={basket}
+            onToggleBasket={toggleBasket}
+            lastItemRef={lastItemRef}
+          />
+        </>
+      )}
 
       {/* Loading Next Page */}
 

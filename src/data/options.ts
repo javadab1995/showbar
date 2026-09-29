@@ -13,10 +13,12 @@ export const TRADE_TYPE_OPTIONS = [
     value: "import",
   },
   {
-    label: "ترانزیت",
+    label: "داخلی",
     value: "transit",
   },
 ];
+
+
 export const cargoOptions: FilterOption[] = [
   {
     value: "food",
@@ -132,10 +134,27 @@ export const cityOptions: FilterOption[] = [
   },
 ];
 
-export const VEHICLE_OPTIONS = [
-  { label: "تریلی", value: "trailer" },
-  { label: "کامیون", value: "truck" },
+export const countryOptions = [
+  { value: "IR", label: "ایران" },
+  { value: "TR", label: "ترکیه" },
+  { value: "IQ", label: "عراق" },
+  { value: "AM", label: "ارمنستان" },
+  { value: "AZ", label: "جمهوری آذربایجان" },
+  { value: "GE", label: "گرجستان" },
+  { value: "TM", label: "ترکمنستان" },
+  { value: "AF", label: "افغانستان" },
+  { value: "PK", label: "پاکستان" },
+  { value: "AE", label: "امارات متحده عربی" },
 ];
+
+
+export const VEHICLE_OPTIONS = [
+  { label: "چادری", value: "curtain_side" },
+  { label: "تانکر", value: "tanker" },
+  { label: "یخچالی", value: "refrigerated" },
+  { label: "کامیونت", value: "light_truck" },
+  { label: "سایر", value: "other" },
+] ;
 
 export const STATUS_OPTIONS = [
   { label: "فعال", value: "active" },
@@ -148,4 +167,6 @@ export const STATUS_OPTIONS = [
 export const CURRENCY_OPTIONS = [
   { value: "IRR", label: "تومان" },
   { value: "USD", label: "دلار" },
-] ;
+];
+
+

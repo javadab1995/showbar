@@ -1,8 +1,6 @@
 import {
   ChevronDown,
   DollarSign,
-  PackageOpen,
-  PanelTopOpen,
   RefreshCw,
   TrendingUp,
 } from "lucide-react";
@@ -68,15 +66,15 @@ export default function CurrencyRates({
     flex items-center gap-1.5
     rounded-b-md
     border border-t-0 border-border
-    bg-background/80
+    bg-warning/80
     px-2.5 py-1
-    text-xs font-medium text-text
+    text-xs font-medium text-orange-50
     backdrop-blur-md
     transition-colors
-    hover:text-primary
+    hover:text-orange-100
   "
       >
-        <DollarSign size={14} className="text-primary group-hover:scale-105 transition-transform ease-in-out duration-200" />
+        <DollarSign size={14} className="text-orange-50 group-hover:animate-ping duration-500 transition-transform ease-in-out " />
         <span>نرخ ارز</span>
 
         <ChevronDown

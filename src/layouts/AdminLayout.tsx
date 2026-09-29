@@ -1,17 +1,18 @@
 import { useState } from "react";
-import { Outlet, useLocation, useNavigate } from "react-router-dom";
-import { navItems } from "../data/mock";
-import { Bell, LogOut, Menu, X } from "lucide-react";
-import ThemeToggle from "../components/ui/ThemeToggle";
+import { Outlet, useLocation } from "react-router-dom";
+import { navItems } from "../data/menu-data";
+
 import { AdminSidebar } from "../components/ui/AdminSidebar";
 import { AdminHeader } from "../components/headers/AdminHeader";
+import RealtimeNotificationToast from "../components/notifications/RealtimeNotificationToast";
+import { useAuth } from "../auth/AuthProvider";
 
 
 
 export default function AdminLayout() {
   const location = useLocation();
-  const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const {user} = useAuth()
 
   const title =
     navItems.find(
@@ -34,12 +35,13 @@ export default function AdminLayout() {
 
       {/* Main Content */}
       <main className="flex-1 flex flex-col min-w-0 ">
-        <AdminHeader title={title} onOpenMenu={() => setMobileOpen(true)} />
+        <AdminHeader title={title} onOpenMenu={() => setMobileOpen(true)} user={user?.email} />
 
         <div className="p-6  flex-1 overflow-y-auto">
           <Outlet />
         </div>
       </main>
+      <RealtimeNotificationToast />
     </div>
   );
 }

@@ -1,22 +1,50 @@
-import { ArrowLeft, CalendarDays, Scale, Trash2, Truck } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 
-import { loads, money } from "../../data/mock";
 import { Button } from "../../components/buttons/Button";
 import { EmptyState } from "../../components/ui/EmptyState";
 import { useBasket } from "../../contexts/BasketContext";
 import GoToLoads from "../../components/buttons/GoToLoads";
+import { useQuery } from "@tanstack/react-query";
+import { getLoadsByIds } from "../../services/apiLoads";
+
+import BasketList from "../../components/lists/BasketList";
+import { toPersianDigits } from "../../helpers/number";
+import Spinner from "../../components/widgets/Spinner";
 
 export function Basket() {
-  const { basket, setBasket } = useBasket();
-  const items = loads.filter((load) => basket.includes(load.id));
+  const { basket } = useBasket();
+
+  const { data: items = [], isPending, error, isError } = useQuery({
+    queryKey: ["basket-loads", basket],
+    queryFn: () => getLoadsByIds(basket),
+    enabled: basket.length > 0,
+  });
+
   const navigate = useNavigate();
 
-  const removeItem = (id: string) => {
-    setBasket(basket.filter((item) => item !== id));
-  };
+   if (isPending) {
+     return (
+       <div className="flex justify-center h-screen items-center gap-">
+         {" "}
+         <Spinner /> <span>در حال بارگیری درخواست ها</span>
+       </div>
+     );
+   }
+  
+  if(isError) {
+    return (
+      
+        <div className="mx-auto">
+          {/* Page header */}
+        
+            <h3 className="text-2xl font-bold tracking-tight text-text sm:text-3xl">
+             {error?.message}
+            </h3>
+            </div>
+            )
+}
 
-  if (!items.length) {
+  if (!items.length ) {
     return (
       <section className="min-h-[calc(100vh-4rem)] bg-bg p-6">
         <div className="mx-auto">
@@ -66,6 +94,8 @@ export function Basket() {
     );
   }
 
+ 
+
   return (
     <section
       dir="rtl"
@@ -82,6 +112,9 @@ export function Basket() {
         {/* Header */}
         <header className="mb-7 flex items-end justify-between gap-4">
           <div>
+            <div className="sm:block hidden my-4">
+              <GoToLoads to="/loads" />
+            </div>
             <h1
               className="
                 text-2xl
@@ -95,12 +128,8 @@ export function Basket() {
             </h1>
 
             <p className="mt-2 text-sm text-text-2">
-              {items.length} بار برای ثبت درخواست انتخاب شده است.
+              {toPersianDigits(+items.length)} بار برای ثبت درخواست انتخاب شده است.
             </p>
-          </div>
-
-          <div className="sm:block hidden">
-            <GoToLoads />
           </div>
         </header>
 
@@ -116,150 +145,7 @@ export function Basket() {
           "
         >
           {items.map((load, index) => (
-            <article
-              key={load.id}
-              className={`
-                relative
-                px-4
-                py-5
- sm:px-6
-                sm:py-6
-                lg:px-7
-                ${index !== items.length - 1 ? "border-b border-border/70" : ""}
-              `}
-            >
-              <div
-                className="
-                  flex
-                  flex-col
-                  gap-5
-                  sm:flex-row
-                  sm:items-center
-                  sm:justify-between
-                  sm:gap-8
-                "
-              >
-                {/* Load information */}
-                <div className="min-w-0 flex-1">
-                  {/* Route */}
-                  <Link
-                    to={`/loads/${load.id}`}
-                    className="
-                      inline-flex
-                      max-w-full
-                      items-center
-                      gap-2
-                      text-[17px]
-                      font-semibold
-                      tracking-tight
-                      text-text
-                      transition-colors
-                      hover:text-primary
-                    "
-                  >
-                    <span className="truncate">{load.origin}</span>
-
-                    <ArrowLeft
-                      size={17}
-                      strokeWidth={1.8}
-                      className="shrink-0 text-primary"
-                    />
-
-                    <span className="truncate">{load.destination}</span>
-                  </Link>
-
-                  {/* Meta */}
-                  <div
-                    className="
-                      mt-3
-                      flex
-                      flex-wrap
-                      items-center
-                      gap-x-5
-                      gap-y-2
-                      text-sm
-                      text-text-2
-                    "
-                  >
-                    <span className="font-medium text-text">{load.cargo}</span>
-
-                    <span className="flex items-center gap-1.5">
-                      <Scale size={14} strokeWidth={1.8} />
-                      {load.weight} تن
-                    </span>
-
-                    <span className="flex items-center gap-1.5">
-                      <Truck size={14} strokeWidth={1.8} />
-                      {load.vehicle}
-                    </span>
-
-                    <span className="flex items-center gap-1.5">
-                      <CalendarDays size={14} strokeWidth={1.8} />
-                      {load.date}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Price + remove */}
-                <div
-                  className="
-                    flex
-                    items-center
-                    justify-between
-                    gap-5
-                    border-t
-                    border-border/60
-                    pt-4
-                    sm:min-w-45
-                    sm:justify-end
-                    sm:border-0
-                    sm:pt-0
-                  "
-                >
-                  <div className="text-right">
-                    <strong
-                      className="
-                        block
-                        text-base
-                        font-bold
-                        tracking-tight
-                        text-text
-                        sm:text-lg
-                      "
-                    >
-                      {money(load.price)}
-                    </strong>
-
-                    <span className="text-xs text-text-2">تومان</span>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => removeItem(load.id)}
-                    aria-label={`حذف بار ${load.origin} به ${load.destination}`}
-                    className="
-                      inline-flex
-                      h-9
-                      w-9
-                      shrink-0
-                      items-center
-                      justify-center
-                      rounded-lg
-                      border
-                      border-border
-                      text-text-2
-                      transition-all
-                      duration-150
-                      hover:border-danger/30
-                      hover:bg-danger/5
-                      hover:text-danger
-                      active:scale-95
-                    "
-                  >
-                    <Trash2 size={17} strokeWidth={1.8} />
-                  </button>
-                </div>
-              </div>
-            </article>
+            <BasketList key={load.id} load={load} />
           ))}
         </div>
 
@@ -309,7 +195,7 @@ export function Basket() {
 
         {/* Mobile back link */}
         <div className="block sm:hidden">
-          <GoToLoads />
+          <GoToLoads to="/loads" />
         </div>
       </div>
     </section>

@@ -1,6 +1,6 @@
 
 
-import { PaginationProps } from "../../types";
+import { PaginationProps } from "../../types/types";
 import { Pagination } from "./Pagination";
 
 

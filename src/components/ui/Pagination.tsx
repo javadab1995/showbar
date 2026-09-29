@@ -1,8 +1,8 @@
 import React from "react";
 
-import { usePagination } from "../../hooks/usePagination";
+import { usePagination } from "../../hooks/other/usePagination";
 
-import type { PaginationProps } from "../../types";
+import type { PaginationProps } from "../../types/types";
 
 export const Pagination: React.FC<PaginationProps> = ({
   currentPage,
@@ -37,12 +37,12 @@ export const Pagination: React.FC<PaginationProps> = ({
               ${
                 pageNumber === "..."
                   ? "cursor-default text-text/50"
-                  : "text-text/75 hover:bg-text/10"
+                  : " hover:bg-border"
               }
 
               ${
                 currentPage === pageNumber
-                  ? "bg-primary-radial font-medium text-surface"
+                  ? "bg-primary-radial font-medium text-background"
                   : ""
               }
             `}

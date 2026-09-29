@@ -12,7 +12,7 @@ export function Button({
   return (
     <button
       disabled={disabled}
-      className={` ${variant} ${className ? className : "bg-primary-radial text-sm  w-full  flex justify-center items-center gap-1.5 cursor-pointer rounded-md font-medium hover:opacity-90 transition-opacity   text-surface p-1.5 "}`}
+      className={` ${variant} ${className ? className : "bg-primary-radial text-sm  w-full  flex justify-center items-center gap-1.5 cursor-pointer rounded-md font-medium hover:opacity-90 transition-opacity   text-surface p-1.5 hover:bg-primary-dark"}`}
       {...props}
     >
       {children}
