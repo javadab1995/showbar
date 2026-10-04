@@ -96,7 +96,7 @@ export function LoadCard({ load, selected, onToggle }: LoadCardProps) {
               <CalendarDays size={14} />
               <span className=" ">
                 {toPersianDate(load.loading_date)}
-                ----
+                |
                 {load.loading_date}
               </span>
             </span>

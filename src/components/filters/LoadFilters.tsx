@@ -61,10 +61,7 @@ export function LoadFilters({
         overflow-x-auto
         flex-nowrap
         pb-2
-        scrollbar-gutter-both
-        scrollbar-thin
-        scrollbar-thumb-primary-dark
-      "
+        scrollbar-hidden "
     >
       {/* Trade type */}
       <div

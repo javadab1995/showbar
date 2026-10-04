@@ -1,9 +1,5 @@
 import {
-
-  LogOut,
-  Building2,
-
-  UsersRound,
+  LogOut
 } from "lucide-react";
 
 
@@ -14,7 +10,7 @@ import CompanyInfoForm from "../../components/forms/CompanyInfoForm";
 import { useAuth } from "../../auth/AuthProvider";
 import AccountSecurity from "../../components/features/settings/AccountSecurity";
 
-export function SettingsPage() {
+export default function  SettingsPage() {
   const { user, signOut } = useAuth();
 
   return (

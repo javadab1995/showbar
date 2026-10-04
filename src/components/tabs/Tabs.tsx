@@ -4,7 +4,7 @@ export type TabItem<T extends string> = {
   id: T;
   label: string;
   icon?: ReactNode;
-};
+} 
 
 type TabsProps<T extends string> = {
   items: TabItem<T>[];

@@ -25,6 +25,8 @@ export const loadSchema = z
     origin_country_code: z.string().min(2, "کشور مبدأ را انتخاب کنید"),
     destination_country_code: z.string().min(2, "کشور مقصد را انتخاب کنید"),
     destination: z.string().trim().min(2, "مقصد باید حداقل ۲ کاراکتر باشد"),
+    origin_city_geoname_id: z.number().nullable(),
+    destination_city_geoname_id: z.number().nullable(),
     origin_location_url: z
       .string()
       .trim()

@@ -8,9 +8,11 @@ import { StatusBadge } from "../../components/ui/StatusBadge";
 import VehicleLabel from "../../components/labels/VehicleLabel";
 import BackButton from "../../components/buttons/BackButton";
 import { toPersianDigits } from "../../helpers/number";
+import { useOnlineStatus } from "../../hooks/other/useOnlineStatus";
 
-export function DriverDetailsPage() {
+export default function DriverDetailsPage() {
   const { id } = useParams();
+    const isOnline = useOnlineStatus();
 
   const { data: driver, isPending, isError, error } = useDriver(id);
 
@@ -29,10 +31,20 @@ export function DriverDetailsPage() {
   }
 
   if (isError || !driver) {
+    console.error("Driver details error:", error);
+
     return (
       <div className="rounded-xl border border-border bg-surface p-6">
-        <p className="text-sm text-danger">
-          {error instanceof Error ? error.message : "راننده پیدا نشد"}
+        <p className="text-sm font-medium text-danger">
+          {isOnline
+            ? "دریافت اطلاعات راننده انجام نشد"
+            : "اتصال به اینترنت برقرار نیست"}
+        </p>
+
+        <p className="mt-2 text-sm text-text-2">
+          {isOnline
+            ? "لطفاً دوباره تلاش کنید."
+            : "برای دریافت اطلاعات راننده، اتصال اینترنت خود را بررسی کنید."}
         </p>
       </div>
     );

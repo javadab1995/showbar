@@ -18,44 +18,56 @@ import { formatMoney } from "../../helpers/formater";
 import { toPersianDate } from "../../helpers/date";
 import { useDashboard } from "../../hooks/admin/useDashboard";
 import { LoadDetailsSkeleton } from "../../components/skeleton/LoadDetailsSkeleton";
-
-
-
-
-
-
+import { useOnlineStatus } from "../../hooks/other/useOnlineStatus";
 
 export default function Dashboard() {
   const { user } = useAuth();
+  const isOnline = useOnlineStatus();
 
-   const { data, isLoading, isError, error } = useDashboard();
+  const { data, isLoading, isError, error } = useDashboard();
 
-   if (isLoading) {
-     return <LoadDetailsSkeleton />;
-   }
+  if (isLoading) {
+    return <LoadDetailsSkeleton />;
+  }
+  if (isError) {
+    console.error("Dashboard error:", error);
 
-   if (isError) {
-     console.error("Dashboard error:", error);
+    return (
+      <div className="flex min-h-100 items-center justify-center">
+        <div className="text-center">
+          <p className="font-semibold text-text">
+            {isOnline
+              ? "دریافت اطلاعات داشبورد انجام نشد"
+              : "اتصال به اینترنت برقرار نیست"}
+          </p>
 
-     return (
-       <div className="flex min-h-100 items-center justify-center">
-         <div className="text-center">
-           <p className="font-semibold text-text">
-             دریافت اطلاعات داشبورد انجام نشد
-           </p>
+          <p className="mt-2 text-sm text-text-2">
+            {isOnline
+              ? "لطفاً دوباره صفحه را بارگذاری کنید."
+              : "برای دریافت اطلاعات داشبورد، اتصال اینترنت خود را بررسی کنید."}
+          </p>
+        </div>
+      </div>
+    );
+  }
 
-           <p className="mt-2 text-sm text-text-2">
-             لطفاً دوباره صفحه را بارگذاری کنید.
-           </p>
-         </div>
-       </div>
-     );
-   }
+  if (!data) {
+    return (
+      <div className="flex min-h-100 items-center justify-center">
+        <div className="text-center">
+          <p className="font-semibold text-text">
+            اطلاعات داشبورد در دسترس نیست
+          </p>
 
-  if (!data) return null;
-  
-    const { stats, recentLoads, pendingRequests } = data;
+          <p className="mt-2 text-sm text-text-2">
+            لطفاً دوباره صفحه را بارگذاری کنید.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
+  const { stats, recentLoads, pendingRequests } = data;
 
   const kpis = [
     {

@@ -5,6 +5,8 @@ import {
   rejectLoadFromRequest,
 } from "../../services/apiRequest";
 
+import { useOnlineStatus } from "../other/useOnlineStatus";
+
 type RequestLoadMutationArgs = {
   requestId: string;
   loadId: string;
@@ -12,9 +14,16 @@ type RequestLoadMutationArgs = {
 
 export function useAssignLoadToRequest() {
   const queryClient = useQueryClient();
+  const isOnline = useOnlineStatus();
 
   return useMutation({
-    mutationFn: (data: RequestLoadMutationArgs) => assignLoadToRequest(data),
+    mutationFn: (data: RequestLoadMutationArgs) => {
+      if (!isOnline) {
+        throw new Error("برای تخصیص بار، اتصال به اینترنت لازم است.");
+      }
+
+      return assignLoadToRequest(data);
+    },
 
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
@@ -34,9 +43,16 @@ export function useAssignLoadToRequest() {
 
 export function useRejectLoadFromRequest() {
   const queryClient = useQueryClient();
+  const isOnline = useOnlineStatus();
 
   return useMutation({
-    mutationFn: (data: RequestLoadMutationArgs) => rejectLoadFromRequest(data),
+    mutationFn: (data: RequestLoadMutationArgs) => {
+      if (!isOnline) {
+        throw new Error("برای رد بار، اتصال به اینترنت لازم است.");
+      }
+
+      return rejectLoadFromRequest(data);
+    },
 
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({

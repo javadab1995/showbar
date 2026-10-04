@@ -30,6 +30,7 @@ export async function getLoads({
     .select("*", {
       count: "exact",
     })
+    .is("archived_at", null)
     .order("created_at", {
       ascending: false,
     })
@@ -128,9 +129,8 @@ if (filters.destination_city_geoname_id) {
   const { data, error, count } = await supabaseQuery;
 
   if (error) {
-    console.error(error);
-
-    throw new Error("دریافت بارها با مشکل مواجه شد");
+    console.error("Supabase getLoads error:", error);
+    throw error;
   }
 
   return {

@@ -17,15 +17,10 @@ type PlateParts = {
   letters: string;
   suffix: string;
 };
+export const parseTransitPlate = (plate: string): PlateParts | null => {
+  const cleanPlate = plate.replace(/\s/g, "").toUpperCase();
 
-export const parseTransitPlate = (
-  plate: string,
-): PlateParts | null => {
-  const cleanPlate = plate
-    .replace(/\s/g, "")
-    .toUpperCase();
-
-  const match = cleanPlate.match(/^(\d+)([A-Z]+)(\d+)$/);
+  const match = cleanPlate.match(/^(\d{2})([A-Z]{1,3})(\d{3})$/);
 
   if (!match) return null;
 
@@ -35,7 +30,6 @@ export const parseTransitPlate = (
     suffix: match[3],
   };
 };
-
 
 
 type LicensePlateData = {

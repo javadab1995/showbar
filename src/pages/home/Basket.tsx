@@ -10,41 +10,29 @@ import { getLoadsByIds } from "../../services/apiLoads";
 import BasketList from "../../components/lists/BasketList";
 import { toPersianDigits } from "../../helpers/number";
 import Spinner from "../../components/widgets/Spinner";
+import { useOnlineStatus } from "../../hooks/other/useOnlineStatus";
 
-export function Basket() {
+export default function Basket() {
   const { basket } = useBasket();
+  const navigate = useNavigate();
+  const isOnline = useOnlineStatus();
 
-  const { data: items = [], isPending, error, isError } = useQuery({
+
+  const {
+    data: items = [],
+    isPending,
+    error,
+    isError,
+  } = useQuery({
     queryKey: ["basket-loads", basket],
     queryFn: () => getLoadsByIds(basket),
     enabled: basket.length > 0,
+    retry: 0
   });
 
-  const navigate = useNavigate();
 
-   if (isPending) {
-     return (
-       <div className="flex justify-center h-screen items-center gap-">
-         {" "}
-         <Spinner /> <span>در حال بارگیری درخواست ها</span>
-       </div>
-     );
-   }
-  
-  if(isError) {
-    return (
-      
-        <div className="mx-auto">
-          {/* Page header */}
-        
-            <h3 className="text-2xl font-bold tracking-tight text-text sm:text-3xl">
-             {error?.message}
-            </h3>
-            </div>
-            )
-}
 
-  if (!items.length ) {
+  if (!basket.length) {
     return (
       <section className="min-h-[calc(100vh-4rem)] bg-bg p-6">
         <div className="mx-auto">
@@ -94,8 +82,49 @@ export function Basket() {
     );
   }
 
- 
 
+  if (isPending) {
+    return (
+      <div className="flex flex-col justify-center h-screen items-center gap-">
+        {" "}
+        <Spinner /> <span>در حال بارگیری درخواست ها</span>
+      </div>
+    );
+  }
+ if (isError) {
+   return (
+     <div className="flex min-h-screen flex-col items-center justify-center px-4 text-center">
+       <div className="max-w-md">
+         <h3 className="text-2xl font-bold tracking-tight text-text sm:text-3xl">
+           {isOnline
+             ? "دریافت اطلاعات بارها با خطا مواجه شد."
+             : "اتصال به اینترنت برقرار نیست."}
+         </h3>
+
+         <p className="mt-3 text-sm text-text-2">
+           {isOnline
+             ? "لطفاً کمی بعد دوباره تلاش کنید."
+             : "برای مشاهده اطلاعات بارهای سبد، اتصال اینترنت خود را بررسی کنید."}
+         </p>
+
+         <div className="mt-6 flex justify-center gap-3">
+           <Button type="button" onClick={() => window.location.reload()}>
+             تلاش مجدد
+           </Button>
+
+           <Button
+             type="button"
+             variant="secondary"
+             onClick={() => navigate("/loads")}
+           >
+             مشاهده بارها
+           </Button>
+         </div>
+       </div>
+     </div>
+   );
+ }
+  
   return (
     <section
       dir="rtl"
@@ -128,7 +157,8 @@ export function Basket() {
             </h1>
 
             <p className="mt-2 text-sm text-text-2">
-              {toPersianDigits(+items.length)} بار برای ثبت درخواست انتخاب شده است.
+              {toPersianDigits(+items.length)} بار برای ثبت درخواست انتخاب شده
+              است.
             </p>
           </div>
         </header>
@@ -144,7 +174,7 @@ export function Basket() {
             shadow-(--shadow)
           "
         >
-          {items.map((load, index) => (
+          {items.map((load) => (
             <BasketList key={load.id} load={load} />
           ))}
         </div>

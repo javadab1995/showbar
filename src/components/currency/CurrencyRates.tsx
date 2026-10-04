@@ -65,7 +65,7 @@ export default function CurrencyRates({
     absolute -top-8 left-0
     flex items-center gap-1.5
     rounded-b-md
-    border border-t-0 border-border
+    border border-t-0 border-transparent
     bg-warning/80
     px-2.5 py-1
     text-xs font-medium text-orange-50

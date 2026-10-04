@@ -2,7 +2,7 @@ import { CheckCircle2, Copy, ArrowLeft } from "lucide-react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useState } from "react";
 
-export function RequestSuccess() {
+export default function RequestSuccess() {
   const [searchParams] = useSearchParams();
   const trackingCode = searchParams.get("code");
 

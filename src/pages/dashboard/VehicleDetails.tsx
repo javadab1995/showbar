@@ -18,7 +18,7 @@ import { toPersianDigits } from "../../helpers/number";
 import VehiclePlate from "../../components/ui/VehiclePlate";
 
 
-export function VehicleDetails() {
+export default function VehicleDetails() {
   const { id } = useParams<{ id: string }>();
 
   const { data, isPending, isError } = useVehicleDetails(id);

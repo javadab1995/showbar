@@ -1,13 +1,21 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+
+import { useNavigate } from "react-router-dom";
+
 import toast from "react-hot-toast";
 
 import { signIn } from "../../services/auth";
+
 import supabase from "../../services/supabase";
+
 import BackButton from "../../components/buttons/BackButton";
+
+import { useOnlineStatus } from "../../hooks/other/useOnlineStatus";
 
 export default function AdminLogin() {
   const navigate = useNavigate();
+
+  const isOnline = useOnlineStatus();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -16,6 +24,11 @@ export default function AdminLogin() {
   const [resetLoading, setResetLoading] = useState(false);
 
   async function handleLogin() {
+    if (!isOnline) {
+      toast.error("برای ورود به پنل مدیریت، اتصال به اینترنت لازم است.");
+      return;
+    }
+
     if (!email || !password) {
       toast.error("ایمیل و رمز عبور را وارد کنید");
       return;
@@ -31,6 +44,7 @@ export default function AdminLogin() {
         .select("id, email, role")
         .eq("id", data.user.id)
         .single();
+
       if (error || !profile) {
         toast.error("حساب کاربری معتبر نیست");
         await supabase.auth.signOut();
@@ -46,13 +60,25 @@ export default function AdminLogin() {
       navigate("/admin", { replace: true });
     } catch (error) {
       console.error("LOGIN ERROR:", error);
-      toast.error("ایمیل یا رمز عبور اشتباه است");
+
+      if (!isOnline) {
+        toast.error("اتصال به اینترنت برقرار نیست. اتصال خود را بررسی کنید.");
+      } else {
+        toast.error("ایمیل یا رمز عبور اشتباه است");
+      }
     } finally {
       setLoading(false);
     }
   }
 
   async function handleForgotPassword() {
+    if (!isOnline) {
+      toast.error(
+        "برای ارسال لینک بازیابی رمز عبور، اتصال به اینترنت لازم است.",
+      );
+      return;
+    }
+
     if (!email) {
       toast.error("ابتدا ایمیل خود را وارد کنید");
       return;
@@ -74,7 +100,12 @@ export default function AdminLogin() {
       toast.success("لینک بازیابی رمز عبور به ایمیل شما ارسال شد");
     } catch (error) {
       console.error("PASSWORD RESET ERROR:", error);
-      toast.error("خطایی در ارسال ایمیل بازیابی رخ داد");
+
+      if (!isOnline) {
+        toast.error("اتصال به اینترنت برقرار نیست. اتصال خود را بررسی کنید.");
+      } else {
+        toast.error("خطایی در ارسال ایمیل بازیابی رخ داد");
+      }
     } finally {
       setResetLoading(false);
     }
@@ -99,6 +130,12 @@ export default function AdminLogin() {
             </p>
           </div>
 
+          {!isOnline && (
+            <div className="mb-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-center text-sm text-red-700">
+              اتصال به اینترنت برقرار نیست.
+            </div>
+          )}
+
           {/* Form */}
           <div className="space-y-5">
             <div className="space-y-2">
@@ -117,16 +154,8 @@ export default function AdminLogin() {
                 placeholder="example@email.com"
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
-                className="w-full rounded-xl  
-            border border-[#E2E7E5]
-            bg-[#FDFDFE]
-            p-3
-            text-gray-900
-            focus:outline-0
-            focus:ring-4
-            focus:ring-green-100
-            focus:border-green-800 disabled:cursor-not-allowed
-                disabled:opacity-60"
+                disabled={loading || resetLoading}
+                className="w-full rounded-xl border border-[#E2E7E5] bg-[#FDFDFE] p-3 text-gray-900 focus:outline-0 focus:ring-4 focus:ring-green-100 focus:border-green-800 disabled:cursor-not-allowed disabled:opacity-60"
               />
             </div>
 
@@ -142,7 +171,7 @@ export default function AdminLogin() {
                 <button
                   type="button"
                   onClick={handleForgotPassword}
-                  disabled={resetLoading}
+                  disabled={resetLoading || loading || !isOnline}
                   className="text-sm font-medium text-[#16916e] transition hover:text-[#09543F] disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {resetLoading
@@ -164,30 +193,16 @@ export default function AdminLogin() {
                     handleLogin();
                   }
                 }}
-                className="w-full rounded-xl  
-            border border-[#E2E7E5]
-            bg-[#FDFDFE]
-            p-3
-            text-gray-900
-            focus:outline-0
-            focus:ring-4
-            focus:ring-green-100
-            focus:border-green-800 disabled:cursor-not-allowed
-                disabled:opacity-60"
+                disabled={loading || resetLoading}
+                className="w-full rounded-xl border border-[#E2E7E5] bg-[#FDFDFE] p-3 text-gray-900 focus:outline-0 focus:ring-4 focus:ring-green-100 focus:border-green-800 disabled:cursor-not-allowed disabled:opacity-60"
               />
             </div>
 
             <button
               type="button"
               onClick={handleLogin}
-              disabled={loading}
-              className="w-full rounded-xl 
-            border border-[#E2E7E5]
-            bg-[#09543F]
-            p-3
-            hover:bg-[#179571]
-            text-gray-100
-             disabled:cursor-not-allowed disabled:opacity-60"
+              disabled={loading || resetLoading || !isOnline}
+              className="w-full rounded-xl border border-[#E2E7E5] bg-[#09543F] p-3 text-gray-100 hover:bg-[#179571] disabled:cursor-not-allowed disabled:opacity-60"
             >
               {loading ? "در حال ورود..." : "ورود به پنل"}
             </button>

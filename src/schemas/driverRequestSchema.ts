@@ -42,8 +42,8 @@ const transitCodeSchema = z
   .trim()
   .toUpperCase()
   .regex(
-    /^\d{2}[A-Z]{1,2}\d{3}$/,
-    "شناسه ترانزیت باید مانند 50A601 یا 50AB601 باشد",
+    /^\d{2}[A-Z]{1,3}\d{3}$/,
+    "شناسه ترانزیت باید مانند 50A601، 50AB601 یا 50ABC601 باشد",
   );
 
 export const driverRequestSchema = z

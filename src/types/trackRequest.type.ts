@@ -1,4 +1,4 @@
-import { DriverRequestStatus } from "./status";
+import { DriverRequestLoadStatus, DriverRequestStatus } from "./status";
 
 
 export type Mode = "history" | "single";
@@ -32,7 +32,7 @@ export type RequestHistoryLoad = {
   exit_borders: string[] | null;
   loading_date: string | null;
   price: number | null;
-  status: string;
+  status: DriverRequestLoadStatus;
   currency: "IRR" | "USD";
   request_status: string;
 };
@@ -47,7 +47,7 @@ export type RequestHistoryVehicle = {
 export type RequestHistoryItem = {
   id: string;
   tracking_code: string;
-  status: DriverRequestStatus;
+  status: DriverRequestLoadStatus;
   created_at: string;
 
   approved_load: {
@@ -61,7 +61,7 @@ export type RequestHistoryItem = {
 export type RequestDetails = {
   id: string;
   tracking_code: string;
-  status: string;
+  status: DriverRequestStatus;
   created_at: string;
   loads:
     | {
@@ -69,7 +69,7 @@ export type RequestDetails = {
         origin: string;
         destination: string;
         cargo: string | null;
-        status: string;
+        status: DriverRequestLoadStatus;
         loading_date: string | null;
       }[]
     | null;

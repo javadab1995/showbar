@@ -1,4 +1,3 @@
-
 import { zodResolver } from "@hookform/resolvers/zod";
 import { BellRing, CheckCircle2 } from "lucide-react";
 import { useForm } from "react-hook-form";
@@ -8,10 +7,13 @@ import { z } from "zod";
 import { Button } from "../../components/buttons/Button";
 import GoToLoads from "../../components/buttons/GoToLoads";
 import Spinner from "../../components/widgets/Spinner";
+import { FormInput } from "../../components/inputs/FormInput";
+
 import { toPersianDate } from "../../helpers/date";
+
 import { useCreateLoadAvailabilityAlert } from "../../hooks/public/useCreateLoadAvailabilityAlert";
 import { useLoad } from "../../hooks/other/useLoad";
-import { FormInput } from "../../components/inputs/FormInput";
+import { useOnlineStatus } from "../../hooks/other/useOnlineStatus";
 
 const notifyMeSchema = z.object({
   name: z
@@ -23,45 +25,42 @@ const notifyMeSchema = z.object({
   mobile: z
     .string()
     .trim()
-    .regex(
-      /^09\d{9}$/,
-      "شماره موبایل باید به صورت ۰۹۱۲۳۴۵۶۷۸۹ باشد.",
-    ),
+    .regex(/^09\d{9}$/, "شماره موبایل باید به صورت ۰۹۱۲۳۴۵۶۷۸۹ باشد."),
 });
 
 type NotifyMeFormValues = z.infer<typeof notifyMeSchema>;
 
-export function NotifyMe() {
+export default function NotifyMe() {
   const { id } = useParams();
 
-  const {
-    data: load,
-    isLoading,
-    isError,
-  } = useLoad(id);
+  const isOnline = useOnlineStatus();
 
-  const createAlertMutation =
-    useCreateLoadAvailabilityAlert();
+  const { data: load, isLoading, isError } = useLoad(id);
+
+  const createAlertMutation = useCreateLoadAvailabilityAlert();
 
   const {
     register,
     handleSubmit,
-    formState: {
-      errors,
-      isSubmitting,
-    },
+    formState: { errors, isSubmitting },
   } = useForm<NotifyMeFormValues>({
     resolver: zodResolver(notifyMeSchema),
+
     defaultValues: {
       name: "",
       mobile: "",
     },
   });
 
-  const onSubmit = async (
-    data: NotifyMeFormValues,
-  ) => {
+  async function onSubmit(data: NotifyMeFormValues) {
     if (!id) {
+      return;
+    }
+
+    // جلوگیری از ارسال درخواست در حالت آفلاین
+    if (!isOnline) {
+      createAlertMutation.reset();
+
       return;
     }
 
@@ -72,9 +71,13 @@ export function NotifyMe() {
         mobile: data.mobile,
       });
     } catch (error) {
-      console.error(error);
+      console.error("Create availability alert error:", error);
     }
-  };
+  }
+
+  // --------------------------------------------------
+  // ثبت موفق درخواست
+  // --------------------------------------------------
 
   if (createAlertMutation.isSuccess) {
     return (
@@ -101,6 +104,7 @@ export function NotifyMe() {
   return (
     <div className="max-w-4xl mx-auto px-6 py-20 mb-10 space-y-6">
       {/* Header */}
+
       <div className="flex flex-col items-center text-center space-y-2 mt-20">
         <div className="w-12 h-12 bg-primary/10 text-primary rounded-full flex items-center justify-center">
           <BellRing className="w-6 h-6 animate-pulse" />
@@ -116,15 +120,19 @@ export function NotifyMe() {
       </div>
 
       {/* Load Error */}
+
       {isError && (
         <p className="p-3 rounded-lg border border-danger bg-danger/10 text-danger text-sm">
-          مشکلی در دریافت بار به وجود آمده است.
+          {isOnline
+            ? "مشکلی در دریافت اطلاعات بار به وجود آمده است."
+            : "اتصال به اینترنت برقرار نیست و اطلاعات بار قابل دریافت نیست."}
         </p>
       )}
 
       {!isLoading ? (
         <div className="bg-surface border border-border p-6 rounded-xl shadow-sm space-y-6">
           {/* Load Info */}
+
           <div className="bg-surface-2 border border-border/60 p-4 rounded-lg space-y-1">
             <span className="text-xs font-semibold text-primary uppercase tracking-wider block">
               مشخصات بار انتخابی
@@ -150,12 +158,14 @@ export function NotifyMe() {
           </div>
 
           {/* Form */}
+
           <form
             className="space-y-4"
             onSubmit={handleSubmit(onSubmit)}
             noValidate
           >
             {/* Name */}
+
             <FormInput
               label="نام و نام‌خانوادگی"
               {...register("name")}
@@ -172,15 +182,24 @@ export function NotifyMe() {
               placeholder="09121234567"
             />
 
-            {/* Mutation Error */}
-            {createAlertMutation.isError && (
+            {/* Offline Message */}
+
+            {!isOnline && (
               <p className="text-sm text-danger">
-                {createAlertMutation.error.message}
-            
+                برای ثبت درخواست اطلاع‌رسانی، اتصال به اینترنت لازم است.
+              </p>
+            )}
+
+            {/* Mutation Error */}
+
+            {createAlertMutation.isError && isOnline && (
+              <p className="text-sm text-danger">
+                ثبت درخواست اطلاع‌رسانی با خطا مواجه شد. لطفاً دوباره تلاش کنید.
               </p>
             )}
 
             {/* Submit */}
+
             <Button
               className="
                 text-sm
@@ -200,7 +219,9 @@ export function NotifyMe() {
                 disabled:cursor-not-allowed
               "
               type="submit"
-              disabled={isSubmitting || createAlertMutation.isPending}
+              disabled={
+                isSubmitting || createAlertMutation.isPending || !isOnline
+              }
             >
               {createAlertMutation.isPending ? "در حال ثبت..." : "اطلاع بده"}
             </Button>
@@ -212,4 +233,3 @@ export function NotifyMe() {
     </div>
   );
 }
-;

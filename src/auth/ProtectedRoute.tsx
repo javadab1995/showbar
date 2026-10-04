@@ -1,7 +1,8 @@
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 
 import { useAuth } from "./AuthProvider";
-import { Loader } from "lucide-react";
+
+import Spinner from "../components/widgets/Spinner";
 
 export default function ProtectedRoute() {
   const { user, loading } = useAuth();
@@ -9,8 +10,8 @@ export default function ProtectedRoute() {
 
   if (loading) {
     return (
-        <div className="min-h-screen flex items-center justify-center">
-            <Loader />
+        <div className="min-h-screen flex flex-col items-center justify-center">
+            <Spinner />
         <p>در حال بررسی حساب کاربری...</p>
       </div>
     );

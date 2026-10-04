@@ -25,11 +25,35 @@ export function FilterCitySearch({
   const [isOpen, setIsOpen] = useState(false);
 
   const containerRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const [dropdownPosition, setDropdownPosition] = useState({
+    top: 0,
+    right: 0,
+  });
 
   useEffect(() => {
     setQuery(value);
   }, [value]);
 
+  /**
+   * محاسبه موقعیت dropdown
+   * چون dropdown fixed است، موقعیت input را نسبت به viewport می‌گیریم.
+   */
+  const updateDropdownPosition = () => {
+    if (!inputRef.current) return;
+
+    const rect = inputRef.current.getBoundingClientRect();
+
+    setDropdownPosition({
+      top: rect.bottom + 4,
+      right: window.innerWidth - rect.right,
+    });
+  };
+
+  /**
+   * بستن dropdown با کلیک بیرون
+   */
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -47,6 +71,31 @@ export function FilterCitySearch({
     };
   }, []);
 
+  /**
+   * وقتی dropdown باز است، با اسکرول یا resize
+   * موقعیت آن را نسبت به input به‌روزرسانی می‌کنیم.
+   */
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handlePositionUpdate = () => {
+      updateDropdownPosition();
+    };
+
+    window.addEventListener("resize", handlePositionUpdate);
+
+    // true باعث می‌شود اسکرول parentهای مختلف هم گرفته شود.
+    window.addEventListener("scroll", handlePositionUpdate, true);
+
+    return () => {
+      window.removeEventListener("resize", handlePositionUpdate);
+      window.removeEventListener("scroll", handlePositionUpdate, true);
+    };
+  }, [isOpen]);
+
+  /**
+   * جستجوی شهر با debounce
+   */
   useEffect(() => {
     if (!countryCode || query.trim().length < 2) {
       setResults([]);
@@ -66,16 +115,22 @@ export function FilterCitySearch({
           signal: controller.signal,
         });
 
-        if (!controller.signal.aborted) {
-          setResults(cities);
-          setIsOpen(true);
-        }
+        if (controller.signal.aborted) return;
+
+        setResults(cities);
+        setIsOpen(true);
+
+        // بعد از دریافت نتایج، دوباره موقعیت را تنظیم می‌کنیم.
+        updateDropdownPosition();
       } catch (error) {
-        if (!controller.signal.aborted) {
-          console.error("City search error:", error);
-          setResults([]);
-          setIsOpen(true);
-        }
+        if (controller.signal.aborted) return;
+
+        console.error("City search error:", error);
+
+        setResults([]);
+        setIsOpen(true);
+
+        updateDropdownPosition();
       } finally {
         if (!controller.signal.aborted) {
           setIsLoading(false);
@@ -93,14 +148,22 @@ export function FilterCitySearch({
     setQuery(newValue);
     onChange(newValue);
 
-    // متن شهر عوض شده، پس ID قبلی دیگر معتبر نیست.
+    // متن شهر تغییر کرده، پس انتخاب قبلی دیگر معتبر نیست.
     onCitySelect?.(null);
+
+    if (countryCode && newValue.trim().length >= 2) {
+      updateDropdownPosition();
+      setIsOpen(true);
+    } else {
+      setIsOpen(false);
+    }
   };
 
   const handleSelect = (city: City) => {
     setQuery(city.name);
     onChange(city.name);
     onCitySelect?.(city);
+
     setIsOpen(false);
   };
 
@@ -108,12 +171,23 @@ export function FilterCitySearch({
     setQuery("");
     onChange("");
     onCitySelect?.(null);
+
     setResults([]);
     setIsOpen(false);
   };
 
+  const handleFocus = () => {
+    if (!countryCode || query.trim().length < 2) {
+      return;
+    }
+
+    updateDropdownPosition();
+    setIsOpen(true);
+  };
+
   return (
-    <div ref={containerRef} className="relative shrink-0">
+    <div ref={containerRef} className="shrink-0">
+      {/* Filter */}
       <div
         className={`
           relative
@@ -135,17 +209,14 @@ export function FilterCitySearch({
         <Search className="ml-1.5 h-3.5 w-3.5 shrink-0" />
 
         <input
+          ref={inputRef}
           type="text"
           value={query}
           disabled={!countryCode}
           placeholder={countryCode ? placeholder : "ابتدا کشور"}
           autoComplete="off"
           onChange={(event) => handleChange(event.target.value)}
-          onFocus={() => {
-            if (countryCode && query.trim().length >= 2) {
-              setIsOpen(true);
-            }
-          }}
+          onFocus={handleFocus}
           className="
             min-w-17.5
             max-w-32.5
@@ -161,14 +232,31 @@ export function FilterCitySearch({
         />
 
         {isLoading && (
-          <div className="mr-1 h-3 w-3 animate-spin rounded-full border border-current/20 border-t-current" />
+          <div
+            className="
+              mr-1
+              h-3
+              w-3
+              animate-spin
+              rounded-full
+              border
+              border-current/20
+              border-t-current
+            "
+          />
         )}
 
         {!isLoading && query && (
           <button
             type="button"
             onClick={handleClear}
-            className="mr-1 rounded-full p-0.5 transition hover:bg-black/5"
+            className="
+              mr-1
+              rounded-full
+              p-0.5
+              transition
+              hover:bg-black/5
+            "
             aria-label="پاک کردن شهر"
           >
             <X className="h-3 w-3" />
@@ -176,14 +264,17 @@ export function FilterCitySearch({
         )}
       </div>
 
+      {/* Dropdown */}
       {isOpen && (
         <div
+          style={{
+            position: "fixed",
+            top: dropdownPosition.top,
+            right: dropdownPosition.right,
+          }}
           className="
-            absolute
-            right-0
-            top-[calc(100%+6px)]
-            z-100
-            w-52
+            z-40
+            w-40
             overflow-hidden
             rounded-xl
             border
@@ -193,12 +284,14 @@ export function FilterCitySearch({
             shadow-xl
           "
         >
+          {/* Loading */}
           {isLoading && (
             <div className="px-3 py-2.5 text-xs text-text/50">
               در حال جستجو...
             </div>
           )}
 
+          {/* Results */}
           {!isLoading && results.length > 0 && (
             <div className="max-h-60 overflow-y-auto">
               {results.map((city) => (
@@ -233,6 +326,7 @@ export function FilterCitySearch({
             </div>
           )}
 
+          {/* Empty */}
           {!isLoading && results.length === 0 && query.trim().length >= 2 && (
             <div className="px-3 py-2.5 text-xs text-text/50">
               شهری پیدا نشد

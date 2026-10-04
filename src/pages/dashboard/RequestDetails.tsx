@@ -31,11 +31,13 @@ import CargoTypeLabel from "../../components/labels/CargoTypeLabel";
 import BackButton from "../../components/buttons/BackButton";
 import { useAssignLoadToRequest, useRejectLoadFromRequest } from "../../hooks/admin/useRequestLoadMutations";
 import toast from "react-hot-toast";
+import { useOnlineStatus } from "../../hooks/other/useOnlineStatus";
 
 type ActionType = "assign" | "reject" | null;
 
-export function RequestDetails() {
+export default function RequestDetails() {
   const { id } = useParams<{ id: string }>();
+  const isOnline = useOnlineStatus();
 
   const [confirm, setConfirm] = useState<{
     type: ActionType;
@@ -66,26 +68,36 @@ export function RequestDetails() {
     );
   }
 
-  if (isError) {
-    return (
-      <div className="mx-auto max-w-5xl">
-        <div
-          className="
-            rounded-xl
-            border border-danger/30
-            bg-danger/5
-            p-4
-            text-sm text-danger
-          "
-        >
-          {error instanceof Error
-            ? error.message
-            : "خطایی در دریافت اطلاعات درخواست رخ داد"}
-        </div>
-      </div>
-    );
-  }
+if (isError) {
+  console.error("Request details error:", error);
 
+  return (
+    <div className="mx-auto max-w-5xl">
+      <div
+        className="
+          rounded-xl
+          border border-danger/30
+          bg-danger/5
+          p-6
+        "
+      >
+        <p className="text-sm font-medium text-danger">
+          {isOnline
+            ? "دریافت اطلاعات درخواست انجام نشد"
+            : "اتصال به اینترنت برقرار نیست"}
+        </p>
+
+        <p className="mt-2 text-sm text-text-2">
+          {isOnline
+            ? "لطفاً دوباره تلاش کنید."
+            : "برای دریافت اطلاعات درخواست، اتصال اینترنت خود را بررسی کنید."}
+        </p>
+      </div>
+    </div>
+  );
+}
+  
+  
   if (!request) {
     return (
       <div className="mx-auto max-w-5xl py-12 text-center">
@@ -136,6 +148,12 @@ export function RequestDetails() {
       return;
     }
 
+    if (!isOnline) {
+      toast.error("برای انجام این عملیات، اتصال به اینترنت لازم است.");
+
+      return;
+    }
+
     if (confirm.type === "assign") {
       assignMutation.mutate(
         {
@@ -151,8 +169,13 @@ export function RequestDetails() {
             });
           },
           onError: (err) => {
-            toast.error(err.message);
-            console.log(err.message);
+            console.error("Assign load error:", err);
+
+            toast.error(
+              isOnline
+                ? "تخصیص بار انجام نشد."
+                : "اتصال به اینترنت برقرار نیست.",
+            );
           },
         },
       );
@@ -467,7 +490,10 @@ export function RequestDetails() {
                             رد بار
                           </Button>
 
-                          <Button onClick={() => handleAssign(load.id)}>
+                          <Button
+                            onClick={() => handleAssign(load.id)}
+                            disabled={!isOnline || isActionPending}
+                          >
                             <CheckCircle2 className="ml-2 h-4 w-4" />
                             تخصیص بار
                           </Button>
@@ -498,6 +524,11 @@ export function RequestDetails() {
         }
       >
         <div className="space-y-5">
+          {!isOnline && (
+            <p className="text-sm text-danger">
+              برای انجام این عملیات، اتصال به اینترنت لازم است.
+            </p>
+          )}
           <div>
             {confirm.type === "assign" ? (
               <>
@@ -579,7 +610,7 @@ export function RequestDetails() {
 
             <Button
               onClick={handleConfirmAction}
-              disabled={isActionPending}
+              disabled={!isOnline || isActionPending}
               variant={confirm.type === "reject" ? "danger" : undefined}
             >
               {isActionPending ? (

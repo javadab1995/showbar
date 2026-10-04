@@ -1,5 +1,4 @@
-
-import {   VehicleDetails, VehicleFilters } from "../types/vehicles";
+import { VehicleDetails, VehicleFilters } from "../types/vehicles";
 import supabase from "./supabase";
 
 export async function getVehicles(filters: VehicleFilters = {}) {
@@ -70,8 +69,6 @@ export async function getVehicles(filters: VehicleFilters = {}) {
   };
 }
 
-
-
 export async function getVehicleDetails(vehicleId: string) {
   const { data: vehicle, error: vehicleError } = await supabase
     .from("vehicles")
@@ -82,8 +79,6 @@ export async function getVehicleDetails(vehicleId: string) {
   if (vehicleError) {
     throw vehicleError;
   }
-
-
 
   const { data: vehicleDrivers, error: driversError } = await supabase
     .from("vehicle_drivers")
@@ -103,9 +98,6 @@ export async function getVehicleDetails(vehicleId: string) {
     .order("created_at", {
       ascending: false,
     });
-  
-
-
 
   if (driversError) {
     throw driversError;
@@ -142,8 +134,6 @@ export async function getVehicleDetails(vehicleId: string) {
     .order("assigned_at", {
       ascending: false,
     });
-
-
 
   if (assignmentsError) {
     throw assignmentsError;
@@ -189,16 +179,47 @@ export async function getVehicleDetails(vehicleId: string) {
       ascending: false,
     });
 
-
   if (requestsError) {
     throw requestsError;
   }
 
+  return {
+    vehicle,
+    drivers: vehicleDrivers ?? [],
+    assignments: assignments ?? [],
+    requests: requests ?? [],
+  } as unknown as VehicleDetails;
+}
 
- return {
-   vehicle,
-   drivers: vehicleDrivers ?? [],
-   assignments: assignments ?? [],
-   requests: requests ?? [],
- } as unknown as VehicleDetails;
+
+export type VehicleLookupResult = {
+  id: string;
+  vehicle_type: string;
+};
+
+type GetVehicleByIdentifierArgs = {
+  identifierType: "PLATE" | "TRANSIT";
+  plate?: string | null;
+  transitCode?: string | null;
+};
+
+export async function getVehicleByIdentifier({
+  identifierType,
+  plate,
+  transitCode,
+}: GetVehicleByIdentifierArgs): Promise<VehicleLookupResult | null> {
+  const { data, error } = await supabase.rpc("get_vehicle_by_identifier", {
+    p_identifier_type: identifierType,
+
+    p_plate: identifierType === "PLATE" ? plate?.trim() || null : null,
+
+    p_transit_code:
+      identifierType === "TRANSIT" ? transitCode?.trim() || null : null,
+  });
+
+  if (error) {
+    throw error;
+  }
+
+  return data?.[0] ?? null;
 }

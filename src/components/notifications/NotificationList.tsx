@@ -18,6 +18,7 @@ import {
   type LoadAvailabilityAlert,
   type LoadNotification,
 } from "../../services/apiNotification-service";
+import { Link } from "react-router-dom";
 
 type NotificationTab = "load_requests" | "availability_alerts";
 
@@ -595,6 +596,7 @@ export default function NotificationList({ onNotificationClick }: Props) {
       {activeTab === "load_requests" && visibleLoadNotifications.length > 0 && (
         <div className="space-y-3">
           {visibleLoadNotifications.map((item) => {
+            console.log(item)
             const status = requestStatusConfig[item.status];
 
             const notification: NotificationItem = {
@@ -605,7 +607,7 @@ export default function NotificationList({ onNotificationClick }: Props) {
             const isSelected = selectedVisibleIds.includes(item.id);
 
             return (
-              <div
+              <Link to={`/admin/requests/${item.request_id}`}
                 key={item.id}
                 className={`
                     group
@@ -701,7 +703,7 @@ export default function NotificationList({ onNotificationClick }: Props) {
                     </div>
                   </button>
                 </div>
-              </div>
+              </Link>
             );
           })}
         </div>

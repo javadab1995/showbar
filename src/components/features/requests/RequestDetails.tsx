@@ -2,19 +2,14 @@
 import { Search } from "lucide-react";
 
 import { Button } from "../../../components/buttons/Button";
-import { STATUS_LABELS } from "../../../types/trackRequest.type";
 import type { RequestDetails as RequestDetailsType } from "../../../types/trackRequest.type";
+import { StatusBadge } from "../../ui/StatusBadge";
 
 type Props = {
   request: RequestDetailsType;
   onNewSearch: () => void;
 };
 
-const STATUS_STYLES = {
-  confirmed: "border-green-500/30 bg-green-500/10 text-green-700",
-  pending: "border-yellow-500/30 bg-yellow-500/10 text-yellow-700",
-  rejected: "border-orange-500/30 bg-orange-500/10 text-orange-700",
-} as const;
 
 const REQUEST_LOAD_STATUS_STYLES = {
   approved: "border-green-500/30 bg-green-500/10 text-green-700",
@@ -27,6 +22,8 @@ export default function RequestDetails({
   request,
   onNewSearch,
 }: Props) {
+
+
   return (
     <div>
       {/* Header */}
@@ -38,15 +35,8 @@ export default function RequestDetails({
             {request.tracking_code}
           </p>
         </div>
-
-        <span
-          className={`rounded-lg border px-3 py-1.5 text-xs font-medium ${
-            STATUS_STYLES[request.status as keyof typeof STATUS_STYLES] ??
-            "border-border bg-surface text-text/60"
-          }`}
-        >
-          {STATUS_LABELS[request.status] ?? request.status}
-        </span>
+        <StatusBadge status={request.status} />
+        
       </div>
 
       {/* Created at */}
@@ -88,15 +78,7 @@ export default function RequestDetails({
                     )}
                   </div>
 
-                  <span
-                    className={`shrink-0 rounded-lg border px-2.5 py-1 text-xs font-medium ${
-                      REQUEST_LOAD_STATUS_STYLES[
-                        load.status as keyof typeof REQUEST_LOAD_STATUS_STYLES
-                      ] ?? "border-border bg-surface text-text/60"
-                    }`}
-                  >
-                    {STATUS_LABELS[load.status] ?? load.status}
-                  </span>
+                <StatusBadge status={load.status} />
                 </div>
 
                 {load.loading_date && (

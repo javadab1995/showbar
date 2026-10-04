@@ -16,7 +16,8 @@ export default function About() {
       <section className="relative min-h-155 overflow-hidden">
         <img
           src="/images/about.png"
-          alt="Showbar truck on the road"
+          alt="Showb
+          ar truck on the road"
           className="absolute inset-0 h-full w-full object-cover"
         />
 

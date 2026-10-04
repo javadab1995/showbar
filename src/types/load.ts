@@ -76,6 +76,8 @@ export type LoadData = {
   currency: Currency;
 
   loading_date: string;
+  origin_city_geoname_id: number | null;
+  destination_city_geoname_id: number | null;
 
   status: LoadStatus;
   description: string | null;

@@ -9,7 +9,7 @@ export default function GoToLoads({to}:To) {
       <Link
         to={to}
         className="
-            my-5
+            my-10
             inline-flex
             items-center
             font-medium

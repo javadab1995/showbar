@@ -2,7 +2,7 @@ import { useState } from "react";
 
 import { DayPicker } from "@daypicker/persian";
 
-import { format as formatJalali } from "date-fns-jalali";
+
 import { format as formatGregorian, parseISO } from "date-fns";
 import { faIR } from "date-fns-jalali/locale";
 

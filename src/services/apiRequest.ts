@@ -1,9 +1,9 @@
 import { DriverRequest } from "../types/types";
 import { AdminRequestListItem, DriverRequestDetails } from "../types/request";
-import { RequestHistoryItem } from "../types/trackRequest.type";
+import { RequestDetails, RequestHistoryItem } from "../types/trackRequest.type";
 
 import supabase from "./supabase";
-import { DriverRequestLoadStatus } from "../types/status";
+import { DriverRequestLoadStatus, DriverRequestStatus } from "../types/status";
 
 export async function getLoadRequests(
   loadId: string,
@@ -87,7 +87,7 @@ export async function getLoadRequests(
 type GetRequestsParams = {
   page?: number;
   pageSize?: number;
-  status?: DriverRequestLoadStatus | "";
+  status?: DriverRequestStatus | "";
 };
 
 export async function getRequests({
@@ -356,13 +356,7 @@ export type RequestLoad = {
   loading_date: string | null;
 };
 
-export type RequestDetails = {
-  id: string;
-  tracking_code: string;
-  status: string;
-  created_at: string;
-  loads: RequestLoad[] | null;
-};
+
 
 export async function getRequestByTrackingCode(
   trackingCode: string,

@@ -7,6 +7,8 @@ import { Button } from "../buttons/Button";
 import ThemeToggle from "../ui/ThemeToggle";
 import Logo from "../ui/Logo";
 
+
+
 export default function PublicHeader() {
   const { basket } = useBasket();
   const { pathname } = useLocation();
@@ -22,7 +24,7 @@ export default function PublicHeader() {
     }`;
 
   return (
-    <header className="h-16 fixed w-full  z-40 backdrop-blur-lg flex justify-between items-center px-6 border-b border-border">
+    <header className={`h-16 fixed w-full  z-40 backdrop-blur-lg flex justify-between items-center px-6 border-b border-border transition-all duration-200 ease-in-out `}>
       {/* Logo */}
      <Logo />
 

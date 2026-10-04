@@ -1,68 +1,65 @@
 import { useNavigate, useSearchParams } from "react-router-dom";
-
 import { useState } from "react";
+import { Search } from "lucide-react";
+
 import { useMediaQuery } from "../../hooks/other/useMediaQuery";
-import { useDriverRequests, useInfiniteDriverRequests } from "../../hooks/admin/useDriverRequests";
+import {
+  useDriverRequests,
+  useInfiniteDriverRequests,
+} from "../../hooks/admin/useDriverRequests";
 import { useInfiniteScroll } from "../../hooks/other/useInfiniteScroll";
+import { useOnlineStatus } from "../../hooks/other/useOnlineStatus";
+
 import { createRequestColumns } from "../../components/columns/Requests.columns";
 import Tabs from "../../components/tabs/Tabs";
-import { Search } from "lucide-react";
 import BaseTable from "../../components/tables/BaseTable";
 import RequestMobileList from "../../components/lists/RequestMobileList";
 import Spinner from "../../components/widgets/Spinner";
-import { DriverRequestLoadStatus } from "../../types/status";
 
+import { DriverRequestStatus } from "../../types/status";
 
-type RequestView = "all" | DriverRequestLoadStatus;
+type RequestView = "all" | DriverRequestStatus;
 
-const tabs: {
-  id: RequestView;
-  label: string;
-}[] = [
+const tabs = [
   {
     id: "all",
     label: "همه",
   },
-  
   {
     id: "pending",
     label: "در انتظار بررسی",
   },
   {
-    id: "approved",
+    id: "confirmed",
     label: "تأیید شده",
   },
   {
     id: "rejected",
     label: "رد شده",
   },
-];
+] 
 
-export function RequestsPage() {
+export default function RequestsPage() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const [query, setQuery] = useState("");
 
   const isMobile = useMediaQuery("(max-width: 767px)");
+  const isOnline = useOnlineStatus();
 
   const currentTab = (searchParams.get("status") as RequestView) || "all";
 
   const status = currentTab === "all" ? "" : currentTab;
 
-  /*
-   * Desktop query
-   */
+  // فقط query مربوط به viewport فعلی فعال باشد
   const {
     data: desktopResult,
     isPending: isDesktopPending,
     isError: isDesktopError,
     error: desktopError,
-  } = useDriverRequests(status);
+  } = useDriverRequests(status, !isMobile);
 
-  /*
-   * Mobile query
-   */
   const {
     data: mobileResult,
     isPending: isMobilePending,
@@ -71,30 +68,19 @@ export function RequestsPage() {
     hasNextPage,
     isFetchingNextPage,
     fetchNextPage,
-  } = useInfiniteDriverRequests(status);
+  } = useInfiniteDriverRequests(status, isMobile);
 
-  /*
-   * Infinite scroll
-   */
   const { lastItemRef } = useInfiniteScroll({
     hasNextPage: Boolean(hasNextPage),
     isFetchingNextPage,
     fetchNextPage,
+    enabled: isOnline && isMobile,
   });
 
-  /*
-   * Desktop data
-   */
   const desktopRequests = desktopResult?.data ?? [];
 
-  /*
-   * Mobile data
-   */
   const mobileRequests = mobileResult?.pages.flatMap((page) => page.data) ?? [];
 
-  /*
-   * Search
-   */
   const filterRequests = <T extends typeof desktopRequests>(requests: T): T => {
     const value = query.trim().toLowerCase();
 
@@ -116,109 +102,84 @@ export function RequestsPage() {
 
   const filteredMobileRequests = filterRequests(mobileRequests);
 
-  /*
-   * Table columns
-   */
   const columns = createRequestColumns({
-    onView: (id) => {
-      navigate(`/admin/requests/${id}`);
-    },
+    onView: (id) => navigate(`/admin/requests/${id}`),
   });
 
-  /*
-   * Tab change
-   */
-  const handleTabChange = (value: RequestView) => {
-    const params = new URLSearchParams(searchParams);
+ const handleTabChange = (value: string) => {
+   const nextValue = value as RequestView;
 
-    if (value === "all") {
-      params.delete("status");
-    } else {
-      params.set("status", value);
-    }
+   const params = new URLSearchParams(searchParams);
 
-    setSearchParams(params);
-  };
+   if (nextValue === "all") {
+     params.delete("status");
+   } else {
+     params.set("status", nextValue);
+   }
 
-  /*
-   * Mobile request click
-   */
+   setSearchParams(params);
+ };
+
   const handleRequestClick = (id: string) => {
     navigate(`/admin/requests/${id}`);
   };
 
-  /*
-   * Current viewport error
-   */
   const isError = isMobile ? isMobileError : isDesktopError;
 
   const error = isMobile ? mobileError : desktopError;
 
+  if (isError) {
+    console.error("Driver requests error:", error);
+  }
+
   return (
     <div className="mx-auto space-y-6">
       {/* Header */}
-      <div>
-        <h2 className="text-2xl font-bold text-text">درخواست‌ها</h2>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 className="text-xl font-semibold text-text">
+            درخواست‌های رانندگان
+          </h1>
 
-        <p className="mt-1 text-sm text-text-2">
-          بررسی درخواست‌های رانندگان بر اساس خودرو
-        </p>
+          <p className="mt-1 text-sm text-text-2">
+            درخواست‌های ثبت‌شده توسط رانندگان را بررسی کنید.
+          </p>
+        </div>
       </div>
 
       {/* Tabs */}
       <Tabs items={tabs} value={currentTab} onChange={handleTabChange} />
 
       {/* Search */}
-      <div className="flex items-center justify-between">
-        <div className="relative w-full sm:max-w-xs">
-          <span
-            className="
-              pointer-events-none
-              absolute inset-y-0 right-3
-              flex items-center
-              text-text-2
-            "
-          >
-            <Search size={16} />
-          </span>
+      <div className="relative">
+        <Search
+          size={18}
+          className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-text-2"
+        />
 
-          <input
-            type="text"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="جستجوی پلاک، شناسه ترانزیتی یا راننده..."
-            className="
-              w-full
-              rounded-lg
-              border border-border
-              bg-surface
-              py-2 pl-3 pr-10
-              text-sm text-text
-              placeholder:text-text-2/60
-              outline-none
-              transition-all
-              focus:border-primary
-              focus:ring-2
-              focus:ring-primary/20
-            "
-          />
-        </div>
+        <input
+          type="text"
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+          placeholder="جستجو بر اساس پلاک، کد ترانزیت، نام یا شماره تماس"
+          className="w-full rounded-xl border border-border bg-surface py-2.5 pr-10 pl-4 text-sm text-text outline-none transition focus:border-primary"
+        />
       </div>
 
-      {/* Error */}
+      {/* Data */}
       {isError ? (
-        <div
-          className="
-            rounded-xl
-            border border-danger/30
-            bg-danger/5
-            p-4
-            text-sm text-danger
-          "
-        >
-          {error instanceof Error
-            ? error.message
-            : "خطایی در دریافت درخواست‌ها رخ داد"}
+        <div className="rounded-xl border border-danger/30 bg-danger/5 p-6">
+          <p className="text-sm font-medium text-danger">
+            {isOnline
+              ? "دریافت اطلاعات درخواست‌ها انجام نشد"
+              : "اتصال به اینترنت برقرار نیست"}
+          </p>
+
+          <p className="mt-2 text-sm text-text-2">
+            {isOnline
+              ? "لطفاً دوباره تلاش کنید."
+              : "برای دریافت درخواست‌ها، اتصال اینترنت خود را بررسی کنید."}
+          </p>
         </div>
       ) : (
         <>
@@ -234,29 +195,16 @@ export function RequestsPage() {
           {/* Mobile */}
           <div className="md:hidden">
             {isMobilePending ? (
-              <div className="py-8 text-center text-sm text-text-2">
-               <Spinner />
+              <div className="flex min-h-40 items-center justify-center">
+                <Spinner />
               </div>
             ) : (
-              <>
-                <RequestMobileList
-                  requests={filteredMobileRequests}
-                  onRequestClick={handleRequestClick}
-                  lastItemRef={lastItemRef}
-                />
-
-                {isFetchingNextPage && (
-                  <div className="py-4 text-center text-xs text-text-2">
-                    در حال دریافت درخواست‌های بیشتر...
-                  </div>
-                )}
-
-                {!hasNextPage && mobileRequests.length > 0 && (
-                  <div className="py-4 text-center text-xs text-text-2">
-                    همه درخواست‌ها نمایش داده شدند
-                  </div>
-                )}
-              </>
+              <RequestMobileList
+                requests={filteredMobileRequests}
+                onRequestClick={handleRequestClick}
+                lastItemRef={lastItemRef}
+               
+              />
             )}
           </div>
         </>

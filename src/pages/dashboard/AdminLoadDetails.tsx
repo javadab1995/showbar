@@ -8,7 +8,7 @@ import { LoadDescription } from "../../components/ui/LoadDescription";
 import { LoadRequests } from "../../components/features/loads/LoadRequests";
 
 
-export function AdminLoadDetails() {
+export default function AdminLoadDetails() {
   const { id } = useParams();
 
   const { data: load, isLoading, isError, error } = useLoad(id);

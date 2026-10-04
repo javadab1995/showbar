@@ -16,6 +16,7 @@ import { toPersianDate } from "../../helpers/date";
 import { BORDER_OPTIONS, VEHICLE_OPTIONS } from "../../data/options";
 import { formatMoney } from "../../helpers/formater";
 import BorderLabel from "../labels/BorderLabel";
+import { getExitBorderLabel } from "../../helpers/exitBorders";
 type BasketItemProps = {
   load: Load;
 };
@@ -26,6 +27,7 @@ export default function BasketList({ load }: BasketItemProps) {
   const vehicleLabel =
     VEHICLE_OPTIONS.find((option) => option.value === load.vehicle_type)
       ?.label ?? "سایر";
+
 
 
   const removeItem = (id: string) => {

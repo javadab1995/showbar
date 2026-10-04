@@ -1,4 +1,5 @@
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
+import { useEffect, useRef } from "react";
 
 import {
   getLoads,
@@ -7,6 +8,7 @@ import {
 } from "../../services/apiLoads";
 
 import type { Coordinates, LoadFilters } from "../../types/load";
+import { useOnlineStatus } from "../other/useOnlineStatus";
 
 export function usePublicLoads(
   query: string,
@@ -14,6 +16,9 @@ export function usePublicLoads(
   userLocation: Coordinates | null,
 ) {
   const isNearbyMode = filters.nearest && userLocation !== null;
+  const isOnline = useOnlineStatus();
+
+  const wasOffline = useRef(false);
 
   const loadsQuery = useInfiniteQuery({
     queryKey: ["public-loads", query, filters],
@@ -26,6 +31,7 @@ export function usePublicLoads(
     initialPageParam: 0,
     getNextPageParam: (lastPage) => lastPage.nextPage,
     enabled: !isNearbyMode,
+    retry: 0,
   });
 
   const nearbyQuery = useQuery({
@@ -59,7 +65,28 @@ export function usePublicLoads(
         );
     },
     enabled: isNearbyMode,
+    retry: 0,
   });
+
+  useEffect(() => {
+    if (!isOnline) {
+      wasOffline.current = true;
+      return;
+    }
+
+    if (!wasOffline.current) {
+      return;
+    }
+
+    wasOffline.current = false;
+
+    if (isNearbyMode) {
+      nearbyQuery.refetch();
+      return;
+    }
+
+    loadsQuery.refetch();
+  }, [isOnline, isNearbyMode]);
 
   const normalLoads = loadsQuery.data?.pages.flatMap((page) => page.data) ?? [];
 
@@ -69,19 +96,12 @@ export function usePublicLoads(
 
   return {
     loads,
-
     totalCount: loads.length,
-
     isLoading: isNearbyMode ? nearbyQuery.isLoading : loadsQuery.isLoading,
-
     isError: isNearbyMode ? nearbyQuery.isError : loadsQuery.isError,
-
     error: isNearbyMode ? nearbyQuery.error : loadsQuery.error,
-
     hasNextPage: isNearbyMode ? false : loadsQuery.hasNextPage,
-
     isFetchingNextPage: isNearbyMode ? false : loadsQuery.isFetchingNextPage,
-
     fetchNextPage: loadsQuery.fetchNextPage,
   };
 }

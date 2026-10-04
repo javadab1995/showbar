@@ -16,7 +16,7 @@ import { FormTextarea } from "../../components/inputs/FormTextarea";
 
 import { FormSelect } from "../../components/inputs/FormSelect";
 
-import { LocationField } from "../../components/maps/LocationField";
+
 
 import { DatePickerField } from "../../components/inputs/DatePickerField";
 
@@ -45,8 +45,9 @@ import Spinner from "../../components/widgets/Spinner";
 import GoToLoads from "../../components/buttons/GoToLoads";
 import { CitySearch } from "../../components/inputs/CitySearch";
 import { MultiSelect } from "../../components/selects/MultiSelect";
+import { useOnlineStatus } from "../../hooks/other/useOnlineStatus";
 
-export function LoadForm() {
+export default function LoadForm() {
   // ==================================================
   // Route
   // ==================================================
@@ -54,6 +55,7 @@ export function LoadForm() {
   const { id } = useParams();
 
   const nav = useNavigate();
+  const isOnline = useOnlineStatus();
 
   const isEdit = Boolean(id);
 
@@ -195,12 +197,17 @@ export function LoadForm() {
   // ==================================================
 
   const onSubmit: SubmitHandler<LoadFormData> = (data) => {
+     if (!isOnline) {
+       return;
+     }
     const loadData: LoadData = {
       origin_country_code: data.origin_country_code,
       origin: data.origin,
 
       destination_country_code: data.destination_country_code,
       destination: data.destination,
+      origin_city_geoname_id: data.origin_city_geoname_id ?? null,
+      destination_city_geoname_id: data.destination_city_geoname_id ?? null,
 
       origin_latitude: data.origin_latitude,
 
@@ -345,6 +352,10 @@ export function LoadForm() {
                       shouldDirty: true,
                     });
 
+                    setValue("origin_city_geoname_id", city?.id ?? null, {
+                      shouldDirty: true,
+                    });
+
                     setValue("origin_longitude", city?.longitude ?? null, {
                       shouldDirty: true,
                     });
@@ -376,6 +387,9 @@ export function LoadForm() {
                     });
 
                     setValue("destination_longitude", city?.longitude ?? null, {
+                      shouldDirty: true,
+                    });
+                    setValue("destination_city_geoname_id", city?.id ?? null, {
                       shouldDirty: true,
                     });
                   }}
@@ -592,63 +606,73 @@ export function LoadForm() {
 
         <div
           className="
-            flex
-            items-center
-            justify-end
-            gap-3
-            border-t
-            border-border
-            bg-bg/40
-            px-6
-            py-5
-            md:px-8
-          "
+    flex
+    flex-col
+    gap-3
+    border-t
+    border-border
+    bg-bg/40
+    px-6
+    py-5
+    md:flex-row
+    md:items-center
+    md:justify-end
+    md:px-8
+  "
         >
-          <Button
-            type="button"
-            onClick={() => nav("/admin/loads")}
-            className="
-              rounded-md
-              bg-surface-radial
-              px-4
-              py-2.5
-              text-surface
-            "
-          >
-            انصراف
-          </Button>
+          {!isOnline && (
+            <p className="text-sm text-danger">
+              برای ثبت یا ویرایش بار، اتصال به اینترنت لازم است.
+            </p>
+          )}
 
-          <Button
-            type="submit"
-            disabled={isPending}
-            className="
-              flex
-              items-center
-              justify-center
-              gap-2
-              rounded-md
-              bg-primary-radial
-              px-5
-              py-2.5
-              font-medium
-              text-surface
-              transition-opacity
-              hover:opacity-90
-              disabled:cursor-not-allowed
-              disabled:opacity-60
-            "
-          >
-            {isPending ? (
-              <>
-                <Loader2 className="animate-spin" size={18} />
-                در حال ذخیره...
-              </>
-            ) : isEdit ? (
-              "ذخیره تغییرات"
-            ) : (
-              "ثبت بار"
-            )}
-          </Button>
+          <div className="flex items-center justify-end gap-3">
+            <Button
+              type="button"
+              onClick={() => nav("/admin/loads")}
+              className="
+        rounded-md
+        bg-surface-radial
+        px-4
+        py-2.5
+        text-surface
+      "
+            >
+              انصراف
+            </Button>
+
+            <Button
+              type="submit"
+              disabled={isPending || !isOnline}
+              className="
+        flex
+        items-center
+        justify-center
+        gap-2
+        rounded-md
+        bg-primary-radial
+        px-5
+        py-2.5
+        font-medium
+        text-surface
+        transition-opacity
+        hover:opacity-90
+        disabled:cursor-not-allowed
+        disabled:opacity-60
+      "
+            >
+              {isPending ? (
+                <>
+                  <Loader2 className="animate-spin" size={18} />
+                  در حال ذخیره...
+                </>
+              ) : isEdit ? (
+                "ذخیره تغییرات"
+              ) : (
+                "ثبت بار"
+              )}
+            </Button>
+          </div>
         </div>
       </form>
     </div>

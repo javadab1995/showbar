@@ -11,12 +11,14 @@ import { useDrivers } from "../../hooks/admin/useDrivers";
 import { ADMIN_PAGE_SIZE } from "../../services/apiLoads";
 import { createDriverColumns } from "../../components/columns/Drivers.columns";
 import { TableFooter } from "../../components/ui/TableFooter";
+import { useOnlineStatus } from "../../hooks/other/useOnlineStatus";
 
 
 
-export function DriversPage() {
+export default function DriversPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate()
+    const isOnline = useOnlineStatus();
 
   const currentPage = Number(searchParams.get("page")) || 1;
 
@@ -32,6 +34,7 @@ export function DriversPage() {
     queryParam,
   );
 
+ 
   const drivers = data?.data ?? [];
   const totalItems = data?.total ?? 0;
 
@@ -69,16 +72,24 @@ export function DriversPage() {
     });
   };
 
-  if (isError) {
-    return (
-      <div className="rounded-xl border border-border bg-surface p-6">
-        <p className="text-sm text-danger">
-          {error instanceof Error ? error.message : "خطا در دریافت رانندگان"}
-        </p>
-      </div>
-    );
-  }
+ if (isError) {
+   return (
+     <div className="rounded-xl border border-border bg-surface p-6">
+       <p className="text-sm text-danger">
+         {isOnline
+           ? "دریافت اطلاعات رانندگان انجام نشد"
+           : "اتصال به اینترنت برقرار نیست"}
+       </p>
 
+       <p className="mt-2 text-sm text-text-2">
+         {isOnline
+           ? "لطفاً دوباره تلاش کنید."
+           : "برای دریافت اطلاعات رانندگان، اتصال اینترنت خود را بررسی کنید."}
+       </p>
+     </div>
+   );
+ }
+  
   return (
     <div className="space-y-5">
       {/* Header */}

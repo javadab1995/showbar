@@ -20,15 +20,18 @@ import { LoadFilters as LoadFiltersComponent } from "../../components/filters/Lo
 
 import { useInfiniteScroll } from "../../hooks/other/useInfiniteScroll";
 import { usePublicLoads } from "../../hooks/public/usePublicLoads";
-import { Loader } from "lucide-react";
+import { Loader, WifiOff } from "lucide-react";
 import Spinner from "../../components/widgets/Spinner";
+import { useOnlineStatus } from "../../hooks/other/useOnlineStatus";
 
-export function PublicLoads() {
+export default function PublicLoads() {
   // ==================================
   // Basket
   // ==================================
 
   const { basket, setBasket } = useBasket();
+
+    const isOnline = useOnlineStatus();
 
   // ==================================
   // Search
@@ -140,20 +143,29 @@ export function PublicLoads() {
   // ==================================
 
   if (isError) {
-    return (
-      <section className="mx-auto px-6 py-20">
-        <p className="text-danger">
-          {error instanceof Error ? error.message : "خطا در دریافت بارها"}
-        </p>
-      </section>
-    );
-  }
+   console.error("Public loads error:", error);
+   const message = !isOnline
+     ? "اتصال به اینترنت برقرار نیست."
+     : "دریافت بارها با خطا مواجه شد.";
 
+   return (
+     <section className="flex flex-col justify-center items-center min-h-100 text-center">
+       <WifiOff className="w-8 h-8" />
+       <p className="text-danger">{message}</p>
+
+       <p className="mt-2 text-sm text-text-2">
+         {!isOnline
+           ? "اتصال اینترنت خود را بررسی کنید."
+           : "لطفاً کمی بعد دوباره تلاش کنید."}
+       </p>
+     </section>
+   );
+ }
   return (
-    <section className="mx-auto px-6 py-20">
+    <section className="mx-auto  px-6 py-20 mb-20 ">
       {/* Header */}
 
-      <div className="mb-6">
+      <div className="mb-6 mt-10">
         <h1 className="text-2xl font-bold text-text">بارهای موجود</h1>
 
         <p className="mt-1 text-sm text-text-2">
@@ -211,6 +223,8 @@ export function PublicLoads() {
           همه بارها نمایش داده شدند
         </div>
       )}
+
+      
     </section>
   );
 }

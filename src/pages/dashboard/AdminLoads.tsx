@@ -1,34 +1,30 @@
 import { Plus, Search } from "lucide-react";
+import { useState } from "react";
 
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 
-import { useState } from "react";
-
 import { Modal } from "../../components/ui/Modal";
-
 import { Button } from "../../components/buttons/Button";
+import { TableFooter } from "../../components/ui/TableFooter";
+import Tabs from "../../components/tabs/Tabs";
+import BaseTable from "../../components/tables/BaseTable";
 
 import { useAdminLoads } from "../../hooks/admin/useAdminLoads";
-
 import { useDebounce } from "../../hooks/other/useDebounce";
-
-
-
-import { ADMIN_PAGE_SIZE } from "../../services/apiLoads";
-import { createLoadColumns } from "../../components/columns/AdminLoads.columns";
-import BaseTable from "../../components/tables/BaseTable";
 import { useDuplicateLoad } from "../../hooks/admin/useDuplicateLoad";
 import { useArchiveLoad } from "../../hooks/admin/useArchiveLoad";
 import { useUpdateLoadStatus } from "../../hooks/admin/useUpdateLoadStatus";
-import { TableFooter } from "../../components/ui/TableFooter";
-import Tabs from "../../components/tabs/Tabs";
+import { useOnlineStatus } from "../../hooks/other/useOnlineStatus";
+
+import { ADMIN_PAGE_SIZE } from "../../services/apiLoads";
+import { createLoadColumns } from "../../components/columns/AdminLoads.columns";
+
 import { LoadStatus } from "../../types/status";
 
 type LoadView = "active" | "archived";
 type LoadSort = "newest" | "oldest";
 
-
-export function AdminLoads() {
+export default function AdminLoads() {
   // ======================================
   // Navigation
   // ======================================
@@ -36,17 +32,24 @@ export function AdminLoads() {
   const navigate = useNavigate();
 
   // ======================================
-  // UI State
+  // Online Status
   // ======================================
+
+  const isOnline = useOnlineStatus();
+
+  // ======================================
+  // URL State
+  // ======================================
+
   const [searchParams, setSearchParams] = useSearchParams();
 
-const currentPage = Number(searchParams.get("page")) || 1;
+  const currentPage = Number(searchParams.get("page")) || 1;
 
   const pageSize = Number(searchParams.get("pageSize")) || ADMIN_PAGE_SIZE;
 
-const view = (searchParams.get("view") || "active") as LoadView;
+  const view = (searchParams.get("view") || "active") as LoadView;
 
-const sort = (searchParams.get("sort") || "newest") as LoadSort;
+  const sort = (searchParams.get("sort") || "newest") as LoadSort;
 
   const archivedPage = view === "archived";
 
@@ -66,15 +69,13 @@ const sort = (searchParams.get("sort") || "newest") as LoadSort;
     setSearchParams(params);
   };
 
+  // ======================================
+  // UI State
+  // ======================================
+
   const [query, setQuery] = useState("");
 
   const [status, setStatus] = useState<LoadStatus | "">("");
-
-
-
-  // ======================================
-  // Delete Modal
-  // ======================================
 
   const [archived, setArchived] = useState<string | null>(null);
 
@@ -88,88 +89,119 @@ const sort = (searchParams.get("sort") || "newest") as LoadSort;
   // Server Data
   // ======================================
 
-  const {
-    data,
-    isPending,
-     isError,
-    error
-    
-  } = useAdminLoads({
+  const { data, isPending, isError } = useAdminLoads({
     page: currentPage,
     pageSize,
     query: debouncedQuery,
     status,
     sort,
-    archived:archivedPage
+    archived: archivedPage,
   });
-
 
   const totalItems = data?.total ?? 0;
 
+  // ======================================
+  // Mutations
+  // ======================================
 
   const duplicateMutation = useDuplicateLoad();
+
   const archivedMutation = useArchiveLoad();
+
   const updatedStatusMutation = useUpdateLoadStatus();
 
- 
+  // ======================================
+  // Data
+  // ======================================
+
   const loads = data?.data ?? [];
 
+  // ======================================
+  // Table Columns
+  // ======================================
 
- const columns = createLoadColumns({
-   onView: (id) => navigate(`/admin/loads/${id}`),
+  const columns = createLoadColumns({
+    onView: (id) => {
+      navigate(`/admin/loads/${id}`);
+    },
 
-   onEdit: (id) => navigate(`/admin/loads/${id}/edit`),
+    onEdit: (id) => {
+      navigate(`/admin/loads/${id}/edit`);
+    },
 
-   onDuplicate: (id) => {
-     duplicateMutation.mutate(id);
-   },
+    onDuplicate: (id) => {
+      if (!isOnline) {
+        return;
+      }
 
-   onUpdateStatus: (id, status) => {
-     updatedStatusMutation.mutate({
-       id,
-       status,
-     });
-   },
+      duplicateMutation.mutate(id);
+    },
 
-   onArchived: (id) => {
-     archivedMutation.mutate(id);
-   },
- });
+    onUpdateStatus: (id, status) => {
+      if (!isOnline) {
+        return;
+      }
+
+      updatedStatusMutation.mutate({
+        id,
+        status,
+      });
+    },
+
+    onArchived: (id) => {
+      if (!isOnline) {
+        return;
+      }
+
+      archivedMutation.mutate(id);
+    },
+  });
+
+  // ======================================
+  // Search
+  // ======================================
 
   const handleSearchChange = (value: string) => {
     setQuery(value);
-    updateSearchParams({ page: 1 });
+
+    updateSearchParams({
+      page: 1,
+    });
   };
+
   // ======================================
   // Status Change
   // ======================================
 
   const handleStatusChange = (value: string) => {
     setStatus(value as LoadStatus | "");
-    updateSearchParams({ page: 1 });
+
+    updateSearchParams({
+      page: 1,
+    });
   };
 
   // ======================================
   // Sort Change
   // ======================================
 
- const handleSortChange = (value: LoadSort) => {
-   updateSearchParams({
-     page: 1,
-     sort: value,
-   });
- };
-  // ======================================
-  // Page Size Change
-  // ======================================
+  const handleSortChange = (value: LoadSort) => {
+    updateSearchParams({
+      page: 1,
+      sort: value,
+    });
+  };
 
+  // ======================================
+  // View Change
+  // ======================================
 
   const handleViewChange = (value: LoadView) => {
     updateSearchParams({
       page: 1,
       view: value,
     });
-  }
+  };
 
   return (
     <div className="space-y-6">
@@ -238,6 +270,27 @@ const sort = (searchParams.get("sort") || "newest") as LoadSort;
       </div>
 
       {/* ======================================
+          Offline Notice
+      ====================================== */}
+
+      {!isOnline && (
+        <div
+          className="
+            rounded-xl
+            border
+            border-danger/30
+            bg-danger/5
+            p-4
+            text-sm
+            text-danger
+          "
+        >
+          اتصال به اینترنت برقرار نیست. اطلاعات بارها و عملیات مدیریتی در حال
+          حاضر در دسترس نیستند.
+        </div>
+      )}
+
+      {/* ======================================
           Toolbar
       ====================================== */}
 
@@ -296,9 +349,7 @@ const sort = (searchParams.get("sort") || "newest") as LoadSort;
           <input
             value={query}
             onChange={(e) => handleSearchChange(e.target.value)}
-            placeholder="
-              جستجوی مسیر، بار یا خودرو...
-            "
+            placeholder="جستجوی مسیر، بار یا خودرو..."
             className="
               w-full
               rounded-lg
@@ -310,11 +361,11 @@ const sort = (searchParams.get("sort") || "newest") as LoadSort;
               pr-10
               text-sm
               text-text
-              
               outline-none
               transition-all
-               focus:border-primary focus:ring-4 focus:ring-primary/10
-              
+              focus:border-primary
+              focus:ring-4
+              focus:ring-primary/10
             "
           />
         </div>
@@ -364,26 +415,28 @@ const sort = (searchParams.get("sort") || "newest") as LoadSort;
           </select>
 
           {/* Sort */}
+
           <select
             value={sort}
             onChange={(e) => handleSortChange(e.target.value as LoadSort)}
             className="
-    cursor-pointer
-    rounded-lg
-    border
-    border-border
-    bg-surface-2
-    px-3
-    py-2.5
-    text-sm
-    text-text
-    outline-none
-    transition-all
-    focus:ring-2
-    focus:ring-primary
-  "
+              cursor-pointer
+              rounded-lg
+              border
+              border-border
+              bg-surface-2
+              px-3
+              py-2.5
+              text-sm
+              text-text
+              outline-none
+              transition-all
+              focus:ring-2
+              focus:ring-primary
+            "
           >
             <option value="newest">جدیدترین</option>
+
             <option value="oldest">قدیمی‌ترین</option>
           </select>
         </div>
@@ -392,7 +445,6 @@ const sort = (searchParams.get("sort") || "newest") as LoadSort;
       {/* ======================================
           Error
       ====================================== */}
-
 
       {isError ? (
         <div
@@ -406,11 +458,14 @@ const sort = (searchParams.get("sort") || "newest") as LoadSort;
             text-danger
           "
         >
-          {error instanceof Error ? error.message : "خطایی رخ داد"}
+          {isOnline
+            ? "دریافت اطلاعات بارها با خطا مواجه شد. لطفاً دوباره تلاش کنید."
+            : "اتصال به اینترنت برقرار نیست. دریافت اطلاعات بارها امکان‌پذیر نیست."}
         </div>
       ) : (
         <>
           <BaseTable data={loads} columns={columns} isPending={isPending} />
+
           <TableFooter
             pageSize={pageSize}
             totalItems={totalItems}
@@ -431,11 +486,7 @@ const sort = (searchParams.get("sort") || "newest") as LoadSort;
       )}
 
       {/* ======================================
-          Table
-      ====================================== */}
-
-      {/* ======================================
-          Delete Modal
+          Archive Modal
       ====================================== */}
 
       <Modal
@@ -451,7 +502,7 @@ const sort = (searchParams.get("sort") || "newest") as LoadSort;
               text-text-2
             "
           >
-            آیا از آرشیو این بار مطمئن هستید؟.
+            آیا از آرشیو این بار مطمئن هستید؟
           </p>
 
           <div
@@ -490,7 +541,11 @@ const sort = (searchParams.get("sort") || "newest") as LoadSort;
                 text-text
               "
               onClick={() => {
-                // بعداً delete mutation
+                if (!isOnline || !archived) {
+                  return;
+                }
+
+                archivedMutation.mutate(archived);
 
                 setArchived(null);
               }}

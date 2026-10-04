@@ -1,4 +1,10 @@
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { lazy } from "react";
+
+const ReactQueryDevtools = lazy(() =>
+  import("@tanstack/react-query-devtools").then((m) => ({
+    default: m.ReactQueryDevtools,
+  })),
+);
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
@@ -10,6 +16,7 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: 0,
+      refetchOnReconnect: true,
     },
   },
 });
@@ -29,7 +36,7 @@ export default function App() {
           gutter={12}
           toastOptions={{
             success: {
-              duration: Infinity,
+              duration: 3000,
             },
             error: {
               duration: 10000,

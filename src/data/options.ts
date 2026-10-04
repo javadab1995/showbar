@@ -89,50 +89,48 @@ export const fleetOptions: FilterOption[] = [
 ];
 
 export const BORDER_OPTIONS: FilterOption[] = [
-  {
-    value: "jolfa",
-    label: "جلفا",
-  },
-  {
-    value: "bazargan",
-    label: "بازرگان",
-  },
-  {
-    value: "razi",
-    label: "رازی",
-  },
-  {
-    value: "sarb",
-    label: "سرو",
-  },
-  {
-    value: "poldasht",
-    label: "پلدشت",
-  },
+  // --- مرزهای ترکیه ---
+  { value: "bazargan", label: "بازرگان" }, // مقابل گوربلاک
+  { value: "razi", label: "رازی" }, // مقابل کاپیکوی
+  { value: "sero", label: "سرو" }, // مقابل اسندره
+
+  // --- مرزهای عراق ---
+  { value: "mehran", label: "مهران" },
+  { value: "khosravi", label: "خسروی" },
+  { value: "parvizkhan", label: "پرویزخان" },
+  { value: "bashmaq", label: "باشماق" },
+  { value: "tamarchin", label: "تمرچین" },
+  { value: "shalamcheh", label: "شلمچه" },
+  { value: "chazzabeh", label: "چذابه" },
+
+  // --- مرزهای آذربایجان (و نخجوان) ---
+  { value: "astara", label: "آستارا" },
+  { value: "bileh-savar", label: "بیله‌سوار" },
+  { value: "jolfa", label: "جلفا" },
+  { value: "poldasht", label: "پلدشت" },
+
+  // --- مرزهای ارمنستان ---
+  { value: "nourdouz", label: "نوردوز" },
+
+  // --- مرزهای ترکمنستان ---
+  { value: "sarakhs", label: "سرخس" },
+  { value: "lotfabad", label: "لطف‌آباد" },
+  { value: "bajgiran", label: "باجگیران" },
+  { value: "incheh-borun", label: "اینچه‌برون" },
+
+  // --- مرزهای پاکستان ---
+  { value: "mirjaveh", label: "میرجاوه" },
+  { value: "rimdan", label: "ریمدان" },
+  { value: "pishin", label: "پیشین" },
+
+  // --- مرزهای افغانستان ---
+  { value: "dogharoon", label: "دوغارون" },
+  { value: "mahirud", label: "ماهیرود" },
+  { value: "milak", label: "میلک" },
 ];
 
-export const cityOptions: FilterOption[] = [
-  {
-    value: "تبریز",
-    label: "تبریز",
-  },
-  {
-    value: "ارومیه",
-    label: "ارومیه",
-  },
-  {
-    value: "تهران",
-    label: "تهران",
-  },
-  {
-    value: "مشهد",
-    label: "مشهد",
-  },
-  {
-    value: "اصفهان",
-    label: "اصفهان",
-  },
-];
+
+
 
 export const countryOptions = [
   { value: "IR", label: "ایران" },
@@ -145,6 +143,8 @@ export const countryOptions = [
   { value: "AF", label: "افغانستان" },
   { value: "PK", label: "پاکستان" },
   { value: "AE", label: "امارات متحده عربی" },
+  { value: "RU", label: "روسیه" },
+  { value: "BG", label: "بلغارستان" },
 ];
 
 

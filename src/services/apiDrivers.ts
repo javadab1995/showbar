@@ -4,12 +4,6 @@ import supabase from "./supabase";
 import type { AdminDriverListItem } from "../types/drivers";
 import { DriverRequestStatus } from "../types/status";
 
-type DriverRecord = {
-  id: string;
-  name: string;
-  phone: string;
-  national_id: string;
-};
 
 export async function createDriverRequest(data: CreateRequestArgs) {
   if (!data.loadIds.length) {
@@ -17,131 +11,62 @@ export async function createDriverRequest(data: CreateRequestArgs) {
   }
 
   // -------------------------
-  // Driver
+  // Tracking Code
   // -------------------------
-const { data: existingDriver, error: driverFindError } = await supabase
-  .from("drivers")
-  .select("id, name, phone, national_id")
-  .eq("national_id", data.nationalID)
-  .maybeSingle();
 
-if (driverFindError) {
-  throw driverFindError;
-}
-
-let driver: DriverRecord;
-
-if (existingDriver) {
-  if (existingDriver.phone !== data.phone) {
-    throw new Error(
-      "این کد ملی قبلاً با شماره موبایل دیگری ثبت شده است. برای تغییر اطلاعات با پشتیبانی تماس بگیرید.",
-    );
-  }
-
-  if (existingDriver.name.trim() !== data.name.trim()) {
-    throw new Error(
-      "نام واردشده با اطلاعات ثبت‌شده برای این کد ملی مطابقت ندارد.",
-    );
-  }
-
-  driver = existingDriver;
-} else {
-  const { data: newDriver, error: driverCreateError } = await supabase
-    .from("drivers")
-    .insert({
-      name: data.name.trim(),
-      national_id: data.nationalID,
-      phone: data.phone,
-    })
-    .select("id, name, phone, national_id")
-    .single();
-
-  if (driverCreateError) {
-    throw driverCreateError;
-  }
-
-  driver = newDriver;
-}
-  // -------------------------
-  // Vehicle
-  // -------------------------
-let vehicle: { id: string };
-
-const vehicleQuery = supabase
-  .from("vehicles")
-  .select("id")
-  .eq("identifier_type", data.identifierType);
-
-if (data.identifierType === "PLATE") {
-  vehicleQuery.eq("plate", data.plate);
-} else {
-  vehicleQuery.eq("transit_code", data.transitCode);
-}
-
-const { data: existingVehicle, error: vehicleFindError } =
-  await vehicleQuery.maybeSingle();
-
-if (vehicleFindError) {
-  throw vehicleFindError;
-}
-
-if (existingVehicle) {
-  vehicle = existingVehicle;
-} else {
-  const { data: newVehicle, error } = await supabase
-    .from("vehicles")
-    .insert({
-      vehicle_type: data.vehicleType,
-      identifier_type: data.identifierType,
-      plate: data.identifierType === "PLATE" ? data.plate : null,
-      transit_code: data.identifierType === "TRANSIT" ? data.transitCode : null,
-    })
-    .select("id")
-    .single();
-
-  if (error) {
-    throw error;
-  }
-
-  vehicle = newVehicle;
-  }
-  
-  
   const trackingCode = generateTrackingCode();
 
+  // -------------------------
+  // Create Driver Request
+  // -------------------------
+  // Driver
+  // Vehicle
+  // Driver Request
+  // Vehicle ↔ Driver
+  // Request ↔ Loads
+  // Load Notifications
+  //
+  // همه داخل RPC انجام می‌شوند.
+  // -------------------------
 
-const { data: requestId, error } = await supabase.rpc("create_driver_request", {
-  p_driver_id: driver.id,
-  p_vehicle_id: vehicle.id,
-  p_trade_type: data.tradeType,
-  p_tracking_code: trackingCode,
-  p_load_ids: data.loadIds,
-  p_note: data.note ?? null,
-});
+  const { data: requestId, error } = await supabase.rpc(
+    "create_driver_request",
+    {
+      p_name: data.name.trim(),
+      p_national_id: data.nationalID.trim(),
+      p_phone: data.phone.trim(),
+      p_vehicle_type: data.vehicleType,
+      p_identifier_type: data.identifierType,
+
+      p_plate:
+        data.identifierType === "PLATE"
+          ? data.plate?.trim() || null
+          : null,
+
+      p_transit_code:
+        data.identifierType === "TRANSIT"
+          ? data.transitCode?.trim() || null
+          : null,
+
+      p_trade_type: data.tradeType,
+      p_tracking_code: trackingCode,
+      p_note: data.note?.trim() || null,
+      p_load_ids: data.loadIds,
+    },
+  );
+
   if (error) {
     throw error;
   }
 
-  const notifications = data.loadIds.map((loadId) => ({
-    request_id: requestId,
-    load_id: loadId,
-    name: data.name,
-    phone: data.phone,
-    status: "active",
-  }));
-
-  const { error: notificationsError } = await supabase
-    .from("load_notifications")
-    .insert(notifications);
-
-  if (notificationsError) throw notificationsError;
-
-  
-return {
-  id: requestId,
-  tracking_code: trackingCode,
-};
+  return {
+    id: requestId,
+    tracking_code: trackingCode,
+  };
 }
+
+
+
 
 
 

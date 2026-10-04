@@ -1,6 +1,36 @@
-@import url("https://fonts.googleapis.com/css2?family=Markazi+Text:wght@400..700&display=swap");
-
 @import "tailwindcss";
+
+@font-face {
+  font-family: "Markazi Text";
+  src: url("/fonts/static/MarkaziText-Regular.woff2") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Markazi Text";
+  src: url("/fonts/static/MarkaziText-Medium.woff2") format("truetype");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Markazi Text";
+  src: url("/fonts/static/MarkaziText-SemiBold.woff2") format("truetype");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Markazi Text";
+  src: url("/fonts/static/MarkaziText-Bold.woff2") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
 
 /* =========================================================
    SHOWBAR DESIGN TOKENS
@@ -10,27 +40,27 @@
   --color-primary: var(--primary);
   --color-primary-dark: var(--primary-dark);
   --color-primary-soft: var(--primary-soft);
-
   --color-background: var(--bg);
   --color-surface: var(--surface);
   --color-surface-2: var(--surface-2);
-
+  --color-logo: var(--logo);
   --color-border: var(--border);
-
   --color-text: var(--text);
   --color-text-2: var(--text-2);
   --color-muted: var(--muted);
-
   --color-success: var(--success);
   --color-warning: var(--warning);
   --color-danger: var(--danger);
-
   --font-sans: var(--font-family);
 }
 
 :root {
   --font-family: "Markazi Text", Tahoma, sans-serif;
 }
+/* =========================================================
+   SHOWBAR DESIGN TOKENS
+   ========================================================= */
+
 
 /* =========================================================
    LIGHT THEME
@@ -40,6 +70,7 @@
   --primary: #0D674E;
   --primary-dark: #09543F;
   --primary-soft: #EAF5F1;
+  --logo: #F9FAFA;
 
   --bg: #F9FAFA;
   --surface: #FDFDFE;
@@ -74,6 +105,7 @@
   --primary: #39A889;
   --primary-dark: #2C8D74;
   --primary-soft: #123B32;
+  --logo: #8ebaae;
 
   --bg: #0D1412;
   --surface: #141D1A;

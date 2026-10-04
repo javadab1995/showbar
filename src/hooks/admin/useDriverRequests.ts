@@ -1,15 +1,18 @@
+import { useEffect, useRef } from "react";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
+
 import { getRequests } from "../../services/apiRequest";
-import { DriverRequestLoadStatus, DriverRequestStatus } from "../../types/status";
-
-
-
+import { DriverRequestStatus } from "../../types/status";
+import { useOnlineStatus } from "../other/useOnlineStatus";
 
 export function useDriverRequests(
-  status: "" | DriverRequestLoadStatus,
+  status: "" | DriverRequestStatus,
   enabled = true,
 ) {
-  return useQuery({
+  const isOnline = useOnlineStatus();
+  const wasOffline = useRef(false);
+
+  const { refetch, ...query } = useQuery({
     queryKey: ["driver-requests", status],
     queryFn: () =>
       getRequests({
@@ -18,11 +21,34 @@ export function useDriverRequests(
         status,
       }),
     enabled,
+    retry: 0,
   });
+
+  useEffect(() => {
+    if (!isOnline) {
+      wasOffline.current = true;
+      return;
+    }
+
+    if (!wasOffline.current) {
+      return;
+    }
+
+    wasOffline.current = false;
+    refetch();
+  }, [isOnline, refetch]);
+
+  return query;
 }
 
-export function useInfiniteDriverRequests(status: "" | DriverRequestLoadStatus, enabled = true) {
-  return useInfiniteQuery({
+export function useInfiniteDriverRequests(
+  status: "" | DriverRequestStatus,
+  enabled = true,
+) {
+  const isOnline = useOnlineStatus();
+  const wasOffline = useRef(false);
+
+  const { refetch, ...query } = useInfiniteQuery({
     queryKey: ["driver-requests-infinite", status],
 
     initialPageParam: 1,
@@ -44,5 +70,22 @@ export function useInfiniteDriverRequests(status: "" | DriverRequestLoadStatus, 
     },
 
     enabled,
+    retry: 0,
   });
+
+  useEffect(() => {
+    if (!isOnline) {
+      wasOffline.current = true;
+      return;
+    }
+
+    if (!wasOffline.current) {
+      return;
+    }
+
+    wasOffline.current = false;
+    refetch();
+  }, [isOnline, refetch]);
+
+  return query;
 }

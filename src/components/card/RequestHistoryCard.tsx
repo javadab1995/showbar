@@ -3,6 +3,7 @@ import { CalendarDays, MapPin } from "lucide-react";
 
 import { STATUS_LABELS } from "../../types/trackRequest.type";
 import type { RequestHistoryItem } from "../../types/trackRequest.type";
+import { StatusBadge } from "../ui/StatusBadge";
 
 type Props = {
   item: RequestHistoryItem;
@@ -40,11 +41,7 @@ export default function RequestHistoryCard({ item }: Props) {
           </p>
         </div>
 
-        <span
-          className={`shrink-0 rounded-lg border px-2.5 py-1.5 text-xs font-medium ${statusStyle}`}
-        >
-          {STATUS_LABELS[item.status] ?? item.status}
-        </span>
+        <StatusBadge status={item.status} />
       </div>
 
       {/* Date */}

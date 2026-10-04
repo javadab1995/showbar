@@ -16,12 +16,12 @@ export default function SupportButton({
   const whatsappUrl = `https://wa.me/${whatsapp.replace(/\D/g, "")}`;
 
   return (
-    <div className="fixed bottom-24 left-5 z-50 md:bottom-6 md:left-6">
+    <div className="fixed bottom-24 right-5 z-50 md:bottom-6 md:right-6">
       {/* Support menu */}
       {open && (
         <div
           className="
-            absolute bottom-14 left-0
+            absolute bottom-14 right-0
             w-64
             overflow-hidden
             rounded-2xl

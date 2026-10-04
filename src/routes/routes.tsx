@@ -1,52 +1,99 @@
-import { Navigate, type RouteObject } from "react-router-dom";
+import { lazy, Suspense } from "react";
+import {  type RouteObject } from "react-router-dom";
 
-import PublicLayout from "../layouts/PublicLayout";
-import AdminLayout from "../layouts/AdminLayout";
-import PublicThemeLayout from "../layouts/PublicThemeLayout";
-import AdminThemeLayout from "../layouts/AdminThemeLayout";
+const PublicLayout = lazy(() => import("../layouts/PublicLayout"));
 
+const AdminLayout = lazy(() => import("../layouts/AdminLayout"));
 
-import { AdminLoads } from "../pages/dashboard/AdminLoads";
-import { AdminLoadDetails } from "../pages/dashboard/AdminLoadDetails";
-import { RequestsPage } from "../pages/dashboard/RequestsPage";
-import { RequestDetails } from "../pages/dashboard/RequestDetails";
-import { VehicleDetails } from "../pages/dashboard/VehicleDetails";
-import { DriversPage } from "../pages/dashboard/DriversPage";
-import { SettingsPage } from "../pages/dashboard/SettingsPage";
-import { LoadForm } from "../pages/dashboard/LoadForm";
-import VehiclesPage from "../pages/dashboard/VehiclesPage";
-import { DriverDetailsPage } from "../pages/dashboard/DriverDetails";
-import AdminLogin from "../pages/dashboard/AdminLogin";
-import UpdatePassword from "../pages/dashboard/UpdatePassword";
+const PublicThemeLayout = lazy(() => import("../layouts/PublicThemeLayout"));
 
-import { PublicLoads } from "../pages/home/PublicLoads";
-import { LoadDetails } from "../pages/home/LoadDetails";
-import { Basket } from "../pages/home/Basket";
-import { RequestSuccess } from "../pages/home/RequestSuccess";
-import { NotifyMe } from "../pages/home/NotifyMe";
-import TrackRequest from "../pages/home/Track";
-import About from "../pages/home/About";
-import Contact from "../pages/home/Contact";
-import DriverRequest from "../pages/home/DriverRequest";
-
-import NotificationList from "../components/notifications/NotificationList";
+const AdminThemeLayout = lazy(() => import("../layouts/AdminThemeLayout"));
 
 import ProtectedRoute from "../auth/ProtectedRoute";
-import AddAdmin from "../pages/dashboard/AddAdmin";
-import Users from "../pages/dashboard/Users";
-import Dashboard from "../pages/dashboard/Dashboard";
 import SuperAdminRoute from "../auth/SuperAdminRoute";
-import StatusPage from "../pages/dashboard/StatusGuidePage";
+import NotFound from "../pages/NotFounde";
+
+const AdminLogin = lazy(() => import("../pages/dashboard/AdminLogin"));
+const UpdatePassword = lazy(() => import("../pages/dashboard/UpdatePassword"));
+
+const Dashboard = lazy(() => import("../pages/dashboard/Dashboard"));
+const AdminLoads = lazy(() => import("../pages/dashboard/AdminLoads"));
+const AdminLoadDetails = lazy(
+  () => import("../pages/dashboard/AdminLoadDetails"),
+);
+const LoadForm = lazy(() => import("../pages/dashboard/LoadForm"));
+
+const RequestsPage = lazy(() => import("../pages/dashboard/RequestsPage"));
+const RequestDetails = lazy(() => import("../pages/dashboard/RequestDetails"));
+
+const VehiclesPage = lazy(() => import("../pages/dashboard/VehiclesPage"));
+const VehicleDetails = lazy(() => import("../pages/dashboard/VehicleDetails"));
+
+const DriversPage = lazy(() => import("../pages/dashboard/DriversPage"));
+const DriverDetailsPage = lazy(
+  () => import("../pages/dashboard/DriverDetails"),
+);
+
+const SettingsPage = lazy(() => import("../pages/dashboard/SettingsPage"));
+
+const StatusPage = lazy(() => import("../pages/dashboard/StatusGuidePage"));
+
+const AddAdmin = lazy(() => import("../pages/dashboard/AddAdmin"));
+
+const Users = lazy(() => import("../pages/dashboard/Users"));
+
+const NotificationList = lazy(
+  () => import("../components/notifications/NotificationList"),
+);
+
+// Public pages
+const PublicLoads = lazy(() => import("../pages/home/PublicLoads"));
+
+const LoadDetails = lazy(() => import("../pages/home/LoadDetails"));
+
+const Basket = lazy(() => import("../pages/home/Basket"));
+
+const RequestSuccess = lazy(() => import("../pages/home/RequestSuccess"));
+
+const NotifyMe = lazy(() => import("../pages/home/NotifyMe"));
+
+const TrackRequest = lazy(() => import("../pages/home/Track"));
+
+const About = lazy(() => import("../pages/home/About"));
+
+const Contact = lazy(() => import("../pages/home/Contact"));
+
+const DriverRequest = lazy(() => import("../pages/home/DriverRequest"));
+
+function RouteLoader() {
+  return (
+    <div className="flex min-h-[50vh] items-center justify-center">
+      <div className="text-sm text-text-2">در حال بارگذاری...</div>
+    </div>
+  );
+}
+
+function LazyPage({ children }: { children: React.ReactNode }) {
+  return <Suspense fallback={<RouteLoader />}>{children}</Suspense>;
+}
 
 export const routes: RouteObject[] = [
   {
     path: "/admin/login",
-    element: <AdminLogin />,
+    element: (
+      <LazyPage>
+        <AdminLogin />
+      </LazyPage>
+    ),
   },
 
   {
     path: "/admin/update-password",
-    element: <UpdatePassword />,
+    element: (
+      <LazyPage>
+        <UpdatePassword />
+      </LazyPage>
+    ),
   },
 
   {
@@ -59,35 +106,152 @@ export const routes: RouteObject[] = [
             path: "/admin",
             element: <AdminLayout />,
             children: [
-              { index: true, element: <Dashboard /> },
+              {
+                index: true,
+                element: (
+                  <LazyPage>
+                    <Dashboard />
+                  </LazyPage>
+                ),
+              },
 
-              { path: "loads", element: <AdminLoads /> },
-              { path: "loads/new", element: <LoadForm /> },
-              { path: "loads/:id", element: <AdminLoadDetails /> },
-              { path: "loads/:id/edit", element: <LoadForm /> },
+              {
+                path: "loads",
+                element: (
+                  <LazyPage>
+                    <AdminLoads />
+                  </LazyPage>
+                ),
+              },
 
-              { path: "notifications", element: <NotificationList /> },
-              { path: "requests", element: <RequestsPage /> },
-              { path: "requests/:id", element: <RequestDetails /> },
+              {
+                path: "loads/new",
+                element: (
+                  <LazyPage>
+                    <LoadForm />
+                  </LazyPage>
+                ),
+              },
 
-              { path: "vehicles", element: <VehiclesPage /> },
-              { path: "vehicles/:id", element: <VehicleDetails /> },
+              {
+                path: "loads/:id",
+                element: (
+                  <LazyPage>
+                    <AdminLoadDetails />
+                  </LazyPage>
+                ),
+              },
 
-              { path: "drivers", element: <DriversPage /> },
-              { path: "drivers/:id", element: <DriverDetailsPage /> },
+              {
+                path: "loads/:id/edit",
+                element: (
+                  <LazyPage>
+                    <LoadForm />
+                  </LazyPage>
+                ),
+              },
 
-              { path: "settings", element: <SettingsPage /> },
+              {
+                path: "notifications",
+                element: (
+                  <LazyPage>
+                    <NotificationList />
+                  </LazyPage>
+                ),
+              },
 
-              { path: "status-guide", element: <StatusPage /> },
+              {
+                path: "requests",
+                element: (
+                  <LazyPage>
+                    <RequestsPage />
+                  </LazyPage>
+                ),
+              },
+
+              {
+                path: "requests/:id",
+                element: (
+                  <LazyPage>
+                    <RequestDetails />
+                  </LazyPage>
+                ),
+              },
+
+              {
+                path: "vehicles",
+                element: (
+                  <LazyPage>
+                    <VehiclesPage />
+                  </LazyPage>
+                ),
+              },
+
+              {
+                path: "vehicles/:id",
+                element: (
+                  <LazyPage>
+                    <VehicleDetails />
+                  </LazyPage>
+                ),
+              },
+
+              {
+                path: "drivers",
+                element: (
+                  <LazyPage>
+                    <DriversPage />
+                  </LazyPage>
+                ),
+              },
+
+              {
+                path: "drivers/:id",
+                element: (
+                  <LazyPage>
+                    <DriverDetailsPage />
+                  </LazyPage>
+                ),
+              },
+
+              {
+                path: "settings",
+                element: (
+                  <LazyPage>
+                    <SettingsPage />
+                  </LazyPage>
+                ),
+              },
+
+              {
+                path: "status-guide",
+                element: (
+                  <LazyPage>
+                    <StatusPage />
+                  </LazyPage>
+                ),
+              },
 
               {
                 element: <SuperAdminRoute />,
                 children: [
                   {
                     path: "add-admin",
-                    element: <AddAdmin />,
+                    element: (
+                      <LazyPage>
+                        <AddAdmin />
+                      </LazyPage>
+                    ),
                   },
-                  { path: "users", element: <Users /> },
+
+                  {
+                    path: "users",
+                    element: (
+                      <LazyPage>
+                        <Users />
+                      </LazyPage>
+                    ),
+                  },
                 ],
               },
             ],
@@ -96,6 +260,7 @@ export const routes: RouteObject[] = [
       },
     ],
   },
+
   {
     element: <PublicThemeLayout />,
     children: [
@@ -105,52 +270,92 @@ export const routes: RouteObject[] = [
         children: [
           {
             index: true,
-            element: <PublicLoads />,
+            element: (
+              <LazyPage>
+                <PublicLoads />
+              </LazyPage>
+            ),
           },
 
           {
             path: "loads",
-            element: <PublicLoads />,
+            element: (
+              <LazyPage>
+                <PublicLoads />
+              </LazyPage>
+            ),
           },
 
           {
             path: "loads/:id",
-            element: <LoadDetails />,
+            element: (
+              <LazyPage>
+                <LoadDetails />
+              </LazyPage>
+            ),
           },
 
           {
             path: "basket",
-            element: <Basket />,
+            element: (
+              <LazyPage>
+                <Basket />
+              </LazyPage>
+            ),
           },
 
           {
             path: "request",
-            element: <DriverRequest />,
+            element: (
+              <LazyPage>
+                <DriverRequest />
+              </LazyPage>
+            ),
           },
 
           {
             path: "request/success",
-            element: <RequestSuccess />,
+            element: (
+              <LazyPage>
+                <RequestSuccess />
+              </LazyPage>
+            ),
           },
 
           {
             path: "about",
-            element: <About />,
+            element: (
+              <LazyPage>
+                <About />
+              </LazyPage>
+            ),
           },
 
           {
             path: "contact",
-            element: <Contact />,
+            element: (
+              <LazyPage>
+                <Contact />
+              </LazyPage>
+            ),
           },
 
           {
             path: "track",
-            element: <TrackRequest />,
+            element: (
+              <LazyPage>
+                <TrackRequest />
+              </LazyPage>
+            ),
           },
 
           {
             path: "notify/:id",
-            element: <NotifyMe />,
+            element: (
+              <LazyPage>
+                <NotifyMe />
+              </LazyPage>
+            ),
           },
         ],
       },
@@ -159,6 +364,6 @@ export const routes: RouteObject[] = [
 
   {
     path: "*",
-    element: <Navigate to="/" replace />,
+    element:<NotFound />,
   },
 ];

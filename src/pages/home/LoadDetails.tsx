@@ -14,6 +14,7 @@
   Plus,
   Scale,
   Truck,
+  WifiOff,
 } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 
@@ -28,9 +29,10 @@ import { useLoad } from "../../hooks/other/useLoad";
 import { toPersianDate } from "../../helpers/date";
 import { formatMoney } from "../../helpers/format";
 import CurrencyFlag from "../../components/widgets/CurrencyFlag";
-import { BORDER_OPTIONS, VEHICLE_OPTIONS } from "../../data/options";
+import { VEHICLE_OPTIONS } from "../../data/options";
 import { toPersianDigits } from "../../helpers/number";
 import { getExitBorderLabels } from "../../helpers/exitBorders";
+import { useOnlineStatus } from "../../hooks/other/useOnlineStatus";
 
 
 
@@ -42,9 +44,10 @@ const TRADE_ICONS = {
 } as const;
 
 
-export function LoadDetails() {
+export default function LoadDetails() {
   const { id } = useParams();
   const { basket, setBasket } = useBasket();
+  const isOnline = useOnlineStatus();
 
 
 
@@ -57,23 +60,36 @@ export function LoadDetails() {
 
 
 
-  if (isLoading) {
+if (isLoading) {
+  if (!isOnline) {
     return (
-      <div className="space-y-3">
-        {[1, 2, 3].map((item) => (
-          <div
-            key={item}
-            className="h-24 animate-pulse rounded-2xl bg-border"
-          />
-        ))}
-      </div>
+      <section className="flex min-h-100 flex-col items-center justify-center text-center">
+        <WifiOff className="h-8 w-8" />
+
+        <p className="mt-3 text-danger">اتصال به اینترنت برقرار نیست.</p>
+
+        <p className="mt-2 text-sm text-text-2">
+          اتصال اینترنت خود را بررسی کنید.
+        </p>
+      </section>
     );
   }
+
+  return (
+    <div className="space-y-3 p-6">
+      {[1, 2, 3].map((item) => (
+        <div key={item} className="h-24 animate-pulse rounded-2xl bg-border " />
+      ))}
+    </div>
+  );
+}
 
   if (isError || !load) {
     return (
       <div className="rounded-2xl border border-border bg-surface p-6 text-center">
-        <p className="text-sm text-danger">دریافت اعلان‌ها با خطا مواجه شد.</p>
+        <p className="text-sm text-danger">
+          دریافت اطلاعات بار با خطا مواجه شد.
+        </p>
       </div>
     );
   }
@@ -85,10 +101,6 @@ export function LoadDetails() {
     VEHICLE_OPTIONS.find((option) => option.value === load.vehicle_type)
       ?.label ?? "سایر";
 
-
-
-  const IconComponent =
-    TRADE_ICONS[load.trade_type as keyof typeof TRADE_ICONS] ?? ArrowLeftRight;
 
     const selected = basket.includes(load.id);
     const active = load.status === "active";
