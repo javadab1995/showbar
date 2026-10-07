@@ -1,30 +1,29 @@
-
 import type {
   Company,
   CreateCompanyData,
   UpdateCompanyData,
 } from "../types/company";
+
 import supabase from "./supabase";
 
-export async function getCompanies(adminId: string): Promise<Company[]> {
+export async function getCompany(): Promise<Company | null> {
   const { data, error } = await supabase
     .from("companies")
     .select("*")
-    .eq("admin_id", adminId)
-    .order("created_at", { ascending: false });
+    .limit(1)
+    .single();
 
-  if (error) {
+  if (error && error.code !== "PGRST116") {
     throw error;
   }
 
-  return data ?? [];
+  return data;
 }
 
 export async function createCompany(data: CreateCompanyData): Promise<Company> {
   const { data: company, error } = await supabase
     .from("companies")
     .insert({
-      admin_id: data.admin_id,
       name: data.name,
       phone: data.phone || null,
       whatsapp: data.whatsapp || null,

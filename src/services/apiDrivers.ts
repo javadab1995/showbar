@@ -16,19 +16,7 @@ export async function createDriverRequest(data: CreateRequestArgs) {
 
   const trackingCode = generateTrackingCode();
 
-  // -------------------------
-  // Create Driver Request
-  // -------------------------
-  // Driver
-  // Vehicle
-  // Driver Request
-  // Vehicle ↔ Driver
-  // Request ↔ Loads
-  // Load Notifications
-  //
-  // همه داخل RPC انجام می‌شوند.
-  // -------------------------
-
+  
   const { data: requestId, error } = await supabase.rpc(
     "create_driver_request",
     {
@@ -56,6 +44,7 @@ export async function createDriverRequest(data: CreateRequestArgs) {
   );
 
   if (error) {
+      console.error("RPC ERROR:", error);
     throw error;
   }
 

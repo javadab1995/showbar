@@ -2,17 +2,16 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import {
   createCompany,
-  getCompanies,
+  getCompany,
   updateCompany,
 } from "../../services/apiCompanies";
 
 import type { CreateCompanyData, UpdateCompanyData } from "../../types/company";
 
-export function useCompanies(adminId?: string) {
+export function useCompany() {
   return useQuery({
-    queryKey: ["companies", adminId],
-    queryFn: () => getCompanies(adminId!),
-    enabled: Boolean(adminId),
+    queryKey: ["company"],
+    queryFn: getCompany,
   });
 }
 
@@ -22,9 +21,9 @@ export function useCreateCompany() {
   return useMutation({
     mutationFn: (data: CreateCompanyData) => createCompany(data),
 
-    onSuccess: (_, variables) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["companies", variables.admin_id],
+        queryKey: ["company"],
       });
     },
   });
@@ -37,9 +36,9 @@ export function useUpdateCompany() {
     mutationFn: ({ id, data }: { id: string; data: UpdateCompanyData }) =>
       updateCompany(id, data),
 
-    onSuccess: (company) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["companies", company.admin_id],
+        queryKey: ["company"],
       });
     },
   });

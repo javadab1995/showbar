@@ -26,7 +26,7 @@ export default function  SettingsPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-8">
           {user ? (
-            <CompanyInfoForm adminId={user.id} />
+            <CompanyInfoForm  />
           ) : (
             <div className="text-text-2">اطلاعات حساب در دسترس نیست.</div>
           )}

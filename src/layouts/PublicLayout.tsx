@@ -27,7 +27,7 @@ export default function PublicLayout() {
               <CurrencyRates />
             </div>
           </aside>
-          <SupportButton phone="09123456789" whatsapp="989123456789" />
+          <SupportButton  />
         </div>
       </BasketProvider>
     );

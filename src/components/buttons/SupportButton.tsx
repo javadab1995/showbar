@@ -1,19 +1,29 @@
 
 import { Headphones, MessageCircle, Phone, X } from "lucide-react";
 import { useState } from "react";
+import { useCompany } from "../../hooks/admin/useCompanies";
+import { SiWhatsapp } from "react-icons/si";
 
-interface SupportButtonProps {
-  phone: string;
-  whatsapp: string;
-}
 
-export default function SupportButton({
-  phone,
-  whatsapp,
-}: SupportButtonProps) {
+export default function SupportButton() {
+  const { data: company, isLoading } = useCompany()
+  const whatsapp = company?.whatsapp ?? "";
+  const phone = company?.phone;
   const [open, setOpen] = useState(false);
 
   const whatsappUrl = `https://wa.me/${whatsapp.replace(/\D/g, "")}`;
+
+  if(isLoading) return (
+    <div className="relative flex w-64 animate-pulse gap-2 p-4">
+      <div className="h-12 w-12 rounded-full bg-border"></div>
+      <div className="flex-1">
+        <div className="mb-1 h-5 w-3/5 rounded-lg bg-border text-lg"></div>
+        <div className="h-5 w-[90%] rounded-lg bg-border text-sm"></div>
+      </div>
+      <div className="absolute bottom-5 right-0 h-4 w-4 rounded-full bg-border"></div>
+    </div>
+  );
+
 
   return (
     <div className="fixed bottom-24 right-5 z-50 md:bottom-6 md:right-6">
@@ -124,7 +134,7 @@ export default function SupportButton({
                   text-primary
                 "
               >
-                <MessageCircle size={18} />
+                <SiWhatsapp size={18} />
               </span>
 
               <span className="flex flex-col">

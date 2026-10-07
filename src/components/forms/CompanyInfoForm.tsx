@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
 import {
-  useCompanies,
+  useCompany,
   useCreateCompany,
   useUpdateCompany,
 } from "../../hooks/admin/useCompanies";
@@ -28,17 +28,14 @@ const companySchema = z.object({
 
 type CompanyFormValues = z.infer<typeof companySchema>;
 
-type Props = {
-  adminId: string ;
-};
 
-export default function CompanyInfoForm({ adminId }: Props) {
-  const { data: companies = [], isLoading } = useCompanies(adminId);
+export default function CompanyInfoForm() {
+  const { data: company , isLoading } = useCompany();
 
   const createMutation = useCreateCompany();
   const updateMutation = useUpdateCompany();
 
-  const company = companies[0] ?? null;
+
 
   const {
     register,
@@ -89,10 +86,7 @@ export default function CompanyInfoForm({ adminId }: Props) {
     }
 
     createMutation.mutate(
-      {
-        admin_id: adminId,
-        ...values,
-      },
+       values,
       {
         onSuccess: () => {
           toast.success("اطلاعات شرکت با موفقیت ثبت شد");

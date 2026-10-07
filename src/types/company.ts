@@ -1,6 +1,5 @@
 export type Company = {
   id: string;
-  admin_id: string;
   name: string;
   phone: string | null;
   whatsapp: string | null;
@@ -11,7 +10,6 @@ export type Company = {
 };
 
 export type CreateCompanyData = {
-  admin_id: string;
   name: string;
   phone?: string;
   whatsapp?: string;

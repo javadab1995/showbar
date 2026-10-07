@@ -83,10 +83,10 @@ export default function DriverRequest() {
           );
         },
 
-        onError() {
+        onError(err) {
           toast.error(
             isOnline
-              ? "ثبت درخواست با خطا مواجه شد. لطفاً دوباره تلاش کنید."
+              ? err.message
               : "اتصال به اینترنت برقرار نیست.",
           );
         },

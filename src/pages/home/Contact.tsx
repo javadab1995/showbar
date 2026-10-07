@@ -1,28 +1,53 @@
 import { ArrowLeft, Mail, MapPin, Phone, Headphones } from "lucide-react";
+import {
+  SiWhatsapp,
+} from "react-icons/si";
+import { useCompany } from "../../hooks/admin/useCompanies";
 
 export default function Contact() {
+  const { data: company, isLoading } = useCompany()
+  
+  const phone = company?.phone || "";
+  const email = company?.email || "";
+  const address = company?.address || "";
+  const whatsapp = company?.whatsapp || "";
+
+  if(isLoading) return (
+    <div className="animate-pulse flex flex-col items-center gap-4 w-60">
+      <div>
+        <div className="w-48 h-6 bg-border rounded-md"></div>
+        <div className="w-28 h-4 bg-border mx-auto mt-3 rounded-md"></div>
+      </div>
+      <div className="h-7 bg-border w-full rounded-md"></div>
+      <div className="h-7 bg-border w-full rounded-md"></div>
+      <div className="h-7 bg-border w-full rounded-md"></div>
+      <div className="h-7 bg-border w-1/2 rounded-md"></div>
+    </div>
+  );
+
+
   return (
     <main className="bg-surface">
       {/* Hero */}
-      <section className="relative overflow-hidden bg-login-pattern">
+      <section className="relative overflow-hidden bg-primary/50">
         <div className="absolute -left-32 -top-32 h-80 w-80 rounded-full bg-text/5 blur-3xl" />
         <div className="absolute -bottom-40 -right-20 h-96 w-96 rounded-full bg-text/5 blur-3xl" />
 
         <div className="relative mx-auto max-w-7xl px-6 py-20 md:py-24">
           <div className="max-w-2xl">
             <div className="mb-5 flex items-center gap-3 text-text/70">
-              <span className="h-px w-10 bg-green-50 " />
+              <span className="h-px w-10 bg-primary " />
 
-              <span className="text-sm font-bold text-green-100">
+              <span className="text-sm font-bold text-text">
                 در ارتباط باشیم
               </span>
             </div>
 
-            <h1 className="text-4xl font-black leading-tight text-white md:text-6xl">
+            <h1 className="text-4xl font-black leading-tight text-text md:text-6xl">
               ارتباط با شوبار
             </h1>
 
-            <p className="mt-6 max-w-xl text-base leading-8 text-white/70 md:text-lg">
+            <p className="mt-6 max-w-xl text-base leading-8 text-text/70 md:text-lg">
               اگر درباره حمل بار، همکاری یا خدمات شوبار سوالی دارید، می‌توانید
               مستقیماً با ما در ارتباط باشید.
             </p>
@@ -39,16 +64,22 @@ export default function Contact() {
               icon={<Phone size={22} />}
               title="تلفن پشتیبانی"
               description="پاسخگویی مستقیم به سوالات شما"
-              value="۰۲۱ - ۸۸۰۰۰۰۰۰"
-              href="tel:+982188000000"
+              value={phone || "ثبت نشده"}
+              href={phone ? `tel:${phone}` : "#"}
             />
-
+            <ContactItem
+              icon={<SiWhatsapp size={22} />}
+              title="واتساپ"
+              description="ارتباط سریع با پشتیبانی"
+              value={whatsapp || "ثبت نشده"}
+              href={whatsapp ? `https://wa.me/${whatsapp}` : "#"}
+            />
             <ContactItem
               icon={<Mail size={22} />}
               title="ایمیل"
               description="برای درخواست‌ها و مکاتبات"
-              value="support@showbar.ir"
-              href="mailto:support@showbar.ir"
+              value={email || "ثبت نشده"}
+              href={email ? `mailto:${email}` : "#"}
             />
 
             <div className="flex items-start gap-4 rounded-2xl border border-border bg-surface p-6">
@@ -60,14 +91,14 @@ export default function Contact() {
                 <h2 className="font-bold text-text">آدرس دفتر</h2>
 
                 <p className="mt-2 leading-7 text-text-2">
-                  تهران، خیابان ونک، برج فناوری، واحد ۱۰
+                  {address || "آدرس ثبت نشده است"}
                 </p>
               </div>
             </div>
           </div>
 
           {/* Support panel */}
-          <div className="relative overflow-hidden rounded-4xl bg-primary p-8 text-white md:p-12">
+          <div className="relative overflow-hidden rounded-4xl bg-primary/50 p-8 text-white md:p-12">
             <div className="absolute -bottom-24 -left-24 h-64 w-64 rounded-full bg-white/5 blur-2xl" />
 
             <div className="relative">
@@ -86,7 +117,7 @@ export default function Contact() {
 
               <div className="mt-10 flex flex-col gap-3 sm:flex-row">
                 <a
-                  href="tel:+982188000000"
+                  href={phone ? `tel:${phone}` : "#"}
                   className="group inline-flex items-center justify-center gap-3 rounded-xl bg-white px-6 py-3.5 font-bold text-primary transition hover:bg-white/90"
                 >
                   تماس با پشتیبانی
@@ -97,7 +128,7 @@ export default function Contact() {
                 </a>
 
                 <a
-                  href="mailto:support@showbar.ir"
+                  href={email ? `mailto:${email}` : "#"}
                   className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/20 px-6 py-3.5 font-bold text-white transition hover:bg-white/10"
                 >
                   ارسال ایمیل

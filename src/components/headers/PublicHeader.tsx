@@ -19,8 +19,8 @@ export default function PublicHeader() {
   const navClass = ({ isActive }: { isActive: boolean }) =>
     `flex items-center justify-center px-4 h-full border-b-2 transition-all duration-200 ${
       isActive
-        ? "border-primary text-primary font-bold"
-        : "border-transparent text-text-2 hover:border-primary/50 hover:text-text"
+        ? "border-primary text-primary/75 font-bold"
+        : "border-transparent text-text hover:border-primary/50 hover:text-text-2"
     }`;
 
   return (
@@ -35,8 +35,8 @@ export default function PublicHeader() {
           className={() =>
             `flex items-center justify-center px-4 h-full border-b-2 transition-all duration-200 ${
               loadsActive
-                ? "border-primary text-primary font-bold"
-                : "border-transparent text-text-2 hover:border-primary/50 hover:text-text"
+                ? "border-primary text-primary/75 font-bold"
+                : "border-transparent text-text hover:border-primary/50 hover:text-text-2"
             }`
           }
         >
