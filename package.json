@@ -21,6 +21,7 @@
     "framer-motion": "^13.1.1",
     "lucide-react": "^0.468.0",
     "react": "^19.0.0",
+    "react-country-flag": "^3.1.0",
     "react-day-picker": "^10.0.1",
     "react-dom": "^19.0.0",
     "react-hook-form": "^7.87.0",

@@ -6,6 +6,7 @@ import { createClient } from "npm:@supabase/supabase-js@2";
 const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:4173",
+  "http://showbar.ir",
   "https://showbar.ir",
 ];
 

@@ -45,6 +45,7 @@ export function CustomSelect({
   onChange,
   className = "",
 }: CustomSelectProps) {
+
   const { themeRoot } = useTheme();
 
   const [open, setOpen] = useState(false);
@@ -120,6 +121,13 @@ export function CustomSelect({
     setOpen(false);
     setActiveIndex(null);
   };
+
+
+  console.log({
+    value,
+    options,
+    selectedOption,
+  });
 
   return (
     <div className={`relative shrink-0 ${className}`}>

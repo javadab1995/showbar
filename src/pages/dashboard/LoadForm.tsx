@@ -16,8 +16,6 @@ import { FormTextarea } from "../../components/inputs/FormTextarea";
 
 import { FormSelect } from "../../components/inputs/FormSelect";
 
-
-
 import { DatePickerField } from "../../components/inputs/DatePickerField";
 
 import {
@@ -102,6 +100,9 @@ export default function LoadForm() {
 
       destination_location_url: "",
 
+      origin_city_geoname_id: null,
+      destination_city_geoname_id: null,
+
       origin_latitude: null,
 
       origin_longitude: null,
@@ -156,6 +157,9 @@ export default function LoadForm() {
 
       destination_longitude: load.destination_longitude ?? null,
 
+      origin_city_geoname_id: null,
+      destination_city_geoname_id: null,
+
       cargo: load.cargo ?? "",
 
       cargo_type: load.cargo_type ?? "",
@@ -197,9 +201,10 @@ export default function LoadForm() {
   // ==================================================
 
   const onSubmit: SubmitHandler<LoadFormData> = (data) => {
-     if (!isOnline) {
-       return;
-     }
+    if (!isOnline) {
+      return;
+    }
+
     const loadData: LoadData = {
       origin_country_code: data.origin_country_code,
       origin: data.origin,
@@ -430,25 +435,12 @@ export default function LoadForm() {
               <Controller
                 name="exit_borders"
                 control={control}
-                render={({ field, fieldState }) => (
+                render={({ field }) => (
                   <MultiSelect
+                    className="h-12 flex items-center w-full rounded-xl border border-border mt-5 bg-bg px-4 text-sm text-text outline-none transition disabled:cursor-not-allowed disabled:opacity-60"
                     options={BORDER_OPTIONS}
                     value={field.value ?? []}
                     onChange={field.onChange}
-                    placeholder="انتخاب مرز خروج | ورود"
-                    disabled={isPending}
-                    className="h-12 flex items-center
-            w-full
-            rounded-xl
-            border border-border mt-5
-            bg-bg
-            px-4
-            text-sm
-            text-text
-            outline-none
-            transition
-            disabled:cursor-not-allowed
-            disabled:opacity-60"
                   />
                 )}
               />

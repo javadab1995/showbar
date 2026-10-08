@@ -99,6 +99,8 @@ export default function PublicLoads() {
     }));
   };
 
+
+  console.log(filters.fleetType)
   // ==================================
   // Near Me
   // ==================================

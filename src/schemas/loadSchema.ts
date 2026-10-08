@@ -66,7 +66,7 @@ export const loadSchema = z
     if (requiresBorder && data.exit_borders.length === 0) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        path: ["exit_border"],
+        path: ["exit_borders"],
         message: "حداقل یک مرز را انتخاب کنید",
       });
     }

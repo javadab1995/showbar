@@ -21,9 +21,6 @@ export type FleetType =
   | "tanker"
   | "other";
 
-export type BorderType = "jolfa" | "bazargan" | "razi" | "sarb" | "poldasht";
-
-
 
 
 

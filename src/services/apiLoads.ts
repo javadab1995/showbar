@@ -109,11 +109,11 @@ if (filters.destination_city_geoname_id) {
       supabaseQuery = supabaseQuery.lt("weight", 10);
       break;
 
-    case "10-15":
+    case "under-15":
       supabaseQuery = supabaseQuery.gte("weight", 10).lt("weight", 15);
       break;
 
-    case "15-20":
+    case "under-20":
       supabaseQuery = supabaseQuery.gte("weight", 15).lt("weight", 20);
       break;
 

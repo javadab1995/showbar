@@ -1,9 +1,20 @@
-import { CurrencyRate } from "../../types/currency";
-
+import ReactCountryFlag from "react-country-flag";
+import type { CurrencyRate } from "../../types/currency";
 
 interface CurrencyRateItemProps {
   rate: CurrencyRate;
 }
+
+const currencyCountries: Record<string, string> = {
+  USD: "US",
+  EUR: "EU",
+  GBP: "GB",
+  AED: "AE",
+  TRY: "TR",
+  RUB: "RU",
+  GEL: "GE",
+  BGN: "BG",
+};
 
 export default function CurrencyRateItem({ rate }: CurrencyRateItemProps) {
   const isPositive = rate.change24h > 0;
@@ -15,13 +26,25 @@ export default function CurrencyRateItem({ rate }: CurrencyRateItemProps) {
         <div
           className="
             flex size-9 shrink-0 items-center justify-center
+            overflow-hidden
             rounded-lg
             bg-primary/10
-            text-sm font-semibold
-            text-primary
+            text-xl
           "
         >
-          {rate.symbol}
+          {currencyCountries[rate.code] ? (
+            <ReactCountryFlag
+              countryCode={currencyCountries[rate.code]}
+              svg
+              style={{
+                width: "1.5em",
+                height: "1.5em",
+              }}
+              title={rate.name}
+            />
+          ) : (
+            "💱"
+          )}
         </div>
 
         <div className="min-w-0">
@@ -39,13 +62,13 @@ export default function CurrencyRateItem({ rate }: CurrencyRateItemProps) {
         <div className="mt-0.5 flex items-center justify-end gap-1">
           {isPositive && (
             <span className="text-xs font-medium text-accent">
-              ↑ {Math.abs(rate.change24h)}٪
+              ↑ {Math.abs(rate.change24h).toFixed(2)}٪
             </span>
           )}
 
           {isNegative && (
             <span className="text-xs font-medium text-primary-dark">
-              ↓ {Math.abs(rate.change24h)}٪
+              ↓ {Math.abs(rate.change24h).toFixed(2)}٪
             </span>
           )}
 

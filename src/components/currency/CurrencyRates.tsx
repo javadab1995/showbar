@@ -1,121 +1,87 @@
-import {
-  ChevronDown,
-  DollarSign,
-  RefreshCw,
-  TrendingUp,
-} from "lucide-react";
-import CurrencyRateItem from "./CurrencyRateItem";
-import type { CurrencyRate } from "../../types/currency";
-import CurrencyRatesSkeleton from "../skeleton/CurrencyRatesSkeleton";
+import { ChevronDown, DollarSign, RefreshCw, TrendingUp } from "lucide-react";
+
 import { useState } from "react";
 
-const mockRates: CurrencyRate[] = [
-  {
-    code: "USD",
-    symbol: "$",
-    name: "دلار آمریکا",
-    price: 226700,
-    change24h: 0.35,
-  },
-  {
-    code: "EUR",
-    symbol: "€",
-    name: "یورو",
-    price: 263400,
-    change24h: 0.18,
-  },
-  {
-    code: "AED",
-    symbol: "د.إ",
-    name: "درهم امارات",
-    price: 61700,
-    change24h: -0.12,
-  },
-  {
-    code: "GBP",
-    symbol: "£",
-    name: "پوند انگلیس",
-    price: 305800,
-    change24h: 0.27,
-  },
-];
+import CurrencyRateItem from "./CurrencyRateItem";
+import CurrencyRatesSkeleton from "../skeleton/CurrencyRatesSkeleton";
 
-interface CurrencyRatesProps {
-  rates?: CurrencyRate[];
-  isLoading?: boolean;
-  isRefreshing?: boolean;
-  lastUpdated?: Date | null;
-  onRefresh?: () => void;
-}
+import { useCurrencyRates } from "../../hooks/other/useCurrencyRates";
 
-export default function CurrencyRates({
-  rates = [],
-  isLoading = false,
-  isRefreshing = false,
-  lastUpdated = null,
-  onRefresh,
-}: CurrencyRatesProps) {
-  const [openmodal, setOpenModal] = useState(false);
+
+
+export default function CurrencyRates() {
+  const [openModal, setOpenModal] = useState(false);
+
+  const { rates, isLoading, isRefreshing, refresh, lastUpdated } =
+    useCurrencyRates();
+
+
   return (
     <>
       <button
         type="button"
         onClick={() => setOpenModal((prev) => !prev)}
-        className=" group
-    absolute -top-8 left-0
-    flex items-center gap-1.5
-    rounded-b-md
-    border border-t-0 border-transparent
-    bg-warning/80
-    px-2.5 py-1
-    text-xs font-medium text-orange-50
-    backdrop-blur-md
-    transition-colors
-    hover:text-orange-100
-  "
+        className="
+          group absolute -top-8 left-0
+          flex items-center gap-1.5
+          rounded-b-md
+          border border-t-0 border-transparent
+          bg-warning/80
+          px-2.5 py-1
+          text-xs font-medium text-orange-50
+          backdrop-blur-md
+          transition-colors
+          hover:text-orange-100
+        "
       >
-        <DollarSign size={14} className="text-orange-50 group-hover:animate-ping duration-500 transition-transform ease-in-out " />
+        <DollarSign
+          size={14}
+          className="
+            text-orange-50
+            transition-transform
+            duration-500
+            group-hover:animate-ping
+          "
+        />
+
         <span>نرخ ارز</span>
 
         <ChevronDown
           size={13}
-          className={`transition-transform duration-200 ${
-            openmodal ? "rotate-180" : ""
-          }`}
+          className={`
+            transition-transform duration-200
+            ${openModal ? "rotate-180" : ""}
+          `}
         />
       </button>
 
-      {openmodal && (
+      {openModal && (
         <section
           className="
-        w-full
-    overflow-hidden
-    rounded-md
-    border border-border
-    bg-primary-soft/50
-    backdrop-blur-md
-    shadow-sm
-    
-      
-
-      "
+            w-full
+            overflow-hidden
+            rounded-md
+            border border-border
+            bg-primary-soft/50
+            backdrop-blur-md
+            shadow-sm
+          "
         >
-          {/* Header */}
           <header
             className="
-          flex items-center justify-between
-          border-b border-border
-          px-4 py-3.5
-        "
+              flex items-center justify-between
+              border-b border-border
+              px-4 py-3.5
+            "
           >
-            <div className="flex items-center gap-2.5 min-w-36">
+            <div className="flex items-center gap-2.5">
               <div
                 className="
-              flex size-9 items-center justify-center
-              rounded-lg
-              bg-primary/10
-              text-primary
-            "
+                  flex size-9 items-center justify-center
+                  rounded-lg
+                  bg-primary/10
+                  text-primary
+                "
               >
                 <TrendingUp size={18} strokeWidth={1.8} />
               </div>
@@ -127,38 +93,34 @@ export default function CurrencyRates({
               </div>
             </div>
 
-            {onRefresh && (
-              <button
-                type="button"
-                onClick={onRefresh}
-                disabled={isRefreshing}
-                aria-label="بروزرسانی نرخ ارز"
-                className="
-              flex size-8 items-center justify-center
-              rounded-lg
-              text-text/50
-              transition
-              hover:bg-bg
-              hover:text-primary
-              disabled:pointer-events-none
-              disabled:opacity-40
-            "
-              >
-                <RefreshCw
-                  size={16}
-                  className={isRefreshing ? "animate-spin" : ""}
-                />
-              </button>
-            )}
+            <button
+              type="button"
+              onClick={() => refresh()}
+              disabled={isRefreshing}
+              aria-label="بروزرسانی نرخ ارز"
+              className="
+                flex size-8 items-center justify-center
+                rounded-lg
+                text-text/50
+                transition
+                hover:bg-bg
+                hover:text-primary
+                disabled:pointer-events-none
+                disabled:opacity-40
+              "
+            >
+              <RefreshCw
+                size={16}
+                className={isRefreshing ? "animate-spin" : ""}
+              />
+            </button>
           </header>
-
-          {/* Content */}
 
           <div className="px-4">
             {isLoading ? (
               <CurrencyRatesSkeleton />
-            ) : mockRates.length > 0 ? (
-              mockRates.map((rate) => (
+            ) : rates.length > 0 ? (
+              rates.map((rate) => (
                 <CurrencyRateItem key={rate.code} rate={rate} />
               ))
             ) : (
@@ -170,17 +132,16 @@ export default function CurrencyRates({
             )}
           </div>
 
-          {/* Footer */}
           <footer
             className="
-          border-t border-border
-          bg-bg/50
-          px-4 py-2.5
-        "
+              border-t border-border
+              bg-bg/50
+              px-4 py-2.5
+            "
           >
             <p className="text-[11px] text-text/45">
               {lastUpdated
-                ? `آخرین بروزرسانی: ${formatRelativeTime(lastUpdated)}`
+                ? `آخرین بروزرسانی: ${lastUpdated.toLocaleTimeString("fa-IR")}`
                 : "در انتظار دریافت نرخ‌ها"}
             </p>
           </footer>

@@ -1,6 +1,7 @@
 import { LoadStatus } from "./status";
 
 
+
 export type TradeType = "" | "export" | "import" | "domestic";
 
 export type Coordinates = {

@@ -17,7 +17,7 @@ export default function TrackTabs({ activeTab, onChange }: Props) {
           transition
           ${
             activeTab === "form"
-              ? "bg-surface text-text shadow-sm"
+              ? "bg-surface text-text border border-border shadow-sm"
               : "text-text/50 hover:text-text"
           }
         `}
@@ -34,7 +34,7 @@ export default function TrackTabs({ activeTab, onChange }: Props) {
           transition
           ${
             activeTab === "history"
-              ? "bg-surface text-text shadow-sm"
+              ? "bg-surface text-text border border-border shadow-sm"
               : "text-text/50 hover:text-text"
           }
         `}

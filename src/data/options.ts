@@ -66,26 +66,11 @@ export const tonnageOptions: FilterOption[] = [
 ];
 
 export const fleetOptions: FilterOption[] = [
-  {
-    value: "tarpaulin",
-    label: "چادری",
-  },
-  {
-    value: "refrigerated",
-    label: "یخچالی",
-  },
-  {
-    value: "truck",
-    label: "کامیونت",
-  },
-  {
-    value: "tanker",
-    label: "تانکر",
-  },
-  {
-    value: "other",
-    label: "سایر",
-  },
+  { label: "چادری", value: "curtain_side" },
+  { label: "تانکر", value: "tanker" },
+  { label: "یخچالی", value: "refrigerated" },
+  { label: "کامیونت", value: "light_truck" },
+  { label: "سایر", value: "other" },
 ];
 
 export const BORDER_OPTIONS: FilterOption[] = [

@@ -10,7 +10,7 @@ import {
 
 import { MultiSelect } from "../selects/MultiSelect";
 import { NearMeFilter } from "../filters/NearMeFilter";
-import { CitySearch } from "../inputs/CitySearch";
+
 
 import type {
   Coordinates,
@@ -39,6 +39,7 @@ export function LoadFilters({
   onNearMeChange,
   onReset,
 }: LoadFiltersProps) {
+
   const handleOriginCountryChange = (countryCode: string) => {
     onChange("origin_country_code", countryCode);
     onChange("origin", "");
@@ -50,6 +51,7 @@ export function LoadFilters({
     onChange("destination", "");
     onChange("destination_city_geoname_id", undefined);
   };
+
 
 
   return (
