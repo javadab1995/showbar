@@ -99,10 +99,9 @@ if (filters.destination_city_geoname_id) {
   }
 
   // Borders
-  if (filters.borders.length > 0) {
-    supabaseQuery = supabaseQuery.in("exit_border", filters.borders);
+  if (filters.borders?.length) {
+    supabaseQuery = supabaseQuery.overlaps("exit_borders", filters.borders);
   }
-
   // Weight
   switch (filters.tonnage) {
     case "under-10":

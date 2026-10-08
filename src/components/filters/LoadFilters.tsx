@@ -63,7 +63,7 @@ export function LoadFilters({
         overflow-x-auto
         flex-nowrap
         pb-2
-        scrollbar-hidden "
+        scrollbar-thin scrollbar-thumb-primary-soft "
     >
       {/* Trade type */}
       <div
@@ -271,6 +271,7 @@ export function LoadFilters({
           value={filters.borders}
           onChange={(value) => onChange("borders", value)}
           placeholder="مرز خروج"
+          className="  min-w-32  flex min-h-9 w-full items-center justify-between gap-2 rounded-full border border-border px-3 py-1 text-sm text-text transition hover:border-primary disabled:cursor-not-allowed disabled:opacity-50"
         />
       </div>
 

@@ -100,7 +100,7 @@ export default function PublicLoads() {
   };
 
 
-  console.log(filters.fleetType)
+
   // ==================================
   // Near Me
   // ==================================
@@ -164,7 +164,7 @@ export default function PublicLoads() {
    );
  }
   return (
-    <section className="mx-auto  px-6 py-20 mb-20 ">
+    <section className="mx-auto  px-6 py-20  ">
       {/* Header */}
 
       <div className="mb-6 mt-10">

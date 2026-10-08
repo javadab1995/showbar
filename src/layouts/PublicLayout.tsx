@@ -14,7 +14,7 @@ export default function PublicLayout() {
  
     return (
       <BasketProvider>
-        <div className="min-h-screen bg-background text-text relative">
+        <div className="min-h-screen bg-background text-text relative ">
           <PublicHeader  />
           <MobileNav />
           <BorderParkBanner  />

@@ -158,6 +158,7 @@ export function MultiSelect({
             bg-surface
             p-1
             shadow-lg
+            scrollbar-none
           "
         >
           {selectedOptions.length > 0 && (
