@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+
+# صفحات داخلی و فرایندهای ثبت درخواست نباید در نتایج جست‌وجو ظاهر شوند
+Disallow: /admin
+Disallow: /basket
+Disallow: /request
+Disallow: /notify/
+
+Sitemap: https://showbar.ir/sitemap.xml
