@@ -2,7 +2,6 @@ import { defineConfig } from "vite";
 
 import react from "@vitejs/plugin-react";
 
-import { visualizer } from "rollup-plugin-visualizer";
 
 import tailwindcss from "@tailwindcss/vite";
 
@@ -59,13 +58,7 @@ export default defineConfig(({ command }) => ({
       },
     }),
 
-    visualizer({
-      filename: "dist/stats.html",
-      open: false,
-      gzipSize: true,
-      brotliSize: true,
-      template: "treemap",
-    }),
+   
   ],
 
   resolve: {
