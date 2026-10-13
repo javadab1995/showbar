@@ -22,11 +22,13 @@ import RequestHistory from "../../components/features/requests/RequestHistory";
 import TrackingCodeForm from "../../components/forms/TrackingCodeForm";
 import RequestDetails from "../../components/features/requests/RequestDetails";
 import HistoryForm from "../../components/forms/HistoryForm";
+import { useOnlineStatus } from "../../hooks/other/useOnlineStatus";
 
 type TrackTab = "form" | "history";
 
 export default function TrackRequest() {
   const [searchParams, setSearchParams] = useSearchParams();
+  const isOnline = useOnlineStatus();
 
   const tabParam = searchParams.get("tab");
 
@@ -72,6 +74,10 @@ export default function TrackRequest() {
   }
 
   async function handleTrackingCodeSubmit(data: TrackRequestFormData) {
+    if (!isOnline) {
+      toast.error("اتصال اینترنت برقرار نیست");
+      return;
+    }
     try {
       setLoading(true);
 
@@ -92,14 +98,19 @@ export default function TrackRequest() {
       });
     } catch (error) {
       console.error("GET REQUEST ERROR:", error);
-
-      toast.error("دریافت درخواست انجام نشد");
+      toast.error(
+        !isOnline ? "اتصال اینترنت برقرار نیست" : "دریافت درخواست انجام نشد",
+      );
     } finally {
       setLoading(false);
     }
   }
 
   async function handleHistorySubmit(data: TrackRequestFormData) {
+    if (!isOnline) {
+      toast.error("اتصال اینترنت برقرار نیست");
+      return;
+    }
     try {
       setLoading(true);
 
@@ -123,6 +134,9 @@ export default function TrackRequest() {
       }
     } catch (error) {
       console.error("GET REQUEST HISTORY ERROR:", error);
+      toast.error(
+        !isOnline ? "اتصال اینترنت برقرار نیست" : "دریافت درخواست انجام نشد",
+      );
 
       toast.error("دریافت سوابق درخواست‌ها انجام نشد");
     } finally {

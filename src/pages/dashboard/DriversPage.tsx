@@ -76,7 +76,7 @@ export default function DriversPage() {
    return (
      <div className="rounded-xl border border-border bg-surface p-6">
        <p className="text-sm text-danger">
-         {isOnline
+         {isOnline 
            ? "دریافت اطلاعات رانندگان انجام نشد"
            : "اتصال به اینترنت برقرار نیست"}
        </p>

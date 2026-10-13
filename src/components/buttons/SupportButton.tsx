@@ -1,19 +1,28 @@
 
-import { Headphones, MessageCircle, Phone, X } from "lucide-react";
+import { Headphones, MessageCircle, Phone, WifiOff, X } from "lucide-react";
 import { useState } from "react";
 import { useCompany } from "../../hooks/admin/useCompanies";
 import { SiWhatsapp } from "react-icons/si";
+import { useOnlineStatus } from "../../hooks/other/useOnlineStatus";
 
 
 export default function SupportButton() {
-  const { data: company, isLoading } = useCompany()
+const isOnline = useOnlineStatus();
+
+  const {
+    data: company,
+    isLoading,
+    isError,
+    error,
+  } = useCompany();
+
   const whatsapp = company?.whatsapp ?? "";
   const phone = company?.phone;
   const [open, setOpen] = useState(false);
 
   const whatsappUrl = `https://wa.me/${whatsapp.replace(/\D/g, "")}`;
 
-  if(isLoading) return (
+  if(isLoading || !company) return (
     <div className="relative flex w-64 animate-pulse gap-2 p-4">
       <div className="h-12 w-12 rounded-full bg-border"></div>
       <div className="flex-1">
@@ -24,6 +33,28 @@ export default function SupportButton() {
     </div>
   );
 
+    if (!company && isError) {
+      return (
+        <div className="flex min-h-[50vh] items-center justify-center bg-surface px-6 py-16">
+          <div className="flex max-w-md flex-col items-center gap-4 text-center">
+            <WifiOff className="h-10 w-10 text-text/50" />
+
+            <h1 className="text-xl font-bold text-text">
+              دریافت اطلاعات تماس ناموفق بود
+            </h1>
+
+            <p className="text-sm leading-7 text-text-2">
+              {isOnline
+                ? error instanceof Error
+                  ? error.message
+                  : "هنگام دریافت اطلاعات تماس مشکلی رخ داد."
+                : "اتصال اینترنت برقرار نیست. پس از برقراری اتصال دوباره تلاش کنید."}
+            </p>
+
+          </div>
+        </div>
+      );
+    }
 
   return (
     <div className="fixed bottom-24 right-5 z-50 md:bottom-6 md:right-6">

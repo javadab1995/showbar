@@ -37,11 +37,6 @@ import { useOnlineStatus } from "../../hooks/other/useOnlineStatus";
 
 
 
-const TRADE_ICONS = {
-  export: ArrowUpFromLine,
-  import: ArrowDownToLine,
-  domestic: ArrowLeftRight,
-} as const;
 
 
 export default function LoadDetails() {
