@@ -68,6 +68,22 @@ jobs:
 
           docker compose up -d --build --force-recreate
 
-          curl -fsS http://127.0.0.1:8080/ >/dev/null
+          for attempt in $(seq 1 12); do
+            if curl --connect-timeout 3 --max-time 10 -fsS http://127.0.0.1:8080/ >/dev/null; then
+              echo "ShowBar is responding."
+              break
+            fi
+
+            if [ "$attempt" -eq 12 ]; then
+              echo "ShowBar did not become ready in time."
+              docker compose ps
+              docker compose logs --tail=60 showbar showbar-api
+              exit 1
+            fi
+
+            echo "Waiting for ShowBar... attempt $attempt/12"
+            sleep 5
+          done
+
           docker compose ps
           REMOTE
