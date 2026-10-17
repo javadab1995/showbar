@@ -26,6 +26,7 @@ import {
   BORDER_OPTIONS,
   CURRENCY_OPTIONS,
   countryOptions,
+  PRICE_TYPE_OPTIONS,
 } from "../../data/options";
 
 import {
@@ -124,6 +125,7 @@ export default function LoadForm() {
       weight: 0,
 
       price: 0,
+      price_type: "total",
 
       currency: "IRR",
 
@@ -173,6 +175,7 @@ export default function LoadForm() {
       weight: load.weight ?? 0,
 
       price: load.price ?? 0,
+      price_type: load.price_type ?? "total",
 
       currency: load.currency ?? "IRR",
 
@@ -235,6 +238,7 @@ export default function LoadForm() {
       weight: data.weight,
 
       price: data.price,
+      price_type: data.price_type,
 
       currency: data.currency,
 
@@ -521,6 +525,13 @@ export default function LoadForm() {
               placeholder="مثلاً 250000000"
               {...register("price")}
               error={errors.price?.message}
+            />
+
+            <FormSelect
+              label="نوع قیمت"
+              options={PRICE_TYPE_OPTIONS}
+              {...register("price_type")}
+              error={errors.price_type?.message}
             />
           </div>
         </section>

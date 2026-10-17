@@ -33,6 +33,8 @@ import { VEHICLE_OPTIONS } from "../../data/options";
 import { toPersianDigits } from "../../helpers/number";
 import { getExitBorderLabels } from "../../helpers/exitBorders";
 import { useOnlineStatus } from "../../hooks/other/useOnlineStatus";
+import BorderLabel from "../../components/labels/BorderLabel";
+import React from "react";
 
 
 
@@ -234,11 +236,13 @@ if (isLoading) {
               />
 
               <InfoItem icon={Truck} label="نوع ناوگان" value={vehicleLabel} />
-              
 
-           
               {load.exit_borders && (
-                <InfoItem icon={Layers} label="مرز خروج" value={getExitBorderLabels(load.exit_borders)} />
+                <InfoItem
+                  icon={Layers}
+                  label="مرز خروج"
+                  value={<BorderLabel value={load.exit_borders} />}
+                />
               )}
 
               <InfoItem
@@ -250,7 +254,18 @@ if (isLoading) {
               <InfoItem
                 icon={CircleDollarSign}
                 label="کرایه حمل"
-                value={formatMoney(load.price)}
+                value={
+                  <>
+                    <strong className="text-xl font-bold text-primary">
+                      {formatMoney(load.price)}
+                    </strong>
+                    <span className="text-text-2 text-xs mr-1 font-medium bg-border rounded-lg p-1">
+                      {load.price_type === "total"
+                        ? "قیمت کل"
+                        : "به ازای هر تن"}
+                    </span>
+                  </>
+                }
                 highlighted
               />
 
@@ -307,7 +322,9 @@ if (isLoading) {
                 <strong className="text-xl font-bold text-primary">
                   {formatMoney(load.price)}
                 </strong>
-                <span>{load.currency === "IRR" ? "تومان" : "دلار"}</span>
+                <span className="text-text-2 text-xs mr-1 font-medium bg-border rounded-lg p-1">
+                  {load.price_type === "total" ? "قیمت کل" : "به ازای هر تن"}
+                </span>
               </div>
             </div>
 
@@ -393,7 +410,7 @@ type InfoItemProps = {
     className?: string;
   }>;
   label: string;
-  value: string | null | undefined | string[];
+  value: string | null | undefined | string[] | React.ReactNode;
   highlighted?: boolean;
 };
 

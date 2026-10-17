@@ -19,6 +19,7 @@ import {
   type LoadNotification,
 } from "../../services/apiNotification-service";
 import { Link } from "react-router-dom";
+import { toPersianDigits } from "../../helpers/number";
 
 type NotificationTab = "load_requests" | "availability_alerts";
 
@@ -369,7 +370,7 @@ export default function NotificationList({ onNotificationClick }: Props) {
                   text-primary
                 "
               >
-                {visibleLoadNotifications.length}
+                {toPersianDigits(visibleLoadNotifications.length)}
               </span>
             )}
 
@@ -419,7 +420,7 @@ export default function NotificationList({ onNotificationClick }: Props) {
                   text-primary
                 "
               >
-                {visibleAvailabilityAlerts.length}
+                {toPersianDigits(visibleAvailabilityAlerts.length)}
               </span>
             )}
 
@@ -501,7 +502,7 @@ export default function NotificationList({ onNotificationClick }: Props) {
 
             <span className="text-xs text-text-2">
               {hasSelection
-                ? `${selectedVisibleIds.length} اعلان انتخاب شده`
+                ? `${toPersianDigits(selectedVisibleIds.length)} اعلان انتخاب شده`
                 : "انتخاب همه"}
             </span>
           </div>
@@ -592,11 +593,9 @@ export default function NotificationList({ onNotificationClick }: Props) {
         </div>
       )}
 
-      {/* Load requests */}
       {activeTab === "load_requests" && visibleLoadNotifications.length > 0 && (
         <div className="space-y-3">
           {visibleLoadNotifications.map((item) => {
-            console.log(item)
             const status = requestStatusConfig[item.status];
 
             const notification: NotificationItem = {
@@ -607,26 +606,23 @@ export default function NotificationList({ onNotificationClick }: Props) {
             const isSelected = selectedVisibleIds.includes(item.id);
 
             return (
-              <Link to={`/admin/requests/${item.request_id}`}
+              <div
                 key={item.id}
                 className={`
-                    group
-                    relative
-                    w-full
-                    rounded-2xl
-                    border
-                    bg-surface
-                    p-4
-                    transition
-                    ${
-                      isSelected
-                        ? "border-primary/40 bg-primary/5"
-                        : "border-border hover:border-primary/30 hover:shadow-sm"
-                    }
-                  `}
+            group relative w-full rounded-2xl border p-4
+            transition-colors duration-200
+            ${
+              isSelected
+                ? "border-primary/40 bg-primary/5"
+                : "border-border bg-surface hover:border-primary/30"
+            }
+          `}
               >
                 <div className="flex items-start gap-3">
-                  <div className="pt-1">
+                  <div
+                    className="flex shrink-0 items-center pt-1"
+                    onClick={(event) => event.stopPropagation()}
+                  >
                     <Checkbox
                       checked={isSelected}
                       onChange={() => toggleSelection(item.id)}
@@ -637,194 +633,56 @@ export default function NotificationList({ onNotificationClick }: Props) {
                   <button
                     type="button"
                     onClick={() => onNotificationClick?.(notification)}
-                    className="
-                        min-w-0
-                        flex-1
-                        text-right
-                      "
+                    className="flex min-w-0 flex-1 items-start gap-3 rounded-xl text-right outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
                   >
-                    <div className="flex items-start gap-3">
-                      <div
-                        className="
-                            flex size-10 shrink-0
-                            items-center justify-center
-                            rounded-xl
-                            bg-primary-soft
-                            text-primary
-                          "
-                      >
-                        <Truck size={19} />
+                    <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary-soft text-primary">
+                      <Truck size={19} />
+                    </div>
+
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-start justify-between gap-2">
+                        <p className="text-sm font-semibold text-text">
+                          درخواست بار جدید
+                        </p>
+
+                        <span
+                          className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] font-medium ${status.className}`}
+                        >
+                          {status.label}
+                        </span>
                       </div>
 
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center justify-between gap-3">
-                          <p className="truncate text-sm font-semibold text-text">
-                            درخواست بار جدید
-                          </p>
+                      <p className="mt-1 wrap-break-word text-sm text-text">
+                        {item.name}
+                      </p>
 
-                          <span
-                            className={`
-                                shrink-0
-                                rounded-full
-                                px-2 py-1
-                                text-[11px]
-                                font-medium
-                                ${status.className}
-                              `}
-                          >
-                            {status.label}
-                          </span>
-                        </div>
+                      {item.load?.[0] && (
+                        <p className="mt-1 wrap-break-word text-xs leading-6 text-text-2">
+                          {item.load[0].origin}
+                          <span className="mx-2 text-muted">←</span>
+                          {item.load[0].destination}
+                        </p>
+                      )}
 
-                        <p className="mt-1 text-sm text-text">{item.name}</p>
+                      <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-muted">
+                        <span className="flex min-w-0 items-center gap-1.5">
+                          <Phone size={13} className="shrink-0" />
+                          <span dir="ltr">{toPersianDigits(item.phone)}</span>
+                        </span>
 
-                        {item.load?.[0] && (
-                          <p className="mt-1 truncate text-xs text-text-2">
-                            {item.load[0].origin}
-
-                            <span className="mx-1 text-muted">←</span>
-
-                            {item.load[0].destination}
-                          </p>
-                        )}
-
-                        <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-muted">
-                          <span className="flex items-center gap-1">
-                            <Phone size={13} />
-                            {item.phone}
-                          </span>
-
-                          <span className="flex items-center gap-1">
-                            <Clock3 size={13} />
-                            {formatDate(item.created_at)}
-                          </span>
-                        </div>
+                        <span className="flex items-center gap-1.5">
+                          <Clock3 size={13} className="shrink-0" />
+                          {formatDate(item.created_at)}
+                        </span>
                       </div>
                     </div>
                   </button>
                 </div>
-              </Link>
+              </div>
             );
           })}
         </div>
       )}
-
-      {/* Availability alerts */}
-      {activeTab === "availability_alerts" &&
-        visibleAvailabilityAlerts.length > 0 && (
-          <div className="space-y-3">
-            {visibleAvailabilityAlerts.map((item) => {
-              const status = alertStatusConfig[item.status];
-
-              const notification: NotificationItem = {
-                type: "availability_alert",
-                data: item,
-              };
-
-              const isSelected = selectedVisibleIds.includes(item.id);
-
-              return (
-                <div
-                  key={item.id}
-                  className={`
-                    group
-                    relative
-                    w-full
-                    rounded-2xl
-                    border
-                    bg-surface
-                    p-4
-                    transition
-                    ${
-                      isSelected
-                        ? "border-primary/40 bg-primary/5"
-                        : "border-border hover:border-primary/30 hover:shadow-sm"
-                    }
-                  `}
-                >
-                  <div className="flex items-start gap-3">
-                    <div className="pt-1">
-                      <Checkbox
-                        checked={isSelected}
-                        onChange={() => toggleSelection(item.id)}
-                        label={`انتخاب درخواست ${item.name}`}
-                      />
-                    </div>
-
-                    <button
-                      type="button"
-                      onClick={() => onNotificationClick?.(notification)}
-                      className="
-                        min-w-0
-                        flex-1
-                        text-right
-                      "
-                    >
-                      <div className="flex items-start gap-3">
-                        <div
-                          className="
-                            flex size-10 shrink-0
-                            items-center justify-center
-                            rounded-xl
-                            bg-primary-soft
-                            text-primary
-                          "
-                        >
-                          <BellRing size={19} />
-                        </div>
-
-                        <div className="min-w-0 flex-1">
-                          <div className="flex items-center justify-between gap-3">
-                            <p className="truncate text-sm font-semibold text-text">
-                              درخواست اطلاع‌رسانی
-                            </p>
-
-                            <span
-                              className={`
-                                shrink-0
-                                rounded-full
-                                px-2 py-1
-                                text-[11px]
-                                font-medium
-                                ${status.className}
-                              `}
-                            >
-                              {status.label}
-                            </span>
-                          </div>
-
-                          <p className="mt-1 text-sm text-text">{item.name}</p>
-
-                          {item.load?.[0] && (
-                            <p className="mt-1 truncate text-xs text-text-2">
-                              {item.load[0].origin}
-
-                              <span className="mx-1 text-muted">←</span>
-
-                              {item.load[0].destination}
-                            </p>
-                          )}
-
-                          <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-muted">
-                            <span className="flex items-center gap-1">
-                              <Phone size={13} />
-                              {item.mobile}
-                            </span>
-
-                            <span className="flex items-center gap-1">
-                              <Clock3 size={13} />
-                              {formatDate(item.created_at)}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
     </div>
   );
 }

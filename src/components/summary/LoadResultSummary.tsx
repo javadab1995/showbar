@@ -1,4 +1,5 @@
 import { Truck } from "lucide-react";
+import { toPersianDigits } from "../../helpers/number";
 
 type LoadResultSummaryProps = {
   count: number;
@@ -28,7 +29,7 @@ export function LoadResultSummary({ count }: LoadResultSummaryProps) {
       </div>
 
       <div className="flex flex-col">
-        <span className="text-sm font-bold text-text">{count} بار یافت شد</span>
+        <span className="text-sm font-bold text-text">{toPersianDigits(count)} بار یافت شد</span>
 
         <span className="text-xs text-text-2">براساس فیلترهای اعمال شده</span>
       </div>

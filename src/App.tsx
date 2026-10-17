@@ -1,4 +1,5 @@
 import { lazy } from "react";
+import { HelmetProvider } from "react-helmet-async";
 
 const ReactQueryDevtools = lazy(() =>
   import("@tanstack/react-query-devtools").then((m) => ({
@@ -25,32 +26,34 @@ const router = createBrowserRouter(routes);
 
 export default function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <ReactQueryDevtools initialIsOpen={false} />
+    <HelmetProvider>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <ReactQueryDevtools initialIsOpen={false} />
 
-        <RouterProvider router={router} />
+          <RouterProvider router={router} />
 
-        <Toaster
-          position="top-center"
-          gutter={12}
-          toastOptions={{
-            success: {
-              duration: 3000,
-            },
-            error: {
-              duration: 10000,
-            },
-            style: {
-              fontSize: "16px",
-              // backgroundColor: "var(--color-background)",
-              // color: "#0D674E",
-              // zIndex: 999,
-              // border: "1px solid var(--color-gray-200)",
-            },
-          }}
-        />
-      </AuthProvider>
-    </QueryClientProvider>
+          <Toaster
+            position="top-center"
+            gutter={12}
+            toastOptions={{
+              success: {
+                duration: 3000,
+              },
+              error: {
+                duration: 10000,
+              },
+              style: {
+                fontSize: "16px",
+                // backgroundColor: "var(--color-background)",
+                // color: "#0D674E",
+                zIndex: 999,
+                // border: "1px solid var(--color-gray-200)",
+              },
+            }}
+          />
+        </AuthProvider>
+      </QueryClientProvider>
+    </HelmetProvider>
   );
 }

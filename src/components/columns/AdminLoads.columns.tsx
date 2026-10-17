@@ -69,7 +69,15 @@ export function createLoadColumns({
     {
       key: "price",
       title: "کرایه",
-      render: (load) => formatMoney(load.price, load.currency),
+      render: (load) => { return (
+        <span className="flex gap-0.5">
+          
+         {formatMoney(load.price, load.currency)}
+          <span className="text-text-2 text-xs mr-1 font-medium bg-border rounded-lg p-1">
+            {load.price_type === "total" ? "قیمت کل" : "به ازای هر تن"}
+          </span>
+        </span>
+      ); },
     },
 
     {

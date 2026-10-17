@@ -8,10 +8,16 @@ import {
   UsersRound,
   Zap,
 } from "lucide-react";
+import SEO from "../../components/seo/SEO";
 
 export default function About() {
   return (
-    <main className="bg-surface text-text" >
+    <main className="bg-surface text-text">
+      <SEO
+        title="درباره شوبار | سامانه حمل‌ونقل و باربری"
+        description="با شوبار آشنا شوید؛ سامانه‌ای برای مشاهده بارهای موجود و ارتباط رانندگان با صاحبان بار در مسیرهای حمل‌ونقل."
+        path="/about"
+      />
       {/* Hero */}
       <section className="relative min-h-155 overflow-hidden">
         <img
@@ -26,8 +32,10 @@ export default function About() {
         <div className="relative mx-auto flex min-h-155 max-w-7xl items-center px-6 py-20">
           <div className="mr-auto max-w-2xl text-right">
             <div className="mb-5 flex items-center justify-start gap-3 text-primary-soft">
-              <span className="h-px w-10 bg-white " />
-              <span className="text-sm font-bold text-warning">درباره شوبار</span>
+              <span className="h-px w-10 bg-warning  " />
+              <span className="text-sm font-bold text-warning">
+                درباره شوبار
+              </span>
             </div>
 
             <h1 className="text-5xl font-black leading-tight text-white md:text-7xl">

@@ -23,6 +23,7 @@ import { usePublicLoads } from "../../hooks/public/usePublicLoads";
 import { Loader, WifiOff } from "lucide-react";
 import Spinner from "../../components/widgets/Spinner";
 import { useOnlineStatus } from "../../hooks/other/useOnlineStatus";
+import SEO from "../../components/seo/SEO";
 
 export default function PublicLoads() {
   // ==================================
@@ -165,6 +166,11 @@ export default function PublicLoads() {
  }
   return (
     <section className="mx-auto  px-6 py-20  ">
+      <SEO
+        title="بارهای موجود برای حمل | شوبار"
+        description="بارهای موجود برای حمل را در شوبار ببینید، مسیر و مشخصات محموله را بررسی کنید و برای حمل بار درخواست ثبت کنید."
+        path="/loads"
+      />
       {/* Header */}
 
       <div className="mb-6 mt-10">
@@ -225,8 +231,6 @@ export default function PublicLoads() {
           همه بارها نمایش داده شدند
         </div>
       )}
-
-      
     </section>
   );
 }

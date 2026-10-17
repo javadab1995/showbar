@@ -74,6 +74,7 @@ export type LoadData = {
 
   weight: number;
   price: number;
+  price_type: "total" | "per_ton";
   currency: Currency;
 
   loading_date: string;

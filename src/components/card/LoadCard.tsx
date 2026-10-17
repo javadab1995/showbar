@@ -95,9 +95,7 @@ export function LoadCard({ load, selected, onToggle }: LoadCardProps) {
             <span className="flex items-center gap-1.5">
               <CalendarDays size={14} />
               <span className=" ">
-                {toPersianDate(load.loading_date)}
-                |
-                {load.loading_date}
+                {toPersianDate(load.loading_date)}|{load.loading_date}
               </span>
             </span>
           </div>
@@ -107,6 +105,9 @@ export function LoadCard({ load, selected, onToggle }: LoadCardProps) {
         <div className="flex shrink-0 flex-col gap-1 md:min-w-42">
           <strong className="text-xs font-bold md:text-sm">
             {formatMoney(load.price)}
+            <span className="text-text-2 text-xs mr-1 font-medium bg-border rounded-lg p-1">
+              {load.price_type === "total" ? "قیمت کل" : "به ازای هر تن"}
+            </span>
           </strong>
 
           <StatusBadge status={load.status} />

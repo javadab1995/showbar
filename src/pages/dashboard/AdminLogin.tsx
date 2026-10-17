@@ -59,11 +59,16 @@ export default function AdminLogin() {
 
       navigate("/admin", { replace: true });
     } catch (error) {
-      console.error("LOGIN ERROR:", error);
+       console.log("وارد catch شدیم");
+
+       toast.error("ایمیل یا رمز عبور نادرست است");
+
+       console.log("درخواست نمایش toast ارسال شد");
 
       if (!isOnline) {
         toast.error("اتصال به اینترنت برقرار نیست. اتصال خود را بررسی کنید.");
       } else {
+        
         toast.error("ایمیل یا رمز عبور اشتباه است");
       }
     } finally {
@@ -114,6 +119,7 @@ export default function AdminLogin() {
   return (
     <main className="min-h-screen bg-[#09543F] text-gray-900 flex items-center justify-center px-4 py-10">
       <div className="w-full max-w-md">
+      
         <div className="bg-[#FDFDFE] border border-[#E2E7E5] rounded-2xl shadow-sm p-6 sm:p-8">
           {/* Header */}
           <div className="mb-8 text-center">

@@ -155,3 +155,8 @@ export const CURRENCY_OPTIONS = [
 ];
 
 
+
+export const PRICE_TYPE_OPTIONS = [
+  { label: "قیمت کل بار", value: "total" },
+  { label: "قیمت به‌ازای هر تن", value: "per_ton" },
+];

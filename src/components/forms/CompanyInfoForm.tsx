@@ -19,9 +19,17 @@ import { useOnlineStatus } from "../../hooks/other/useOnlineStatus";
 const companySchema = z.object({
   name: z.string().trim().min(2, "نام شرکت حداقل باید ۲ کاراکتر باشد"),
   phone: z.string().trim(),
-  whatsapp: z.string().trim(),
+  whatsapp_import: z.string().trim(),
+  whatsapp_export: z.string().trim(),
   email: z.string().trim().email("ایمیل معتبر نیست").or(z.literal("")),
   address: z.string().trim(),
+  instagram: z.string().trim(),
+  rubika_import_url: z.string().trim(),
+  rubika_export_url: z.string().trim(),
+  bale_import_url: z.string().trim(),
+  bale_export_url: z.string().trim(),
+  eitaa_import_url: z.string().trim(),
+  eitaa_export_url: z.string().trim(),
 });
 
 type CompanyFormValues = z.infer<typeof companySchema>;
@@ -51,9 +59,18 @@ export default function CompanyInfoForm() {
     defaultValues: {
       name: "",
       phone: "",
-      whatsapp: "",
+      whatsapp_import: "",
+      whatsapp_export: "",
+      instagram:"",
       email: "",
       address: "",
+
+      rubika_import_url: "",
+      rubika_export_url: "",
+      bale_import_url: "",
+      bale_export_url: "",
+      eitaa_import_url: "",
+      eitaa_export_url: "",
     },
   });
 
@@ -63,7 +80,8 @@ export default function CompanyInfoForm() {
     reset({
       name: company.name ?? "",
       phone: company.phone ?? "",
-      whatsapp: company.whatsapp ?? "",
+      whatsapp_import: company.whatsapp_import ?? "",
+      whatsapp_export: company.whatsapp_export ?? "",
       email: company.email ?? "",
       address: company.address ?? "",
     });
@@ -202,8 +220,8 @@ export default function CompanyInfoForm() {
             >
               <WifiOff className="h-5 w-5 shrink-0" />
               <p>
-                آفلاین هستی. اطلاعات را می‌توانی ببینی، اما ذخیره‌سازی
-                تا زمان برقراری اتصال غیرفعال است.
+                آفلاین هستی. اطلاعات را می‌توانی ببینی، اما ذخیره‌سازی تا زمان
+                برقراری اتصال غیرفعال است.
               </p>
             </div>
           )}
@@ -213,9 +231,9 @@ export default function CompanyInfoForm() {
               role="alert"
               className="mb-5 rounded-xl border border-border bg-surface-2 p-4 text-sm text-text"
             >
-              دریافت آخرین اطلاعات با خطا مواجه شد. اطلاعات موجود
-              نمایش داده شده‌اند؛ برای اطمینان از آخرین وضعیت، اتصال
-              را بررسی و صفحه را مجدداً بارگذاری کن.
+              دریافت آخرین اطلاعات با خطا مواجه شد. اطلاعات موجود نمایش داده
+              شده‌اند؛ برای اطمینان از آخرین وضعیت، اتصال را بررسی و صفحه را
+              مجدداً بارگذاری کن.
             </div>
           )}
 
@@ -233,15 +251,62 @@ export default function CompanyInfoForm() {
             />
 
             <FormInput
-              label="واتساپ"
-              error={errors.whatsapp?.message}
-              {...register("whatsapp")}
+              label="واتساپ(واردات)"
+              error={errors.whatsapp_import?.message}
+              {...register("whatsapp_import")}
+            />
+            <FormInput
+              label="واتساپ(صادرات)"
+              error={errors.whatsapp_export?.message}
+              {...register("whatsapp_export")}
             />
 
             <FormInput
               label="ایمیل رسمی"
               error={errors.email?.message}
               {...register("email")}
+            />
+
+            <FormInput
+              label="لینک روبیکا (واردات)"
+              error={errors.rubika_import_url?.message}
+              {...register("rubika_import_url")}
+            />
+
+            <FormInput
+              label="لینک روبیکا (صادرات)"
+              error={errors.rubika_export_url?.message}
+              {...register("rubika_export_url")}
+            />
+
+            <FormInput
+              label="لینک بله (واردات)"
+              error={errors.bale_import_url?.message}
+              {...register("bale_import_url")}
+            />
+
+            <FormInput
+              label="لینک بله (صادرات)"
+              error={errors.bale_export_url?.message}
+              {...register("bale_export_url")}
+            />
+
+            <FormInput
+              label="لینک ایتا (واردات)"
+              error={errors.eitaa_import_url?.message}
+              {...register("eitaa_import_url")}
+            />
+
+            <FormInput
+              label="لینک ایتا (صادرات)"
+              error={errors.eitaa_export_url?.message}
+              {...register("eitaa_export_url")}
+            />
+
+            <FormInput
+              label="لینک اینستاگرام"
+              error={errors.instagram?.message}
+              {...register("instagram")}
             />
 
             <label className="space-y-1.5 md:col-span-2">

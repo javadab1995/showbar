@@ -49,6 +49,7 @@ export const loadSchema = z
     vehicle_type: z.string().min(1, "نوع ناوگان را انتخاب کنید"),
     weight: numberField("وزن الزامی است", "وزن باید بیشتر از صفر باشد"),
     price: numberField("کرایه الزامی است", "کرایه باید بیشتر از صفر باشد"),
+    price_type: z.enum(["total", "per_ton"]),
     loading_date: z.string().min(1, "تاریخ بارگیری الزامی است"),
     status: z
       .enum(["active", "reserved", "completed", "cancelled", "expired"])
