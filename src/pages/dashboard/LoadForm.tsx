@@ -436,12 +436,15 @@ export default function LoadForm() {
             />
 
             {showBorder && (
+
               <Controller
+               
                 name="exit_borders"
                 control={control}
                 render={({ field }) => (
                   <MultiSelect
-                    className="h-12 flex items-center w-full rounded-xl border border-border mt-5 bg-bg px-4 text-sm text-text outline-none transition disabled:cursor-not-allowed disabled:opacity-60"
+                    label="مرز خروج"
+                    className="h-12 flex items-center w-full rounded-xl border border-border  bg-bg px-4 text-sm text-text outline-none transition disabled:cursor-not-allowed disabled:opacity-60"
                     options={BORDER_OPTIONS}
                     value={field.value ?? []}
                     onChange={field.onChange}

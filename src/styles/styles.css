@@ -131,7 +131,36 @@
   --shadow:
     0 8px 28px rgba(0, 0, 0, 0.18);
 }
+/* Inputs and selects: light and dark themes */
+input,
+select,
+textarea {
+  color: var(--text);
+  background-color: var(--surface);
+}
 
+input::placeholder,
+textarea::placeholder {
+  color: var(--muted);
+  opacity: 1;
+}
+
+
+
+/* Browser autofill */
+[data-theme="dark"] input:-webkit-autofill,
+[data-theme="dark"] textarea:-webkit-autofill,
+[data-theme="dark"] select:-webkit-autofill {
+  -webkit-text-fill-color: var(--text);
+  caret-color: var(--text);
+}
+
+[data-theme="light"] input:-webkit-autofill,
+[data-theme="light"] textarea:-webkit-autofill,
+[data-theme="light"] select:-webkit-autofill {
+  -webkit-text-fill-color: var(--text);
+  caret-color: var(--text);
+}
 
 @utility filter-select {
   @apply w-auto rounded-full border border-border px-3 py-1 text-sm 
@@ -298,6 +327,7 @@
       var(--primary-dark)
     );
 }
+
 
 
 html {

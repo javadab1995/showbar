@@ -21,11 +21,13 @@ type MultiSelectProps = {
   placeholder?: string;
   disabled?: boolean;
   className?: string;
+  label?:string,
 };
-
+// 
 export function MultiSelect({
   options,
   value,
+  label="",
   onChange,
   placeholder = "انتخاب کنید",
   disabled = false,
@@ -89,6 +91,9 @@ export function MultiSelect({
 
   return (
     <div className="w-full">
+      <label  className="text-xs font-medium text-text">
+        {label}
+      </label>
       {/* Trigger */}
       <button
         ref={refs.setReference}
@@ -96,7 +101,6 @@ export function MultiSelect({
         disabled={disabled}
         {...getReferenceProps()}
         className={`${className ? className : "flex min-h-9 w-full items-center justify-between gap-2 rounded-full border border-border px-3 py-1 text-sm text-text transition hover:border-primary disabled:cursor-not-allowed disabled:opacity-50"}`}
-         
       >
         <div className="flex min-w-0 flex-1 flex-wrap gap-1.5">
           {selectedOptions.length === 0 ? (
