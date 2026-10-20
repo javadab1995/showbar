@@ -319,12 +319,20 @@ if (isLoading) {
               </span>
 
               <div className=" flex  items-baseline gap-1.5 mt-2">
-                <strong className="text-xl font-bold text-primary">
-                  {formatMoney(load.price)}
+                <strong className="text-xs font-bold md:text-sm">
+                  {load.pricing_type === "negotiable" ? (
+                    <span>توافقی</span>
+                  ) : (
+                    <>
+                      {formatMoney(load.price!)}
+                      <span className="mr-1 rounded-lg bg-border p-1 text-xs font-medium text-text-2">
+                        {load.price_type === "total"
+                          ? "قیمت کل"
+                          : "به ازای هر تن"}
+                      </span>
+                    </>
+                  )}
                 </strong>
-                <span className="text-text-2 text-xs mr-1 font-medium bg-border rounded-lg p-1">
-                  {load.price_type === "total" ? "قیمت کل" : "به ازای هر تن"}
-                </span>
               </div>
             </div>
 

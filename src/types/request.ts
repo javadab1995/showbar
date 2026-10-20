@@ -55,6 +55,7 @@ export type DriverRequestDetails = {
   };
 
   loads: {
+    pricing_type: "fixed" | "negotiable";
     id: string;
     origin: string;
     destination: string;

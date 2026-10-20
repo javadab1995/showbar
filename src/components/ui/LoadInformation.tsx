@@ -87,7 +87,19 @@ export function LoadInformation({ load }: LoadInformationProps) {
           value={load.loading_date ? toPersianDate(load.loading_date) : "-"}
         />
 
-        <LoadInfoItem label="کرایه" value={formatMoney(load.price, load.currency)} />
+        <LoadInfoItem label="کرایه"  value={
+                          <>
+                            <strong className="text-xl font-bold text-primary">
+                              {formatMoney(load.price, load.currency)}
+                            </strong>
+                            <span className="text-text-2 text-xs mr-1 font-medium bg-border rounded-lg p-1">
+                              {load.price_type === "total"
+                                ? "قیمت کل"
+                                : "به ازای هر تن"}
+                            </span>
+                          </>
+                        }
+                         />
 
         <LoadInfoItem
           label="تاریخ ثبت"

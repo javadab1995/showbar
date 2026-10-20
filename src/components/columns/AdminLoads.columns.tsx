@@ -56,8 +56,8 @@ export function createLoadColumns({
       key: "vehicle_type",
       title: "نوع ناوگان",
       render: (load) => {
-        return <VehicleLabel value={load.vehicle_type} />
-      }
+        return <VehicleLabel value={load.vehicle_type} />;
+      },
     },
 
     {
@@ -69,23 +69,25 @@ export function createLoadColumns({
     {
       key: "price",
       title: "کرایه",
-      render: (load) => { return (
+      render: (load) => (
         <span className="flex gap-0.5">
-          
-         {formatMoney(load.price, load.currency)}
-          <span className="text-text-2 text-xs mr-1 font-medium bg-border rounded-lg p-1">
-            {load.price_type === "total" ? "قیمت کل" : "به ازای هر تن"}
-          </span>
+          {load.pricing_type === "negotiable" ? (
+            "توافقی"
+          ) : (
+            <>
+              {formatMoney(load.price!, load.currency)}
+              <span className="mr-1 rounded-lg bg-border p-1 text-xs font-medium text-text-2">
+                {load.price_type === "total" ? "قیمت کل" : "به ازای هر تن"}
+              </span>
+            </>
+          )}
         </span>
-      ); },
+      ),
     },
-
     {
       key: "status",
       title: "وضعیت",
       render: (load) => {
-      
-
         return <StatusBadge status={load.status} />;
       },
     },
@@ -113,34 +115,34 @@ export function createLoadColumns({
               icon: Copy,
               onClick: () => onDuplicate(load.id),
             },
-           {
-  id: "status",
-  label: "تغییر وضعیت",
-  icon: RefreshCw,
-  children: [
-    {
-      id: "active",
-      label: "فعال",
-      onClick: () => onUpdateStatus(load.id, "active"),
-    },
-    {
-      id: "reserved",
-      label: "رزرو شده",
-      onClick: () => onUpdateStatus(load.id, "reserved"),
-    },
-    {
-      id: "completed",
-      label: "تکمیل شده",
-      onClick: () => onUpdateStatus(load.id, "completed"),
-    },
-    {
-      id: "cancelled",
-      label: "لغو شده",
-      danger: true,
-      onClick: () => onUpdateStatus(load.id, "cancelled"),
-    },
-  ],
-},
+            {
+              id: "status",
+              label: "تغییر وضعیت",
+              icon: RefreshCw,
+              children: [
+                {
+                  id: "active",
+                  label: "فعال",
+                  onClick: () => onUpdateStatus(load.id, "active"),
+                },
+                {
+                  id: "reserved",
+                  label: "رزرو شده",
+                  onClick: () => onUpdateStatus(load.id, "reserved"),
+                },
+                {
+                  id: "completed",
+                  label: "تکمیل شده",
+                  onClick: () => onUpdateStatus(load.id, "completed"),
+                },
+                {
+                  id: "cancelled",
+                  label: "لغو شده",
+                  danger: true,
+                  onClick: () => onUpdateStatus(load.id, "cancelled"),
+                },
+              ],
+            },
             {
               id: "archive",
               label: "انتقال به آرشیو",

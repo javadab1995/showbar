@@ -21,6 +21,8 @@ export type TrackRequestFormData = {
 };
 
 export type RequestHistoryLoad = {
+  pricing_type: "fixed" | "negotiable";
+
   id: string;
   origin: string;
   destination: string;
@@ -35,6 +37,7 @@ export type RequestHistoryLoad = {
   status: DriverRequestLoadStatus;
   currency: "IRR" | "USD";
   request_status: string;
+  price_type: "total" | "per_ton";
 };
 
 export type RequestHistoryVehicle = {

@@ -1,6 +1,9 @@
 import { getExitBorderLabels } from "../../helpers/exitBorders";
 import { formatMoney } from "../../helpers/formater";
-import { REQUEST_LOAD_STATUS_LABELS, RequestHistoryLoad } from "../../types/trackRequest.type";
+import {
+  REQUEST_LOAD_STATUS_LABELS,
+  RequestHistoryLoad,
+} from "../../types/trackRequest.type";
 import BorderLabel from "../labels/BorderLabel";
 
 type Props = {
@@ -68,9 +71,18 @@ export default function RequestLoadCard({ load }: Props) {
           {load.price && (
             <div>
               <span className="text-text/50">کرایه:</span>{" "}
-              <span className="font-medium">
-                {formatMoney(load.price, load.currency)}
-              </span>
+              <strong className="text-xs font-bold md:text-sm">
+                          {load.pricing_type === "negotiable" ? (
+                            <span>توافقی</span>
+                          ) : (
+                            <>
+                              {formatMoney(load.price!, load.currency)}
+                              <span className="mr-1 rounded-lg bg-border p-1 text-xs font-medium text-text-2">
+                                {load.price_type === "total" ? "قیمت کل" : "به ازای هر تن"}
+                              </span>
+                            </>
+                          )}
+                        </strong>
             </div>
           )}
         </div>

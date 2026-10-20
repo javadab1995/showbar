@@ -48,7 +48,14 @@ export const loadSchema = z
     exit_borders: z.array(z.string()).default([]),
     vehicle_type: z.string().min(1, "نوع ناوگان را انتخاب کنید"),
     weight: numberField("وزن الزامی است", "وزن باید بیشتر از صفر باشد"),
-    price: numberField("کرایه الزامی است", "کرایه باید بیشتر از صفر باشد"),
+    pricing_type: z.enum(["fixed", "negotiable"]),
+    price: z.preprocess((value) => {
+      if (value === "" || value === null || value === undefined) {
+        return undefined;
+      }
+
+      return Number(value);
+    }, z.number().positive("کرایه باید بیشتر از صفر باشد").optional()),
     price_type: z.enum(["total", "per_ton"]),
     loading_date: z.string().min(1, "تاریخ بارگیری الزامی است"),
     status: z
@@ -69,6 +76,14 @@ export const loadSchema = z
         code: z.ZodIssueCode.custom,
         path: ["exit_borders"],
         message: "حداقل یک مرز را انتخاب کنید",
+      });
+    }
+
+    if (data.pricing_type === "fixed" && data.price === undefined) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["price"],
+        message: "کرایه الزامی است",
       });
     }
   });

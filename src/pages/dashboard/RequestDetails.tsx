@@ -209,7 +209,7 @@ if (isError) {
     <div className="mx-auto max-w-5xl space-y-6">
       {/* Back */}
       <div>
-        <BackButton to="/admin/requests" title="بازگشت به درخواست ها" />
+        <BackButton to="/admin/requests" title="بازگشت به درخواست ها"  />
       </div>
 
       {/* Header */}
@@ -456,7 +456,11 @@ if (isError) {
 
                       <InfoRow
                         label="قیمت"
-                        value={formatMoney(load.price, load.currency)}
+                        value={
+                          load?.pricing_type === "negotiable"
+                            ? "توافقی"
+                            : formatMoney(load.price, load.currency)
+                        }
                       />
 
                       <InfoRow

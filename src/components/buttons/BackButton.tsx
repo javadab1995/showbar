@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 type LinkProps = {
   to: string;
   title?: string;
-  icon: Boolean;
+  icon?: Boolean;
 }
 
 export default function BackButton({to, title, icon=true}:LinkProps) {

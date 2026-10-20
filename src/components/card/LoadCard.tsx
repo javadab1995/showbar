@@ -104,10 +104,16 @@ export function LoadCard({ load, selected, onToggle }: LoadCardProps) {
         {/* Price + Status */}
         <div className="flex shrink-0 flex-col gap-1 md:min-w-42">
           <strong className="text-xs font-bold md:text-sm">
-            {formatMoney(load.price)}
-            <span className="text-text-2 text-xs mr-1 font-medium bg-border rounded-lg p-1">
-              {load.price_type === "total" ? "قیمت کل" : "به ازای هر تن"}
-            </span>
+            {load.pricing_type === "negotiable" ? (
+              <span>توافقی</span>
+            ) : (
+              <>
+                {formatMoney(load.price!)}
+                <span className="mr-1 rounded-lg bg-border p-1 text-xs font-medium text-text-2">
+                  {load.price_type === "total" ? "قیمت کل" : "به ازای هر تن"}
+                </span>
+              </>
+            )}
           </strong>
 
           <StatusBadge status={load.status} />

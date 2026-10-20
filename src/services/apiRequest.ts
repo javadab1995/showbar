@@ -219,6 +219,7 @@ export async function getRequestById(
           trade_type,
           weight,
           price,
+          pricing_type,
           cargo,
           currency,
           loading_date,
@@ -264,6 +265,7 @@ export async function getRequestById(
         trade_type: load.trade_type,
         weight: load.weight,
         price: load.price,
+        pricing_type: load.pricing_type,
         currency: load.currency,
         loading_date: load.loading_date,
 

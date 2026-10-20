@@ -125,6 +125,7 @@ export default function LoadForm() {
       weight: 0,
 
       price: 0,
+      pricing_type: "fixed",
       price_type: "total",
 
       currency: "IRR",
@@ -174,7 +175,8 @@ export default function LoadForm() {
 
       weight: load.weight ?? 0,
 
-      price: load.price ?? 0,
+      pricing_type: load.pricing_type ?? "fixed",
+      price: load.price ?? undefined,
       price_type: load.price_type ?? "total",
 
       currency: load.currency ?? "IRR",
@@ -198,6 +200,7 @@ export default function LoadForm() {
   const tradeType = watch("trade_type");
 
   const showBorder = tradeType === "export" || tradeType === "import";
+  const pricingType = watch("pricing_type");
 
   // ==================================================
   // Submit
@@ -205,6 +208,10 @@ export default function LoadForm() {
 
   const onSubmit: SubmitHandler<LoadFormData> = (data) => {
     if (!isOnline) {
+      return;
+    }
+
+    if (data.pricing_type === "fixed" && data.price == null) {
       return;
     }
 
@@ -237,7 +244,8 @@ export default function LoadForm() {
 
       weight: data.weight,
 
-      price: data.price,
+      price: data.pricing_type === "negotiable" ? null : data.price!,
+      pricing_type: data.pricing_type,
       price_type: data.price_type,
 
       currency: data.currency,
@@ -436,9 +444,7 @@ export default function LoadForm() {
             />
 
             {showBorder && (
-
               <Controller
-               
                 name="exit_borders"
                 control={control}
                 render={({ field }) => (
@@ -514,28 +520,41 @@ export default function LoadForm() {
             </div>
           </div>
 
-          <div className="mt-4 grid grid-cols-2 gap-6 ">
+          <div className="mt-4 grid grid-cols-1 gap-6 ">
             <FormSelect
-              label="ارز"
-              options={CURRENCY_OPTIONS}
-              {...register("currency")}
-              error={errors.currency?.message}
+              label="نحوه تعیین کرایه"
+              options={[
+                { label: "کرایه مشخص", value: "fixed" },
+                { label: "توافقی", value: "negotiable" },
+              ]}
+              {...register("pricing_type")}
+              error={errors.pricing_type?.message}
             />
+            {pricingType === "fixed" && (
+              <div className="mt-4 grid grid-cols-2 gap-6">
+                <FormSelect
+                  label="ارز"
+                  options={CURRENCY_OPTIONS}
+                  {...register("currency")}
+                  error={errors.currency?.message}
+                />
 
-            <FormInput
-              label="قیمت"
-              type="number"
-              placeholder="مثلاً 250000000"
-              {...register("price")}
-              error={errors.price?.message}
-            />
+                <FormInput
+                  label="قیمت"
+                  type="number"
+                  placeholder="مثلاً 250000000"
+                  {...register("price")}
+                  error={errors.price?.message}
+                />
 
-            <FormSelect
-              label="نوع قیمت"
-              options={PRICE_TYPE_OPTIONS}
-              {...register("price_type")}
-              error={errors.price_type?.message}
-            />
+                <FormSelect
+                  label="نوع قیمت"
+                  options={PRICE_TYPE_OPTIONS}
+                  {...register("price_type")}
+                  error={errors.price_type?.message}
+                />
+              </div>
+            )}
           </div>
         </section>
 

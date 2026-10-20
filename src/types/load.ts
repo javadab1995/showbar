@@ -73,7 +73,8 @@ export type LoadData = {
   exit_borders: string[];
 
   weight: number;
-  price: number;
+  price: number | null;
+  pricing_type: "fixed" | "negotiable";
   price_type: "total" | "per_ton";
   currency: Currency;
 
