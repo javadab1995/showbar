@@ -186,11 +186,9 @@ export function LoadFilters({
           onChange={(event) => handleOriginCountryChange(event.target.value)}
           className="
             h-7
-            
-            border-l border-border
             bg-transparent
             px-1
-           
+            rounded-full
             text-xs
             text-text
             outline-none
@@ -223,7 +221,7 @@ export function LoadFilters({
           rounded-full
           border
           border-border
-          bg-surface
+          
           p-1
         "
       >
@@ -234,8 +232,8 @@ export function LoadFilters({
           }
           className="
             h-7
+            rounded-full
             
-            border-l border-border
             bg-transparent
             px-1
            

@@ -15,6 +15,7 @@ import { SiWhatsapp } from "react-icons/si";
 import { useCompany } from "../../hooks/admin/useCompanies";
 import { useOnlineStatus } from "../../hooks/other/useOnlineStatus";
 import SEO from "../../components/seo/SEO";
+import { toPersianDigits } from "../../helpers/number";
 
 export default function Contact() {
   const isOnline = useOnlineStatus();
@@ -218,14 +219,14 @@ const socialLinks = [
               icon={<Phone size={22} />}
               title="تلفن پشتیبانی"
               description="پاسخگویی مستقیم به سوالات شما"
-              value={phone || "ثبت نشده"}
+              value={toPersianDigits(phone )|| "ثبت نشده"}
               href={phone ? `tel:${phone}` : undefined}
             />
             <ContactItem
               icon={<SiWhatsapp size={22} />}
               title="واتساپ صادرات"
               description="ارتباط با بخش صادرات"
-              value={whatsappExport || "ثبت نشده"}
+              value={toPersianDigits(whatsappExport) || "ثبت نشده"}
               href={whatsappExportUrl}
             />
 
@@ -233,7 +234,7 @@ const socialLinks = [
               icon={<SiWhatsapp size={22} />}
               title="واتساپ واردات"
               description="ارتباط با بخش واردات"
-              value={whatsappImport || "ثبت نشده"}
+              value={toPersianDigits(whatsappImport) || "ثبت نشده"}
               href={whatsappImportUrl}
             />
 

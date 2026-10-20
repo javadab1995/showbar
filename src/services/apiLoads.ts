@@ -1,6 +1,7 @@
 import { LoadStatus } from "../types/status";
 import type { Load, LoadData, LoadFilters } from "../types/load";
 import supabase from "./supabase";
+import { getTehranDate } from "../helpers/date";
 
 const PAGE_SIZE = 20;
 
@@ -47,28 +48,33 @@ export async function getLoads({
     );
   }
 
+  if (filters.origin_country_code) {
+    supabaseQuery = supabaseQuery.eq(
+      "origin_country_code",
+      filters.origin_country_code,
+    );
+  }
 
-if (filters.origin_country_code) {
-  supabaseQuery = supabaseQuery.eq("origin_country_code", filters.origin_country_code);
-}
+  if (filters.origin_city_geoname_id) {
+    supabaseQuery = supabaseQuery.eq(
+      "origin_city_geoname_id",
+      filters.origin_city_geoname_id,
+    );
+  }
 
-if (filters.origin_city_geoname_id) {
-  supabaseQuery = supabaseQuery.eq("origin_city_geoname_id", filters.origin_city_geoname_id);
-}
+  if (filters.destination_country_code) {
+    supabaseQuery = supabaseQuery.eq(
+      "destination_country_code",
+      filters.destination_country_code,
+    );
+  }
 
-if (filters.destination_country_code) {
-  supabaseQuery = supabaseQuery.eq(
-    "destination_country_code",
-    filters.destination_country_code,
-  );
-}
-
-if (filters.destination_city_geoname_id) {
-  supabaseQuery = supabaseQuery.eq(
-    "destination_city_geoname_id",
-    filters.destination_city_geoname_id,
-  );
-}
+  if (filters.destination_city_geoname_id) {
+    supabaseQuery = supabaseQuery.eq(
+      "destination_city_geoname_id",
+      filters.destination_city_geoname_id,
+    );
+  }
 
   // Trade Type
   if (filters.tradeType) {
@@ -212,13 +218,11 @@ export async function getAdminLoads({
     );
   }
 
-
   if (archived) {
     supabaseQuery = supabaseQuery.not("archived_at", "is", null);
   } else {
     supabaseQuery = supabaseQuery.is("archived_at", null);
   }
-
 
   // ======================================
   // Status
@@ -442,4 +446,25 @@ export async function restoreLoad(id: string) {
   }
 
   return data;
+}
+
+export async function archiveExpiredLoads(): Promise<number> {
+  const today = getTehranDate();
+
+  const { data, error } = await supabase
+    .from("loads")
+    .update({
+      archived_at: new Date().toISOString(),
+    })
+    .eq("status", "active")
+    .is("archived_at", null)
+    .lt("loading_date", today)
+    .select("id");
+
+  if (error) {
+    console.error("Archive expired loads error:", error);
+    throw error;
+  }
+
+  return data?.length ?? 0;
 }

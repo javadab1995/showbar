@@ -13,11 +13,18 @@ import ProtectedRoute from "../auth/ProtectedRoute";
 import SuperAdminRoute from "../auth/SuperAdminRoute";
 import NotFound from "../pages/NotFounde";
 
+
+
+
 const AdminLogin = lazy(() => import("../pages/dashboard/AdminLogin"));
 const UpdatePassword = lazy(() => import("../pages/dashboard/UpdatePassword"));
 
 const Dashboard = lazy(() => import("../pages/dashboard/Dashboard"));
 const AdminLoads = lazy(() => import("../pages/dashboard/AdminLoads"));
+const AdminPosts = lazy(() => import("../pages/dashboard/AdminPosts"));
+const AdminPostForm = lazy(() => import("../pages/dashboard/AdminPostForm"));
+const EditPost = lazy(() => import("../pages/dashboard/EditPost"));
+
 const AdminLoadDetails = lazy(
   () => import("../pages/dashboard/AdminLoadDetails"),
 );
@@ -60,6 +67,8 @@ const NotifyMe = lazy(() => import("../pages/home/NotifyMe"));
 const TrackRequest = lazy(() => import("../pages/home/Track"));
 
 const About = lazy(() => import("../pages/home/About"));
+const PostsPage = lazy(() => import("../pages/home/PostsPage"));
+const PostDetailsPage = lazy(() => import("../pages/home/PostDetailsPage"));
 
 const Contact = lazy(() => import("../pages/home/Contact"));
 
@@ -224,6 +233,31 @@ export const routes: RouteObject[] = [
               },
 
               {
+                path: "posts",
+                element: (
+                  <LazyPage>
+                    <AdminPosts />
+                  </LazyPage>
+                ),
+              },
+              {
+                path: "posts/new",
+                element: (
+                  <LazyPage>
+                    <AdminPostForm />
+                  </LazyPage>
+                ),
+              },
+              {
+                path: "posts/:id/edit",
+                element: (
+                  <LazyPage>
+                    <EditPost />
+                  </LazyPage>
+                ),
+              },
+
+              {
                 path: "status-guide",
                 element: (
                   <LazyPage>
@@ -339,6 +373,22 @@ export const routes: RouteObject[] = [
               </LazyPage>
             ),
           },
+          {
+            path: "posts",
+            element: (
+              <LazyPage>
+                <PostsPage />
+              </LazyPage>
+            ),
+          },
+          {
+            path: "posts/:slug",
+            element: (
+              <LazyPage>
+                <PostDetailsPage />
+              </LazyPage>
+            ),
+          },
 
           {
             path: "track",
@@ -364,6 +414,6 @@ export const routes: RouteObject[] = [
 
   {
     path: "*",
-    element:<NotFound />,
+    element: <NotFound />,
   },
 ];

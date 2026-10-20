@@ -4,6 +4,7 @@ import { SiWhatsapp } from "react-icons/si";
 
 import { useCompany } from "../../hooks/admin/useCompanies";
 import { useOnlineStatus } from "../../hooks/other/useOnlineStatus";
+import { toPersianDigits } from "../../helpers/number";
 
 export default function SupportButton() {
   const isOnline = useOnlineStatus();
@@ -121,7 +122,7 @@ export default function SupportButton() {
                       تماس با پشتیبانی
                     </span>
 
-                    <span className="text-xs text-text-2">{phone}</span>
+                    <span className="text-xs text-text-2">{toPersianDigits(phone)}</span>
                   </span>
                 </a>
               )}
@@ -153,7 +154,7 @@ export default function SupportButton() {
                     </span>
 
                     <span className="text-xs text-text-2" dir="ltr">
-                      {whatsappExport}
+                      {toPersianDigits(whatsappExport)}
                     </span>
                   </span>
                 </a>
@@ -186,7 +187,7 @@ export default function SupportButton() {
                     </span>
 
                     <span className="text-xs text-text-2" dir="ltr">
-                      {whatsappImport}
+                      {toPersianDigits(whatsappImport)}
                     </span>
                   </span>
                 </a>

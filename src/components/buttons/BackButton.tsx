@@ -3,9 +3,10 @@ import { Link } from 'react-router-dom';
 type LinkProps = {
   to: string;
   title?: string;
+  icon: Boolean;
 }
 
-export default function BackButton({to, title}:LinkProps) {
+export default function BackButton({to, title, icon=true}:LinkProps) {
   return (
 
       <Link
@@ -25,11 +26,11 @@ export default function BackButton({to, title}:LinkProps) {
            
           "
       >
-        <ChevronRight
+        {icon && <ChevronRight
           className="group-hover:translate-x-0.5 transition-all  duration-200
             ease-in-out"
           size={18}
-        />
+        />}
        {title}
       </Link>
     );

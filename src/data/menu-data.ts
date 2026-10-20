@@ -4,6 +4,7 @@ import {
   Info,
   LayoutDashboard,
   LucideUsers,
+  Newspaper,
   Settings,
   Truck,
   UserPlus,
@@ -24,8 +25,13 @@ export const navItems: NavItem[] = [
   { label: "رانندگان", path: "/admin/drivers", icon: Users },
 
   { label: "افزودن ادمین", path: "/admin/add-admin", icon: UserPlus },
-  { label: " ادمین ها", path: "/admin/users", icon:LucideUsers },
-  { label: "راهنما", path: "/admin/status-guide", icon:Info },
+  { label: " ادمین ها", path: "/admin/users", icon: LucideUsers },
+  { label: "راهنما", path: "/admin/status-guide", icon: Info },
   { label: "تنظیمات", path: "/admin/settings", icon: Settings },
+  {
+    label: "اخبار و مطالب",
+    path: "/admin/posts",
+    icon: Newspaper,
+  },
 ];
 

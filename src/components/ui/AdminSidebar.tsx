@@ -32,8 +32,8 @@ export const AdminSidebar = ({ mobileOpen, setMobileOpen }: SidebarProps) => {
         mobileOpen ? "translate-x-0" : "translate-x-full lg:translate-x-0"
       }`}
     >
-      <div className="h-full flex flex-col p-6">
-        <div className="flex items-center justify-between mb-10">
+      <div className="h-full flex flex-col px-6 py-2">
+        <div className="flex items-center justify-between mb-2">
          <Logo />
           <button
             className="lg:hidden p-2 text-text-2 hover:bg-surface-2 rounded-lg"
@@ -54,9 +54,9 @@ export const AdminSidebar = ({ mobileOpen, setMobileOpen }: SidebarProps) => {
             return (
               <button
                 key={item.path}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-medium ${
+                className={`w-full flex items-center gap-3 px-4 py-2 rounded-lg transition-all font-medium ${
                   active
-                    ? "bg-primary-radial text-surface shadow-lg shadow-primary/20"
+                    ? "bg-primary text-surface shadow-lg shadow-primary/20"
                     : "text-text-2 hover:bg-surface-2 hover:text-text"
                 }`}
                 onClick={() => {

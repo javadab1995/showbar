@@ -6,6 +6,7 @@ import { useBasket } from "../../contexts/BasketContext";
 import { Button } from "../buttons/Button";
 import ThemeToggle from "../ui/ThemeToggle";
 import Logo from "../ui/Logo";
+import { toPersianDigits } from "../../helpers/number";
 
 
 
@@ -48,6 +49,9 @@ export default function PublicHeader() {
         <NavLink to="/contact" className={navClass}>
           تماس با ما
         </NavLink>
+        <NavLink to="/posts" className={navClass}>
+          اخبار و بلاگ
+        </NavLink>
       </div>
 
       {/* Actions */}
@@ -64,7 +68,7 @@ export default function PublicHeader() {
 
           <span>سبد بار</span>
 
-          {basket.length > 0 && <b className="text-primary">{basket.length}</b>}
+          {basket.length > 0 && <b className="text-primary">{toPersianDigits(basket.length)}</b>}
         </NavLink>
       </div>
     </header>

@@ -1,4 +1,4 @@
-import { Plus, Search } from "lucide-react";
+import { Plus, RefreshCw, Search } from "lucide-react";
 import { useState } from "react";
 
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
@@ -20,6 +20,7 @@ import { ADMIN_PAGE_SIZE } from "../../services/apiLoads";
 import { createLoadColumns } from "../../components/columns/AdminLoads.columns";
 
 import { LoadStatus } from "../../types/status";
+import { useArchiveExpiredLoads } from "../../hooks/admin/useArchiveExpiredLoads";
 
 type LoadView = "active" | "archived";
 type LoadSort = "newest" | "oldest";
@@ -115,6 +116,19 @@ export default function AdminLoads() {
   // ======================================
 
   const loads = data?.data ?? [];
+
+  const { mutate: archiveExpiredLoads, isPending: isArchiving } =
+    useArchiveExpiredLoads();
+
+  const handleArchiveExpiredLoads = () => {
+    if (
+      !window.confirm("تمام بارهای فعال با تاریخ بارگیری گذشته آرشیو شوند؟")
+    ) {
+      return;
+    }
+
+    archiveExpiredLoads();
+  };
 
   // ======================================
   // Table Columns
@@ -239,34 +253,57 @@ export default function AdminLoads() {
             مدیریت و پیگیری همه بارهای ثبت‌شده
           </p>
         </div>
-
-        <Button
-          className="
-            hidden
-            h-12
+        <div className="flex items-center gap-4">
+          <Button
+            className="
+           
             max-w-48
             items-center
             justify-center
             rounded-md
             bg-primary-radial
-            p-2.5
+            p-1.5
             text-surface
             hover:opacity-90
             md:flex
           "
-        >
-          <Link
-            className="
+          >
+            <Link
+              className="
               flex
               items-center
               gap-2.5
             "
-            to="/admin/loads/new"
+              to="/admin/loads/new"
+            >
+              <Plus size={20} />
+              افزودن بار
+            </Link>
+          </Button>
+
+          <button
+            type="button"
+            onClick={handleArchiveExpiredLoads}
+            disabled={isArchiving}
+            className="border border-border
+            max-w-48
+            items-center
+            justify-center
+            rounded-md
+            p-1.5
+            text-text
+            hover:opacity-90
+            flex gap-4"
           >
-            <Plus size={20} />
-            افزودن بار
-          </Link>
-        </Button>
+            <span>
+              {isArchiving ? "در حال به‌روزرسانی..." : "به‌روزرسانی بارها"}
+            </span>
+            <RefreshCw
+              size={16}
+              className={isArchiving ? "animate-spin" : ""}
+            />
+          </button>
+        </div>
       </div>
 
       {/* ======================================
