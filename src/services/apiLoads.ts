@@ -432,10 +432,13 @@ export async function archiveLoad(id: string) {
 }
 
 export async function restoreLoad(id: string) {
+  const today = new Date().toLocaleDateString("en-CA");
+
   const { data, error } = await supabase
     .from("loads")
     .update({
       archived_at: null,
+      loading_date: today,
     })
     .eq("id", id)
     .select()
@@ -468,3 +471,4 @@ export async function archiveExpiredLoads(): Promise<number> {
 
   return data?.length ?? 0;
 }
+

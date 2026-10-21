@@ -21,6 +21,7 @@ import { createLoadColumns } from "../../components/columns/AdminLoads.columns";
 
 import { LoadStatus } from "../../types/status";
 import { useArchiveExpiredLoads } from "../../hooks/admin/useArchiveExpiredLoads";
+import { useRestoreLoad } from "../../hooks/admin/useRestoreLoad";
 
 type LoadView = "active" | "archived";
 type LoadSort = "newest" | "oldest";
@@ -108,6 +109,7 @@ export default function AdminLoads() {
   const duplicateMutation = useDuplicateLoad();
 
   const archivedMutation = useArchiveLoad();
+  const restoreMutation = useRestoreLoad();
 
   const updatedStatusMutation = useUpdateLoadStatus();
 
@@ -134,42 +136,37 @@ export default function AdminLoads() {
   // Table Columns
   // ======================================
 
-  const columns = createLoadColumns({
-    onView: (id) => {
-      navigate(`/admin/loads/${id}`);
-    },
+ const columns = createLoadColumns({
+   isArchived: archivedPage,
 
-    onEdit: (id) => {
-      navigate(`/admin/loads/${id}/edit`);
-    },
+   onView: (id) => {
+     navigate(`/admin/loads/${id}`);
+   },
 
-    onDuplicate: (id) => {
-      if (!isOnline) {
-        return;
-      }
+   onEdit: (id) => {
+     navigate(`/admin/loads/${id}/edit`);
+   },
 
-      duplicateMutation.mutate(id);
-    },
+   onDuplicate: (id) => {
+     if (!isOnline) return;
+     duplicateMutation.mutate(id);
+   },
 
-    onUpdateStatus: (id, status) => {
-      if (!isOnline) {
-        return;
-      }
+   onUpdateStatus: (id, status) => {
+     if (!isOnline) return;
+     updatedStatusMutation.mutate({ id, status });
+   },
 
-      updatedStatusMutation.mutate({
-        id,
-        status,
-      });
-    },
+   onArchived: (id) => {
+     if (!isOnline) return;
+     archivedMutation.mutate(id);
+   },
 
-    onArchived: (id) => {
-      if (!isOnline) {
-        return;
-      }
-
-      archivedMutation.mutate(id);
-    },
-  });
+   onRestore: (id) => {
+     if (!isOnline) return;
+     restoreMutation.mutate(id);
+   },
+ });
 
   // ======================================
   // Search

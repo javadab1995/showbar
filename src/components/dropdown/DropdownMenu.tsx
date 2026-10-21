@@ -1,12 +1,5 @@
-
-
-
 import { useState } from "react";
-import {
-  ChevronLeft,
-  MoreVertical,
-  type LucideIcon,
-} from "lucide-react";
+import { ChevronLeft, MoreVertical, type LucideIcon } from "lucide-react";
 
 import {
   useFloating,
@@ -28,6 +21,7 @@ interface DropdownItem {
   onClick?: () => void;
   danger?: boolean;
   warning?: boolean;
+  success?: boolean;
   disabled?: boolean;
   children?: DropdownItem[];
 }
@@ -36,9 +30,7 @@ interface DropdownMenuProps {
   items: DropdownItem[];
 }
 
-export default function DropdownMenu({
-  items = [],
-}: DropdownMenuProps) {
+export default function DropdownMenu({ items = [] }: DropdownMenuProps) {
   const [open, setOpen] = useState(false);
   const [submenu, setSubmenu] = useState<DropdownItem | null>(null);
   const { themeRoot } = useTheme();
@@ -54,26 +46,22 @@ export default function DropdownMenu({
     },
     placement: "bottom-end",
     whileElementsMounted: autoUpdate,
-    middleware: [
-      offset(8),
-      flip({ padding: 8 }),
-      shift({ padding: 8 }),
-    ],
+    middleware: [offset(8), flip({ padding: 8 }), shift({ padding: 8 })],
   });
 
   const click = useClick(context);
   const dismiss = useDismiss(context);
 
-  const { getReferenceProps, getFloatingProps } =
-    useInteractions([click, dismiss]);
+  const { getReferenceProps, getFloatingProps } = useInteractions([
+    click,
+    dismiss,
+  ]);
 
   const handleItemClick = (item: DropdownItem) => {
     if (item.disabled) return;
 
     if (item.children?.length) {
-      setSubmenu((current) =>
-        current?.id === item.id ? null : item,
-      );
+      setSubmenu((current) => (current?.id === item.id ? null : item));
       return;
     }
 
@@ -144,25 +132,25 @@ export default function DropdownMenu({
                         setSubmenu(null);
                       }}
                       className={`
-                        flex w-full items-center gap-2
-                        rounded-lg px-3 py-2.5
-                        text-sm transition
+  flex w-full items-center gap-2
+  rounded-lg px-3 py-2.5
+  text-sm transition
 
-                        ${item.danger ? "text-danger hover:bg-danger/10" : ""}
+  ${item.danger ? "text-danger hover:bg-danger/10" : ""}
 
-                        ${
-                          item.warning ? "text-warning hover:bg-warning/10" : ""
-                        }
+  ${item.warning ? "text-warning hover:bg-warning/10" : ""}
 
-                        ${
-                          !item.danger && !item.warning
-                            ? "text-text hover:bg-primary/5"
-                            : ""
-                        }
+  ${item.success ? "text-success hover:bg-success/10" : ""}
 
-                        disabled:pointer-events-none
-                        disabled:opacity-50
-                      `}
+  ${
+    !item.danger && !item.warning && !item.success
+      ? "text-text hover:bg-primary/5"
+      : ""
+  }
+
+  disabled:pointer-events-none
+  disabled:opacity-50
+`}
                     >
                       {Icon && <Icon size={16} />}
                       <span>{item.label}</span>
@@ -190,11 +178,13 @@ export default function DropdownMenu({
 
                       ${item.warning ? "text-warning hover:bg-warning/10" : ""}
 
-                      ${
-                        !item.danger && !item.warning
-                          ? "text-text hover:bg-primary/5"
-                          : ""
-                      }
+                     ${item.success ? "text-success hover:bg-success/10" : ""}
+
+${
+  !item.danger && !item.warning && !item.success
+    ? "text-text hover:bg-primary/5"
+    : ""
+}
 
                       disabled:pointer-events-none
                       disabled:opacity-50
@@ -217,4 +207,3 @@ export default function DropdownMenu({
     </>
   );
 }
-

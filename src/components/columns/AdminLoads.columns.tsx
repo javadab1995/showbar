@@ -1,4 +1,4 @@
-import {  Archive, ArrowLeft, Ban, Copy, Eye, Pencil, RefreshCw, Trash2 } from "lucide-react";
+import {  Archive, ArrowLeft, Ban, Copy, Eye, Pencil, RefreshCw, RotateCcw, Trash2 } from "lucide-react";
 
 
 
@@ -14,18 +14,20 @@ import { formatMoney } from "../../helpers/formater";
 import { LoadStatus } from "../../types/status";
 
 type LoadColumnActions = {
+  isArchived: boolean;
   onView: (id: string) => void;
   onEdit: (id: string) => void;
   onDuplicate: (id: string) => void;
-  onUpdateStatus: (id: string, status:LoadStatus) => void;
+  onUpdateStatus: (id: string, status: LoadStatus) => void;
   onArchived: (id: string) => void;
+  onRestore: (id: string) => void;
 };
 
 export function createLoadColumns({
   onView,
   onEdit,
   onDuplicate,
-  onArchived, onUpdateStatus
+  onArchived, onUpdateStatus, isArchived, onRestore
 }: LoadColumnActions): TableColumn<Load>[] {
   return [
     {
@@ -144,11 +146,13 @@ export function createLoadColumns({
               ],
             },
             {
-              id: "archive",
-              label: "انتقال به آرشیو",
-              icon: Archive,
-              warning: true,
-              onClick: () => onArchived(load.id),
+              id: isArchived ? "restore" : "archive",
+              label: isArchived ? "بازگردانی از آرشیو" : "انتقال به آرشیو",
+              icon: isArchived ? RotateCcw : Archive,
+              warning: !isArchived,
+              success:isArchived,
+              onClick: () =>
+                isArchived ? onRestore(load.id) : onArchived(load.id),
             },
           ]}
         />
