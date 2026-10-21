@@ -44,7 +44,7 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-      - name: Deploy application
+      - name: Deploy to VPS
         env:
           SSH_HOST: ${{ secrets.SSH_HOST }}
           SSH_PORT: ${{ secrets.SSH_PORT }}
@@ -57,10 +57,8 @@ jobs:
           ssh -vvv \
             -p "$SSH_PORT" \
             -o BatchMode=yes \
-            -o IdentitiesOnly=yes \
             -o ConnectTimeout=15 \
-            -o ServerAliveInterval=15 \
-            -o ServerAliveCountMax=2 \
+            -o KexAlgorithms=curve25519-sha256 \
             -o StrictHostKeyChecking=accept-new \
             "$SSH_USER@$SSH_HOST" \
             'echo "SSH connected successfully"; whoami; hostname'
@@ -71,6 +69,7 @@ jobs:
             -p "$SSH_PORT" \
             -o BatchMode=yes \
             -o ConnectTimeout=15 \
+            -o KexAlgorithms=curve25519-sha256 \
             -o StrictHostKeyChecking=accept-new \
             "$SSH_USER@$SSH_HOST" 'bash -se' <<'REMOTE'
           set -eu
