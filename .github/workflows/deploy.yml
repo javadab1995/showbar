@@ -51,10 +51,26 @@ jobs:
           SSH_USER: ${{ secrets.SSH_USER }}
         run: |
           set -eu
-          mkdir -p ~/.ssh
-          chmod 700 ~/.ssh
 
-          ssh -p "$SSH_PORT" \
+          echo "Testing SSH connection..."
+
+          ssh -vvv \
+            -p "$SSH_PORT" \
+            -o BatchMode=yes \
+            -o IdentitiesOnly=yes \
+            -o ConnectTimeout=15 \
+            -o ServerAliveInterval=15 \
+            -o ServerAliveCountMax=2 \
+            -o StrictHostKeyChecking=accept-new \
+            "$SSH_USER@$SSH_HOST" \
+            'echo "SSH connected successfully"; whoami; hostname'
+
+          echo "Starting deployment..."
+
+          ssh \
+            -p "$SSH_PORT" \
+            -o BatchMode=yes \
+            -o ConnectTimeout=15 \
             -o StrictHostKeyChecking=accept-new \
             "$SSH_USER@$SSH_HOST" 'bash -se' <<'REMOTE'
           set -eu
